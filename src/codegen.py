@@ -40,6 +40,8 @@ class CppCodegen:
             return f"({expr.op}{operand_str})"
         elif isinstance(expr, CastExpr):
             sub_expr = self.emit_expr(expr.expr)
+            if "*" in expr.target_type:
+                return f"(({expr.target_type})({sub_expr}))"
             return f"static_cast<{expr.target_type}>({sub_expr})"
         elif isinstance(expr, AssertNonNullExpr):
             sub_expr = self.emit_expr(expr.expr)
@@ -135,6 +137,11 @@ class CppCodegen:
                 lines.append(self.emit_stmt(s, indent_level + 1))
             lines.append(f"{ind}}}\n")
             return "".join(lines)
+        elif isinstance(stmt, SeqStmt):
+            lines = []
+            for s in stmt.statements:
+                lines.append(self.emit_stmt(s, indent_level))
+            return "".join(lines)
         elif isinstance(stmt, LetStmt):
             if stmt.destructure:
                 vars_str = ", ".join(stmt.destructure)
@@ -144,6 +151,9 @@ class CppCodegen:
             else:
                 qual = "" if stmt.is_mut else "const "
                 t_str = stmt.type_annotation if stmt.type_annotation else "auto"
+                if stmt.constructor_args is not None:
+                    cargs = ", ".join(self.emit_expr(a) for a in stmt.constructor_args)
+                    return f"{line_dir}{ind}{qual}{t_str} {stmt.name}({cargs});\n"
                 init_str = f" = {self.emit_expr(stmt.init_expr)}" if stmt.init_expr else ""
                 return f"{line_dir}{ind}{qual}{t_str} {stmt.name}{init_str};\n"
         elif isinstance(stmt, ReturnStmt):
@@ -217,7 +227,11 @@ class CppCodegen:
             return "".join(res)
         elif isinstance(stmt, ForEnumerateStmt):
             qual = "auto&" if stmt.is_mut else "const auto&"
-            iter_str = self.emit_expr(stmt.iter_expr)
+            iter_expr = stmt.iter_expr
+            if isinstance(iter_expr, CallExpr) and isinstance(iter_expr.callee, Identifier) and iter_expr.callee.name == "enumerate" and len(iter_expr.args) == 1:
+                iter_str = self.emit_expr(iter_expr.args[0])
+            else:
+                iter_str = self.emit_expr(iter_expr)
             res = [f"{line_dir}{ind}usize {stmt.idx_var} = 0;\n"]
             res.append(f"{ind}for ({qual} {stmt.val_var} : {iter_str}) if (bool _step_ = true) for (; _step_; _step_ = false, {stmt.idx_var}++) {{\n")
             for s in stmt.body.statements:
@@ -251,8 +265,8 @@ class CppCodegen:
                     body_lines.append(self.emit_stmt(s, indent_level + 1))
                 return f"{line_dir}{ind}auto {guard_name} = ::veloc::ScopeGuardHelper() + [&]() {{\n{''.join(body_lines)}{ind}}};\n"
             else:
-                body_str = self.emit_stmt(stmt.body, 0).strip()
-                return f"{line_dir}{ind}auto {guard_name} = ::veloc::ScopeGuardHelper() + [&]() {{ {body_str} }};\n"
+                body_lines = self.emit_stmt(stmt.body, indent_level + 1)
+                return f"{line_dir}{ind}auto {guard_name} = ::veloc::ScopeGuardHelper() + [&]() {{\n{body_lines}{ind}}};\n"
         elif isinstance(stmt, BenchStmt):
             res = [
                 f"{line_dir}{ind}{{\n",
@@ -361,7 +375,8 @@ class CppCodegen:
             lines.append("}\n")
             return "".join(lines)
         elif isinstance(decl, RawCppStmt):
-            line_dir = f'#line {decl.line} "{decl.file}"\n'
+            clean_file = decl.file.replace(chr(92), "/")
+            line_dir = f'#line {decl.line} "{clean_file}"\n'
             return f"{line_dir}{decl.code}\n\n"
         else:
             return ""

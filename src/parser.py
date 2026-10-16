@@ -7,8 +7,37 @@ from ast_nodes import *
 from diagnostics import DiagnosticReporter, Diagnostic, DiagnosticCode
 from codegen import CppCodegen
 
+def format_raw_tokens(tokens: List[Token]) -> str:
+    parts = []
+    for t in tokens:
+        if t.type == TokenType.STRING_LIT:
+            esc = t.value.replace("\n", "\\n").replace('"', '\\"')
+            parts.append(f'"{esc}"')
+        elif t.type == TokenType.CHAR_LIT:
+            parts.append(f"'{t.value}'")
+        else:
+            parts.append(t.value)
+    return " ".join(parts)
+
+def is_ident_token(t: Token) -> bool:
+    v = t.value
+    return bool(v) and (v[0].isalpha() or v[0] == '_') and all(c.isalnum() or c == '_' for c in v)
+
+def format_type_tokens(tokens: List[Token]) -> str:
+    res = []
+    for i, t in enumerate(tokens):
+        if i > 0:
+            prev = tokens[i-1]
+            if is_ident_token(prev) and is_ident_token(t):
+                res.append(" ")
+            elif prev.value in ("*", "&") and is_ident_token(t):
+                res.append(" ")
+        res.append(t.value)
+    return "".join(res)
+
 # Operator Precedence for Pratt Parser
 PRECEDENCE: Dict[TokenType, int] = {
+    TokenType.EQ: 5,           # =
     TokenType.PIPE: 10,        # |>
     TokenType.COALESCE: 20,    # ??
     TokenType.OR: 30,          # ||
@@ -169,7 +198,26 @@ class Parser:
             # Member access: left.member
             if op_tok.type == TokenType.DOT:
                 member_tok = self.expect(TokenType.IDENT, "Expected member name after '.'")
-                left = MemberAccessExpr(op_tok.line, op_tok.col, self.filename, object=left, member=member_tok.value)
+                member_name = member_tok.value
+                # Check for template arguments: member<T, ...>
+                if self.check(TokenType.LT):
+                    save_lt = self.pos
+                    self.advance() # <
+                    tmpl_parts = []
+                    depth = 1
+                    while not self.check(TokenType.EOF) and depth > 0:
+                        t = self.advance()
+                        if t.type == TokenType.LT: depth += 1
+                        elif t.type == TokenType.GT: depth -= 1
+                        elif t.type in (TokenType.SEMICOLON, TokenType.LBRACE): break
+                        if depth > 0:
+                            tmpl_parts.append(t)
+                    if depth == 0 and (self.check(TokenType.LPAREN) or self.check(TokenType.DOT)):
+                        tmpl_str = format_type_tokens(tmpl_parts)
+                        member_name += f"<{tmpl_str}>"
+                    else:
+                        self.pos = save_lt
+                left = MemberAccessExpr(op_tok.line, op_tok.col, self.filename, object=left, member=member_name)
                 continue
 
             # Indexing: left[index]
@@ -191,6 +239,12 @@ class Parser:
                 left = CallExpr(op_tok.line, op_tok.col, self.filename, callee=left, args=args)
                 continue
 
+            # Assignment operators: left = right (Right-associative)
+            if op_tok.type == TokenType.EQ:
+                right = self.parse_expr(prec - 1)
+                left = BinaryExpr(op_tok.line, op_tok.col, self.filename, left=left, op=op_tok.value, right=right)
+                continue
+
             # Standard binary expression
             right = self.parse_expr(prec)
             left = BinaryExpr(op_tok.line, op_tok.col, self.filename, left=left, op=op_tok.value, right=right)
@@ -200,8 +254,8 @@ class Parser:
     def parse_prefix(self) -> Expr:
         tok = self.current()
 
-        # Unary operators: +, -, !, ~, *
-        if tok.type in (TokenType.PLUS, TokenType.MINUS, TokenType.NOT, TokenType.BIT_NOT, TokenType.STAR):
+        # Unary operators: +, -, !, ~, *, &
+        if tok.type in (TokenType.PLUS, TokenType.MINUS, TokenType.NOT, TokenType.BIT_NOT, TokenType.STAR, TokenType.BIT_AND):
             self.advance()
             operand = self.parse_expr(140)
             return UnaryExpr(tok.line, tok.col, self.filename, op=tok.value, operand=operand)
@@ -212,14 +266,14 @@ class Parser:
             save_pos = self.pos
             self.advance() # (
             type_tokens = []
-            while not self.check(TokenType.RPAREN) and not self.check(TokenType.EOF) and len(type_tokens) < 5:
+            while self.current().type in (TokenType.IDENT, TokenType.STAR, TokenType.BIT_AND, TokenType.CONST, TokenType.COLON_COLON) and len(type_tokens) < 5:
                 t = self.advance()
                 type_tokens.append(t)
-            if self.check(TokenType.RPAREN):
+            if len(type_tokens) > 0 and self.check(TokenType.RPAREN):
                 self.advance() # )
                 # If next token can begin an expression or unary operator
                 if self.check(TokenType.IDENT) or self.check(TokenType.LPAREN) or self.check(TokenType.INT_LIT) or self.check(TokenType.FLOAT_LIT) or self.check(TokenType.STAR) or self.check(TokenType.PLUS) or self.check(TokenType.MINUS):
-                    type_str = "".join(t.value for t in type_tokens)
+                    type_str = format_type_tokens(type_tokens)
                     try:
                         operand = self.parse_expr(140)
                         return CastExpr(tok.line, tok.col, self.filename, expr=operand, target_type=type_str)
@@ -255,7 +309,7 @@ class Parser:
                     # Capture parameters and body as a lambda
                     lambda_toks = self.tokens[save_pos:self.pos]
                     if self.check(TokenType.LPAREN):
-                        self.advance() # (
+                        lambda_toks.append(self.advance()) # (
                         while not self.check(TokenType.RPAREN) and not self.check(TokenType.EOF):
                             lambda_toks.append(self.advance())
                         if self.check(TokenType.RPAREN):
@@ -353,12 +407,89 @@ class Parser:
     # ==========================================
     # Statement Parsing
     # ==========================================
+    def _format_prep_directive(self, tokens: List[Token]) -> str:
+        parts = []
+        for i, t in enumerate(tokens):
+            if t.type == TokenType.HASH:
+                parts.append("#")
+            elif i > 0 and (tokens[i-1].value in ("<", "#", ".") or t.value in (">", ".")):
+                parts.append(t.value)
+            elif t.type == TokenType.STRING_LIT:
+                parts.append(f'"{t.value}"')
+            else:
+                if parts and parts[-1] not in ("#", "<"):
+                    parts.append(" ")
+                parts.append(t.value)
+        return "".join(parts)
+
     def parse_stmt(self) -> Stmt:
         tok = self.current()
+
+        # Preprocessor directive statement: #pragma, etc.
+        if tok.type == TokenType.HASH:
+            prep_tokens = []
+            dir_line = tok.line
+            while not self.check(TokenType.EOF) and self.current().line == dir_line:
+                prep_tokens.append(self.advance())
+            return RawCppStmt(tok.line, tok.col, self.filename, code=self._format_prep_directive(prep_tokens))
 
         # Let statement: let [mut] [(a, b) | x[: type]] [= expr];
         if tok.type == TokenType.LET:
             return self.parse_let_stmt()
+
+        # C-style variable declaration: [const] type [*|&]* name [= init];
+        # e.g.: u8* hash_buf = ...; const usize N = 100; int x = 0;
+        is_const = False
+        save_pos = self.pos
+        if self.check(TokenType.CONST):
+            is_const = True
+            self.advance()
+        
+        if self.check(TokenType.IDENT):
+            type_tokens = [self.advance()]
+            while self.check(TokenType.STAR) or self.check(TokenType.BIT_AND) or (self.check(TokenType.COLON_COLON) and self.pos + 1 < len(self.tokens) and self.tokens[self.pos + 1].type == TokenType.IDENT):
+                type_tokens.append(self.advance())
+            if self.check(TokenType.LT):
+                type_tokens.append(self.advance())
+                depth = 1
+                while self.pos < len(self.tokens) and depth > 0:
+                    t = self.advance()
+                    type_tokens.append(t)
+                    if t.type == TokenType.LT: depth += 1
+                    elif t.type == TokenType.GT: depth -= 1
+                    elif t.type in (TokenType.SEMICOLON, TokenType.LBRACE): break
+            while self.check(TokenType.STAR) or self.check(TokenType.BIT_AND):
+                type_tokens.append(self.advance())
+            if self.check(TokenType.IDENT):
+                var_stmts = []
+                type_str = format_type_tokens(type_tokens)
+                while not self.check(TokenType.EOF):
+                    if not self.check(TokenType.IDENT):
+                        break
+                    var_name_tok = self.advance()
+                    init_expr = None
+                    cargs = None
+                    if self.match(TokenType.EQ):
+                        init_expr = self.parse_expr(0)
+                    elif self.match(TokenType.LPAREN):
+                        cargs = []
+                        if not self.check(TokenType.RPAREN):
+                            while True:
+                                cargs.append(self.parse_expr(0))
+                                if not self.match(TokenType.COMMA):
+                                    break
+                        self.expect(TokenType.RPAREN, "Expected ')' after constructor arguments")
+                    var_stmts.append(LetStmt(tok.line, tok.col, self.filename, name=var_name_tok.value,
+                                             type_annotation=type_str, is_mut=not is_const, init_expr=init_expr,
+                                             constructor_args=cargs))
+                    if self.match(TokenType.COMMA):
+                        continue
+                    break
+                if self.match(TokenType.SEMICOLON):
+                    if len(var_stmts) == 1:
+                        return var_stmts[0]
+                    return SeqStmt(tok.line, tok.col, self.filename, statements=var_stmts)
+        self.pos = save_pos
 
         # Return statement
         if tok.type == TokenType.RETURN:
@@ -564,6 +695,7 @@ class Parser:
         # Fallback to Raw C++ for loop
         raw_tokens = [start_tok]
         if has_paren:
+            raw_tokens.append(Token(TokenType.LPAREN, "(", start_tok.line, start_tok.col, 1, start_tok.file))
             paren_depth = 1
             while paren_depth > 0 and not self.check(TokenType.EOF):
                 t = self.advance()
@@ -572,7 +704,7 @@ class Parser:
                 elif t.type == TokenType.RPAREN: paren_depth -= 1
 
         body = self.parse_block()
-        raw_header = " ".join(t.value for t in raw_tokens)
+        raw_header = format_raw_tokens(raw_tokens)
         body_cpp = CppCodegen("<include>").emit_stmt(body)
         return RawCppStmt(start_tok.line, start_tok.col, self.filename, code=f"{raw_header} {body_cpp}")
 
@@ -649,7 +781,7 @@ class Parser:
             elif t.type == TokenType.SEMICOLON and brace_depth == 0:
                 break
 
-        raw_str = " ".join(t.value for t in raw_tokens)
+        raw_str = format_raw_tokens(raw_tokens)
         return RawCppStmt(start_tok.line, start_tok.col, self.filename, code=raw_str)
 
     # ==========================================
@@ -665,6 +797,14 @@ class Parser:
 
     def parse_decl(self) -> Optional[Decl]:
         tok = self.current()
+
+        # Preprocessor directive: #include, #define, #pragma, etc.
+        if tok.type == TokenType.HASH:
+            prep_tokens = []
+            dir_line = tok.line
+            while not self.check(TokenType.EOF) and self.current().line == dir_line:
+                prep_tokens.append(self.advance())
+            return RawCppStmt(tok.line, tok.col, self.filename, code=self._format_prep_directive(prep_tokens))
 
         # Module: module Name;
         if tok.type == TokenType.MODULE:
@@ -750,6 +890,48 @@ class Parser:
             return FnDecl(start_tok.line, start_tok.col, self.filename, name=name_tok.value,
                           params=params, return_type=ret_type, body=body, is_pub=is_pub)
 
+        # C-style function: [type] name(params) [-> ret] { ... } (e.g. int main(), void test())
+        if tok.type == TokenType.IDENT:
+            save_pos = self.pos
+            type_tokens = []
+            while self.pos < len(self.tokens) and self.current().type in (TokenType.IDENT, TokenType.STAR, TokenType.BIT_AND, TokenType.CONST):
+                type_tokens.append(self.advance())
+            if len(type_tokens) >= 1 and self.check(TokenType.LPAREN):
+                fn_name = type_tokens[-1].value
+                ret_type = format_type_tokens(type_tokens[:-1]) if len(type_tokens) > 1 else "auto"
+                self.advance() # consume '('
+                
+                params = []
+                if not self.check(TokenType.RPAREN):
+                    while not self.check(TokenType.EOF):
+                        param_tokens = []
+                        while not self.check(TokenType.COMMA) and not self.check(TokenType.RPAREN) and not self.check(TokenType.EOF):
+                            param_tokens.append(self.advance())
+                        if len(param_tokens) == 1:
+                            params.append(FnParam(param_tokens[0].line, param_tokens[0].col, self.filename,
+                                                  name=param_tokens[0].value, type_name="auto"))
+                        elif len(param_tokens) >= 2:
+                            name_p = param_tokens[-1]
+                            t_str = format_type_tokens(param_tokens[:-1])
+                            params.append(FnParam(name_p.line, name_p.col, self.filename,
+                                                  name=name_p.value, type_name=t_str))
+                        if not self.match(TokenType.COMMA):
+                            break
+                if self.check(TokenType.RPAREN):
+                    self.advance() # consume ')'
+                    if self.match(TokenType.THIN_ARROW):
+                        ret_parts = []
+                        while not self.check(TokenType.LBRACE) and not self.check(TokenType.EOF):
+                            ret_parts.append(self.advance().value)
+                        ret_type = " ".join(ret_parts)
+                    
+                    if self.check(TokenType.LBRACE):
+                        body = self.parse_block()
+                        return FnDecl(tok.line, tok.col, self.filename, name=fn_name,
+                                      params=params, return_type=ret_type, body=body, is_pub=is_pub)
+            # Not a function, backtrack
+            self.pos = save_pos
+
         # Top-level C++ statement / block (e.g. #include, typedef, standard struct, global variable)
         # Parse until balanced block or semicolon
         raw_tokens = []
@@ -766,5 +948,5 @@ class Parser:
             elif t.type == TokenType.SEMICOLON and brace_depth == 0:
                 break
 
-        raw_str = " ".join(t.value for t in raw_tokens)
+        raw_str = format_raw_tokens(raw_tokens)
         return RawCppStmt(tok.line, tok.col, self.filename, code=raw_str)

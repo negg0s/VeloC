@@ -121,12 +121,17 @@ class BlockStmt(Stmt):
     statements: List[Stmt] = field(default_factory=list)
 
 @dataclass
+class SeqStmt(Stmt):
+    statements: List[Stmt] = field(default_factory=list)
+
+@dataclass
 class LetStmt(Stmt):
     name: str = ""
     type_annotation: Optional[str] = None
     is_mut: bool = False
     init_expr: Optional[Expr] = None
     destructure: Optional[List[str]] = None
+    constructor_args: Optional[List[Expr]] = None
 
 @dataclass
 class ReturnStmt(Stmt):
