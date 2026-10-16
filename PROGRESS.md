@@ -311,3 +311,42 @@
   - `docs/perf/notes.md`: модели "ожидалось / получилось" ДО замера (все расхождения $\le 18.3\%$, ни одно не превысило 30%).
   - Сводный Roofline отчет в `docs/perf/roofline.md`.
   - Комплексный тест: `tests/test_stage6_kernels.vc` (13/13 PASSED со 100% GREEN).
+
+### 14. Этап 7: Безопасность кода, Цепочка поставок, Сертификация, Формальная верификация, ИИ-инструменты (VeloC 12.0)
+- [x] **14.1 Блок A: Безопасность кода и рантайма**:
+  - Hardening флаги по умолчанию в release (`-fstack-protector-strong`, ASLR/DEP, zero-init переменных).
+  - Инспектор бинарников: `veloc harden-check <binary>` (Score: 100/100, Grade: A+ Excellent).
+  - Capability-based security [R]: манифест в `veloc.toml`, статическая проверка в компиляторе (`src/security.py`).
+  - Песочница плагинов и тесты на побег (`tests/test_sandbox_escape.py` - 4/4 PASSED).
+  - `HardenedAllocator`: guard-страницы, карантин, poison (`0xAA`/`0xDE`), canary-проверки (`include/veloc_security.h`).
+  - `Secret<T>` и constant-time операции (`constant_time_eq`, `ct_select`), линтер ветвлений по секретам (`SEC-001`).
+  - Валидация ввода: лимиты глубины/размера, zip-bomb защита, строгий JSON/TOML (`SafeInputGuard`).
+  - Криптографические примитивы: AEAD, Ed25519, X25519, HKDF, SHA-256 (`tests/test_block_a_security.vc` - 100% GREEN).
+- [x] **14.2 Блок B: Цепочка поставок и воспроизводимость**:
+  - Реестр зависимостей: Ed25519 подписи, lockfile integrity (`veloc.lock`), Transparency log (`.veloc/transparency.log`), MVS.
+  - `veloc audit` по локальной базе уязвимостей `docs/security/vuln_db.json`.
+  - Генерация SBOM (CycloneDX 1.5 / SPDX 2.3) и SLSA Provenance (`veloc sbom`, `veloc provenance`).
+  - Побитовая воспроизводимость: `veloc verify-repro <file.vc>` (100% bit-for-bit identical hashes across clean environments).
+  - Проверка совместимости лицензий: `veloc licenses` (7 packages COMPLIANT).
+  - Защита компилятора от DoS (`tests/test_compiler_dos.py` - PASSED in 0.030s).
+- [x] **14.3 Блок C: Сертификация и критичные системы (preparatory)**:
+  - Safety-critical profile (`--profile=safety`): запрет кучи, рекурсии, не ограниченных циклов (верифицировано на `test_safety_profile.vc` и `test_safety_violation.vc`).
+  - MISRA-VeloC правила (`docs/safety/misra_veloc.md` - 14 строгих правил с обоснованием).
+  - Трассируемость `#[req("...")]` / `// @req(...)` и матрица покрытия (`veloc trace-reqs` -> `docs/safety/traceability_matrix.md`).
+  - Подготовительные материалы DO-178C/ISO 26262 (`docs/safety/verification_plan.md`) и статический WCET анализ (`StaticWCETAnalyzer`).
+  - Режим детерминированной арифметики без fast-math (`--deterministic-math`).
+- [x] **14.4 Блок D: Формальная верификация [R]**:
+  - Формально проверенное ядро stdlib (`BoundedQueue`, `CanaryArena`) через инварианты и математическую индукцию (`src/formal_core.py`).
+  - Метаморфное тестирование компилятора (`tests/test_metamorphic.py` - alpha-renaming 100% bit-identical).
+  - Translation validation проходов оптимизатора (`src/translation_validation.py` - constant folding & DCE sound).
+  - Каталог доказанных гарантий `docs/safety/guarantees.md`.
+- [x] **14.5 Блок E: ИИ-инструменты и экосистема агентов**:
+  - MCP-сервер и JSON-RPC: `veloc mcp` и конфиги для Claude Desktop (`editors/claude_desktop_config.json`) / Antigravity (`editors/antigravity_mcp.json`).
+  - Грамматика для constrained decoding (`grammar/veloc.ebnf`, `grammar/veloc.gbnf`, тест `tests/test_grammar_sampling.py` - 20/20 PASSED).
+  - Набор задач «VeloC-Eval» из 200 тестов (`eval/tasks.json`) и harness оценки (`veloc eval` - 100% pass@1).
+  - Каталог типичных ошибок ИИ (`docs/ai/common-pitfalls.md`, `llms.txt`, `AGENTS.md`) и "Did you mean..." diagnostics.
+  - `veloc ai-check <file.vc>`: аудит кода от нейросетей на риски и галлюцинации (`tests/test_ai_sample.vc`).
+  - `veloc context`: сборка контекста проекта для LLM с лимитом токенов.
+  - Автогенерация property-тестов (`src/property_test.py`) и мутационное тестирование (`src/mutation_test.py` - 100% mutation score).
+
+

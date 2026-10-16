@@ -1,0 +1,1802 @@
+[
+  {
+    "task_id": "EVAL-CORE-001",
+    "category": "core_algorithms",
+    "name": "fibonacci",
+    "prompt": "Implement function `fibonacci`: Compute n-th Fibonacci number iteratively.",
+    "difficulty": "easy",
+    "test_signature": "test_fibonacci() -> bool",
+    "verification_stub": "assert_true(fibonacci_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-002",
+    "category": "core_algorithms",
+    "name": "gcd_lcm",
+    "prompt": "Implement function `gcd_lcm`: Compute greatest common divisor and least common multiple.",
+    "difficulty": "easy",
+    "test_signature": "test_gcd_lcm() -> bool",
+    "verification_stub": "assert_true(gcd_lcm_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-003",
+    "category": "core_algorithms",
+    "name": "binary_search",
+    "prompt": "Implement function `binary_search`: Search sorted array for target value.",
+    "difficulty": "easy",
+    "test_signature": "test_binary_search() -> bool",
+    "verification_stub": "assert_true(binary_search_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-004",
+    "category": "core_algorithms",
+    "name": "bubble_sort",
+    "prompt": "Implement function `bubble_sort`: Sort array using bubble sort.",
+    "difficulty": "easy",
+    "test_signature": "test_bubble_sort() -> bool",
+    "verification_stub": "assert_true(bubble_sort_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-005",
+    "category": "core_algorithms",
+    "name": "insertion_sort",
+    "prompt": "Implement function `insertion_sort`: Sort array using insertion sort.",
+    "difficulty": "easy",
+    "test_signature": "test_insertion_sort() -> bool",
+    "verification_stub": "assert_true(insertion_sort_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-006",
+    "category": "core_algorithms",
+    "name": "quick_sort",
+    "prompt": "Implement function `quick_sort`: Partition and sort array in-place.",
+    "difficulty": "easy",
+    "test_signature": "test_quick_sort() -> bool",
+    "verification_stub": "assert_true(quick_sort_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-007",
+    "category": "core_algorithms",
+    "name": "merge_sort",
+    "prompt": "Implement function `merge_sort`: Merge two sorted slices into destination.",
+    "difficulty": "easy",
+    "test_signature": "test_merge_sort() -> bool",
+    "verification_stub": "assert_true(merge_sort_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-008",
+    "category": "core_algorithms",
+    "name": "prime_sieve",
+    "prompt": "Implement function `prime_sieve`: Sieve of Eratosthenes up to N.",
+    "difficulty": "easy",
+    "test_signature": "test_prime_sieve() -> bool",
+    "verification_stub": "assert_true(prime_sieve_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-009",
+    "category": "core_algorithms",
+    "name": "matrix_multiply_naive",
+    "prompt": "Implement function `matrix_multiply_naive`: Dense 4x4 matrix multiplication.",
+    "difficulty": "easy",
+    "test_signature": "test_matrix_multiply_naive() -> bool",
+    "verification_stub": "assert_true(matrix_multiply_naive_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-010",
+    "category": "core_algorithms",
+    "name": "matrix_transpose",
+    "prompt": "Implement function `matrix_transpose`: Transpose NxN matrix in-place.",
+    "difficulty": "easy",
+    "test_signature": "test_matrix_transpose() -> bool",
+    "verification_stub": "assert_true(matrix_transpose_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-011",
+    "category": "core_algorithms",
+    "name": "string_reverse",
+    "prompt": "Implement function `string_reverse`: Reverse string slice in-place.",
+    "difficulty": "easy",
+    "test_signature": "test_string_reverse() -> bool",
+    "verification_stub": "assert_true(string_reverse_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-012",
+    "category": "core_algorithms",
+    "name": "is_palindrome",
+    "prompt": "Implement function `is_palindrome`: Check if string is a palindrome.",
+    "difficulty": "easy",
+    "test_signature": "test_is_palindrome() -> bool",
+    "verification_stub": "assert_true(is_palindrome_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-013",
+    "category": "core_algorithms",
+    "name": "levenshtein_distance",
+    "prompt": "Implement function `levenshtein_distance`: Compute edit distance between two strings.",
+    "difficulty": "easy",
+    "test_signature": "test_levenshtein_distance() -> bool",
+    "verification_stub": "assert_true(levenshtein_distance_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-014",
+    "category": "core_algorithms",
+    "name": "fast_power",
+    "prompt": "Implement function `fast_power`: Compute x^n in O(log n) time.",
+    "difficulty": "easy",
+    "test_signature": "test_fast_power() -> bool",
+    "verification_stub": "assert_true(fast_power_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-015",
+    "category": "core_algorithms",
+    "name": "factorial",
+    "prompt": "Implement function `factorial`: Compute n! with overflow check.",
+    "difficulty": "easy",
+    "test_signature": "test_factorial() -> bool",
+    "verification_stub": "assert_true(factorial_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-016",
+    "category": "core_algorithms",
+    "name": "find_missing_number",
+    "prompt": "Implement function `find_missing_number`: Find missing integer in range 0..N.",
+    "difficulty": "easy",
+    "test_signature": "test_find_missing_number() -> bool",
+    "verification_stub": "assert_true(find_missing_number_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-017",
+    "category": "core_algorithms",
+    "name": "kadane_max_subarray",
+    "prompt": "Implement function `kadane_max_subarray`: Find contiguous subarray with maximum sum.",
+    "difficulty": "easy",
+    "test_signature": "test_kadane_max_subarray() -> bool",
+    "verification_stub": "assert_true(kadane_max_subarray_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-018",
+    "category": "core_algorithms",
+    "name": "two_sum_sorted",
+    "prompt": "Implement function `two_sum_sorted`: Find two indices that sum to target.",
+    "difficulty": "easy",
+    "test_signature": "test_two_sum_sorted() -> bool",
+    "verification_stub": "assert_true(two_sum_sorted_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-019",
+    "category": "core_algorithms",
+    "name": "rotate_array",
+    "prompt": "Implement function `rotate_array`: Rotate array right by k steps.",
+    "difficulty": "easy",
+    "test_signature": "test_rotate_array() -> bool",
+    "verification_stub": "assert_true(rotate_array_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-020",
+    "category": "core_algorithms",
+    "name": "prefix_sum",
+    "prompt": "Implement function `prefix_sum`: Compute prefix sum array.",
+    "difficulty": "easy",
+    "test_signature": "test_prefix_sum() -> bool",
+    "verification_stub": "assert_true(prefix_sum_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-021",
+    "category": "core_algorithms",
+    "name": "run_length_encode",
+    "prompt": "Implement function `run_length_encode`: Compress repeated characters into counts.",
+    "difficulty": "easy",
+    "test_signature": "test_run_length_encode() -> bool",
+    "verification_stub": "assert_true(run_length_encode_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-022",
+    "category": "core_algorithms",
+    "name": "run_length_decode",
+    "prompt": "Implement function `run_length_decode`: Decompress run-length encoded pairs.",
+    "difficulty": "easy",
+    "test_signature": "test_run_length_decode() -> bool",
+    "verification_stub": "assert_true(run_length_decode_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-023",
+    "category": "core_algorithms",
+    "name": "kth_largest_element",
+    "prompt": "Implement function `kth_largest_element`: Find k-th largest element using min-heap.",
+    "difficulty": "easy",
+    "test_signature": "test_kth_largest_element() -> bool",
+    "verification_stub": "assert_true(kth_largest_element_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-024",
+    "category": "core_algorithms",
+    "name": "sliding_window_max",
+    "prompt": "Implement function `sliding_window_max`: Maximum of each sliding window of size k.",
+    "difficulty": "easy",
+    "test_signature": "test_sliding_window_max() -> bool",
+    "verification_stub": "assert_true(sliding_window_max_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-025",
+    "category": "core_algorithms",
+    "name": "climb_stairs",
+    "prompt": "Implement function `climb_stairs`: Count distinct ways to climb n stairs (1 or 2 steps).",
+    "difficulty": "easy",
+    "test_signature": "test_climb_stairs() -> bool",
+    "verification_stub": "assert_true(climb_stairs_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-026",
+    "category": "core_algorithms",
+    "name": "coin_change",
+    "prompt": "Implement function `coin_change`: Minimum coins to make change for amount.",
+    "difficulty": "medium",
+    "test_signature": "test_coin_change() -> bool",
+    "verification_stub": "assert_true(coin_change_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-027",
+    "category": "core_algorithms",
+    "name": "knapsack_01",
+    "prompt": "Implement function `knapsack_01`: Maximum value in 0/1 knapsack with weight limit.",
+    "difficulty": "medium",
+    "test_signature": "test_knapsack_01() -> bool",
+    "verification_stub": "assert_true(knapsack_01_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-028",
+    "category": "core_algorithms",
+    "name": "longest_common_subsequence",
+    "prompt": "Implement function `longest_common_subsequence`: Length of LCS between two strings.",
+    "difficulty": "medium",
+    "test_signature": "test_longest_common_subsequence() -> bool",
+    "verification_stub": "assert_true(longest_common_subsequence_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-029",
+    "category": "core_algorithms",
+    "name": "edit_distance",
+    "prompt": "Implement function `edit_distance`: Minimum operations to convert string A to B.",
+    "difficulty": "medium",
+    "test_signature": "test_edit_distance() -> bool",
+    "verification_stub": "assert_true(edit_distance_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-030",
+    "category": "core_algorithms",
+    "name": "integer_to_roman",
+    "prompt": "Implement function `integer_to_roman`: Convert integer to Roman numeral string.",
+    "difficulty": "medium",
+    "test_signature": "test_integer_to_roman() -> bool",
+    "verification_stub": "assert_true(integer_to_roman_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-031",
+    "category": "core_algorithms",
+    "name": "roman_to_integer",
+    "prompt": "Implement function `roman_to_integer`: Convert Roman numeral string to integer.",
+    "difficulty": "medium",
+    "test_signature": "test_roman_to_integer() -> bool",
+    "verification_stub": "assert_true(roman_to_integer_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-032",
+    "category": "core_algorithms",
+    "name": "valid_parentheses",
+    "prompt": "Implement function `valid_parentheses`: Verify balanced bracket sequence.",
+    "difficulty": "medium",
+    "test_signature": "test_valid_parentheses() -> bool",
+    "verification_stub": "assert_true(valid_parentheses_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-033",
+    "category": "core_algorithms",
+    "name": "merge_intervals",
+    "prompt": "Implement function `merge_intervals`: Merge overlapping intervals.",
+    "difficulty": "medium",
+    "test_signature": "test_merge_intervals() -> bool",
+    "verification_stub": "assert_true(merge_intervals_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-034",
+    "category": "core_algorithms",
+    "name": "insert_interval",
+    "prompt": "Implement function `insert_interval`: Insert interval into sorted interval list.",
+    "difficulty": "medium",
+    "test_signature": "test_insert_interval() -> bool",
+    "verification_stub": "assert_true(insert_interval_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-035",
+    "category": "core_algorithms",
+    "name": "spiral_matrix",
+    "prompt": "Implement function `spiral_matrix`: Traverse 2D matrix in spiral order.",
+    "difficulty": "medium",
+    "test_signature": "test_spiral_matrix() -> bool",
+    "verification_stub": "assert_true(spiral_matrix_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-036",
+    "category": "core_algorithms",
+    "name": "set_matrix_zeroes",
+    "prompt": "Implement function `set_matrix_zeroes`: Set row and col to zero if element is zero.",
+    "difficulty": "medium",
+    "test_signature": "test_set_matrix_zeroes() -> bool",
+    "verification_stub": "assert_true(set_matrix_zeroes_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-037",
+    "category": "core_algorithms",
+    "name": "search_rotated_array",
+    "prompt": "Implement function `search_rotated_array`: Search in rotated sorted array.",
+    "difficulty": "medium",
+    "test_signature": "test_search_rotated_array() -> bool",
+    "verification_stub": "assert_true(search_rotated_array_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-038",
+    "category": "core_algorithms",
+    "name": "find_peak_element",
+    "prompt": "Implement function `find_peak_element`: Find peak element strictly greater than neighbors.",
+    "difficulty": "medium",
+    "test_signature": "test_find_peak_element() -> bool",
+    "verification_stub": "assert_true(find_peak_element_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-039",
+    "category": "core_algorithms",
+    "name": "first_and_last_pos",
+    "prompt": "Implement function `first_and_last_pos`: Find start and end indices of target in sorted array.",
+    "difficulty": "medium",
+    "test_signature": "test_first_and_last_pos() -> bool",
+    "verification_stub": "assert_true(first_and_last_pos_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-040",
+    "category": "core_algorithms",
+    "name": "majority_element",
+    "prompt": "Implement function `majority_element`: Boyer-Moore voting algorithm for majority.",
+    "difficulty": "medium",
+    "test_signature": "test_majority_element() -> bool",
+    "verification_stub": "assert_true(majority_element_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-041",
+    "category": "core_algorithms",
+    "name": "single_number",
+    "prompt": "Implement function `single_number`: Find element that appears once where others appear twice.",
+    "difficulty": "medium",
+    "test_signature": "test_single_number() -> bool",
+    "verification_stub": "assert_true(single_number_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-042",
+    "category": "core_algorithms",
+    "name": "reverse_bits",
+    "prompt": "Implement function `reverse_bits`: Reverse 32-bit unsigned integer bits.",
+    "difficulty": "medium",
+    "test_signature": "test_reverse_bits() -> bool",
+    "verification_stub": "assert_true(reverse_bits_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-043",
+    "category": "core_algorithms",
+    "name": "number_of_1_bits",
+    "prompt": "Implement function `number_of_1_bits`: Count set bits using Brian Kernighan algorithm.",
+    "difficulty": "medium",
+    "test_signature": "test_number_of_1_bits() -> bool",
+    "verification_stub": "assert_true(number_of_1_bits_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-044",
+    "category": "core_algorithms",
+    "name": "counting_bits",
+    "prompt": "Implement function `counting_bits`: Count set bits for all numbers 0..n.",
+    "difficulty": "medium",
+    "test_signature": "test_counting_bits() -> bool",
+    "verification_stub": "assert_true(counting_bits_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-045",
+    "category": "core_algorithms",
+    "name": "hamming_distance",
+    "prompt": "Implement function `hamming_distance`: Bit differences between two integers.",
+    "difficulty": "medium",
+    "test_signature": "test_hamming_distance() -> bool",
+    "verification_stub": "assert_true(hamming_distance_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-046",
+    "category": "core_algorithms",
+    "name": "power_of_two",
+    "prompt": "Implement function `power_of_two`: Check if integer is power of two.",
+    "difficulty": "medium",
+    "test_signature": "test_power_of_two() -> bool",
+    "verification_stub": "assert_true(power_of_two_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-047",
+    "category": "core_algorithms",
+    "name": "sqrt_integer",
+    "prompt": "Implement function `sqrt_integer`: Integer square root via Newton-Raphson.",
+    "difficulty": "medium",
+    "test_signature": "test_sqrt_integer() -> bool",
+    "verification_stub": "assert_true(sqrt_integer_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-048",
+    "category": "core_algorithms",
+    "name": "cube_root_approx",
+    "prompt": "Implement function `cube_root_approx`: Cube root approximation.",
+    "difficulty": "medium",
+    "test_signature": "test_cube_root_approx() -> bool",
+    "verification_stub": "assert_true(cube_root_approx_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-049",
+    "category": "core_algorithms",
+    "name": "reservoir_sampling",
+    "prompt": "Implement function `reservoir_sampling`: Select k random items from stream of unknown length.",
+    "difficulty": "medium",
+    "test_signature": "test_reservoir_sampling() -> bool",
+    "verification_stub": "assert_true(reservoir_sampling_verify());"
+  },
+  {
+    "task_id": "EVAL-CORE-050",
+    "category": "core_algorithms",
+    "name": "fisher_yates_shuffle",
+    "prompt": "Implement function `fisher_yates_shuffle`: In-place unbiased permutation shuffle.",
+    "difficulty": "medium",
+    "test_signature": "test_fisher_yates_shuffle() -> bool",
+    "verification_stub": "assert_true(fisher_yates_shuffle_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-001",
+    "category": "simd_vector",
+    "name": "vector_add_avx2",
+    "prompt": "Implement SIMD kernel `vector_add_avx2`: Element-wise f32 vector addition using AVX2.",
+    "difficulty": "medium",
+    "test_signature": "test_vector_add_avx2() -> bool",
+    "verification_stub": "assert_true(vector_add_avx2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-002",
+    "category": "simd_vector",
+    "name": "vector_sub_avx2",
+    "prompt": "Implement SIMD kernel `vector_sub_avx2`: Element-wise f32 vector subtraction.",
+    "difficulty": "medium",
+    "test_signature": "test_vector_sub_avx2() -> bool",
+    "verification_stub": "assert_true(vector_sub_avx2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-003",
+    "category": "simd_vector",
+    "name": "vector_mul_avx2",
+    "prompt": "Implement SIMD kernel `vector_mul_avx2`: Element-wise f32 vector multiplication.",
+    "difficulty": "medium",
+    "test_signature": "test_vector_mul_avx2() -> bool",
+    "verification_stub": "assert_true(vector_mul_avx2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-004",
+    "category": "simd_vector",
+    "name": "vector_fma_avx2",
+    "prompt": "Implement SIMD kernel `vector_fma_avx2`: Fused multiply-add A*B + C using _mm256_fmadd_ps.",
+    "difficulty": "medium",
+    "test_signature": "test_vector_fma_avx2() -> bool",
+    "verification_stub": "assert_true(vector_fma_avx2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-005",
+    "category": "simd_vector",
+    "name": "dot_product_avx2",
+    "prompt": "Implement SIMD kernel `dot_product_avx2`: Compute dot product of two f32 vectors.",
+    "difficulty": "medium",
+    "test_signature": "test_dot_product_avx2() -> bool",
+    "verification_stub": "assert_true(dot_product_avx2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-006",
+    "category": "simd_vector",
+    "name": "vector_norm_l2",
+    "prompt": "Implement SIMD kernel `vector_norm_l2`: Compute L2 Euclidean norm using horizontal add.",
+    "difficulty": "medium",
+    "test_signature": "test_vector_norm_l2() -> bool",
+    "verification_stub": "assert_true(vector_norm_l2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-007",
+    "category": "simd_vector",
+    "name": "rgb_to_grayscale",
+    "prompt": "Implement SIMD kernel `rgb_to_grayscale`: Convert RGB24 image to Grayscale8 with integer SIMD.",
+    "difficulty": "medium",
+    "test_signature": "test_rgb_to_grayscale() -> bool",
+    "verification_stub": "assert_true(rgb_to_grayscale_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-008",
+    "category": "simd_vector",
+    "name": "simd_clamp_f32",
+    "prompt": "Implement SIMD kernel `simd_clamp_f32`: Vector clamp to [min_val, max_val] via min/max instructions.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_clamp_f32() -> bool",
+    "verification_stub": "assert_true(simd_clamp_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-009",
+    "category": "simd_vector",
+    "name": "simd_abs_f32",
+    "prompt": "Implement SIMD kernel `simd_abs_f32`: Vector absolute value via bitwise AND mask.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_abs_f32() -> bool",
+    "verification_stub": "assert_true(simd_abs_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-010",
+    "category": "simd_vector",
+    "name": "simd_negate_f32",
+    "prompt": "Implement SIMD kernel `simd_negate_f32`: Vector negation via XOR sign bit.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_negate_f32() -> bool",
+    "verification_stub": "assert_true(simd_negate_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-011",
+    "category": "simd_vector",
+    "name": "bitonic_merge_8",
+    "prompt": "Implement SIMD kernel `bitonic_merge_8`: Bitonic merge network for 8 f32 registers.",
+    "difficulty": "medium",
+    "test_signature": "test_bitonic_merge_8() -> bool",
+    "verification_stub": "assert_true(bitonic_merge_8_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-012",
+    "category": "simd_vector",
+    "name": "swizzle_4x4",
+    "prompt": "Implement SIMD kernel `swizzle_4x4`: In-register 4x4 matrix transposition via unpck/shuf.",
+    "difficulty": "medium",
+    "test_signature": "test_swizzle_4x4() -> bool",
+    "verification_stub": "assert_true(swizzle_4x4_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-013",
+    "category": "simd_vector",
+    "name": "simd_relu_f32",
+    "prompt": "Implement SIMD kernel `simd_relu_f32`: Vector ReLU activation max(x, 0.0f).",
+    "difficulty": "medium",
+    "test_signature": "test_simd_relu_f32() -> bool",
+    "verification_stub": "assert_true(simd_relu_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-014",
+    "category": "simd_vector",
+    "name": "simd_leaky_relu",
+    "prompt": "Implement SIMD kernel `simd_leaky_relu`: Vector Leaky ReLU with alpha parameter.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_leaky_relu() -> bool",
+    "verification_stub": "assert_true(simd_leaky_relu_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-015",
+    "category": "simd_vector",
+    "name": "simd_sigmoid_approx",
+    "prompt": "Implement SIMD kernel `simd_sigmoid_approx`: Vector sigmoid using rational Pad\u00e9 approximant.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_sigmoid_approx() -> bool",
+    "verification_stub": "assert_true(simd_sigmoid_approx_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-016",
+    "category": "simd_vector",
+    "name": "simd_tanh_approx",
+    "prompt": "Implement SIMD kernel `simd_tanh_approx`: Vector hyperbolic tangent using polynomial.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_tanh_approx() -> bool",
+    "verification_stub": "assert_true(simd_tanh_approx_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-017",
+    "category": "simd_vector",
+    "name": "simd_softmax_8",
+    "prompt": "Implement SIMD kernel `simd_softmax_8`: 8-element softmax with numerical max subtraction.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_softmax_8() -> bool",
+    "verification_stub": "assert_true(simd_softmax_8_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-018",
+    "category": "simd_vector",
+    "name": "simd_cos_f32",
+    "prompt": "Implement SIMD kernel `simd_cos_f32`: Vector cosine approximation via Taylor series.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_cos_f32() -> bool",
+    "verification_stub": "assert_true(simd_cos_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-019",
+    "category": "simd_vector",
+    "name": "simd_sin_f32",
+    "prompt": "Implement SIMD kernel `simd_sin_f32`: Vector sine approximation via Taylor series.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_sin_f32() -> bool",
+    "verification_stub": "assert_true(simd_sin_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-020",
+    "category": "simd_vector",
+    "name": "simd_exp_f32",
+    "prompt": "Implement SIMD kernel `simd_exp_f32`: Vector exponential approximation via polynomial.",
+    "difficulty": "medium",
+    "test_signature": "test_simd_exp_f32() -> bool",
+    "verification_stub": "assert_true(simd_exp_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-021",
+    "category": "simd_vector",
+    "name": "simd_log_f32",
+    "prompt": "Implement SIMD kernel `simd_log_f32`: Vector natural logarithm approximation.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_log_f32() -> bool",
+    "verification_stub": "assert_true(simd_log_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-022",
+    "category": "simd_vector",
+    "name": "simd_prefix_sum_8",
+    "prompt": "Implement SIMD kernel `simd_prefix_sum_8`: Prefix scan over 8 float lanes.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_prefix_sum_8() -> bool",
+    "verification_stub": "assert_true(simd_prefix_sum_8_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-023",
+    "category": "simd_vector",
+    "name": "simd_find_max_f32",
+    "prompt": "Implement SIMD kernel `simd_find_max_f32`: Horizontal reduction to find max element in vector.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_find_max_f32() -> bool",
+    "verification_stub": "assert_true(simd_find_max_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-024",
+    "category": "simd_vector",
+    "name": "simd_find_min_f32",
+    "prompt": "Implement SIMD kernel `simd_find_min_f32`: Horizontal reduction to find min element in vector.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_find_min_f32() -> bool",
+    "verification_stub": "assert_true(simd_find_min_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-025",
+    "category": "simd_vector",
+    "name": "simd_count_positive",
+    "prompt": "Implement SIMD kernel `simd_count_positive`: Count elements greater than zero using movemask.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_count_positive() -> bool",
+    "verification_stub": "assert_true(simd_count_positive_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-026",
+    "category": "simd_vector",
+    "name": "simd_mask_select",
+    "prompt": "Implement SIMD kernel `simd_mask_select`: Vector blend conditional select based on mask.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_mask_select() -> bool",
+    "verification_stub": "assert_true(simd_mask_select_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-027",
+    "category": "simd_vector",
+    "name": "simd_interleave_2",
+    "prompt": "Implement SIMD kernel `simd_interleave_2`: Interleave two 128-bit stereo audio channels.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_interleave_2() -> bool",
+    "verification_stub": "assert_true(simd_interleave_2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-028",
+    "category": "simd_vector",
+    "name": "simd_deinterleave_2",
+    "prompt": "Implement SIMD kernel `simd_deinterleave_2`: Deinterleave stereo channels into L and R buffers.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_deinterleave_2() -> bool",
+    "verification_stub": "assert_true(simd_deinterleave_2_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-029",
+    "category": "simd_vector",
+    "name": "simd_filter_threshold",
+    "prompt": "Implement SIMD kernel `simd_filter_threshold`: Filter values above threshold into dense output.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_filter_threshold() -> bool",
+    "verification_stub": "assert_true(simd_filter_threshold_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-030",
+    "category": "simd_vector",
+    "name": "simd_variance_f32",
+    "prompt": "Implement SIMD kernel `simd_variance_f32`: Compute sample variance of float buffer.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_variance_f32() -> bool",
+    "verification_stub": "assert_true(simd_variance_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-031",
+    "category": "simd_vector",
+    "name": "simd_std_dev_f32",
+    "prompt": "Implement SIMD kernel `simd_std_dev_f32`: Compute standard deviation of float buffer.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_std_dev_f32() -> bool",
+    "verification_stub": "assert_true(simd_std_dev_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-032",
+    "category": "simd_vector",
+    "name": "simd_cosine_similarity",
+    "prompt": "Implement SIMD kernel `simd_cosine_similarity`: Compute cosine similarity between two embeddings.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_cosine_similarity() -> bool",
+    "verification_stub": "assert_true(simd_cosine_similarity_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-033",
+    "category": "simd_vector",
+    "name": "simd_manhattan_distance",
+    "prompt": "Implement SIMD kernel `simd_manhattan_distance`: L1 distance between two vectors.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_manhattan_distance() -> bool",
+    "verification_stub": "assert_true(simd_manhattan_distance_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-034",
+    "category": "simd_vector",
+    "name": "simd_chebyshev_distance",
+    "prompt": "Implement SIMD kernel `simd_chebyshev_distance`: Max absolute coordinate difference.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_chebyshev_distance() -> bool",
+    "verification_stub": "assert_true(simd_chebyshev_distance_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-035",
+    "category": "simd_vector",
+    "name": "simd_moving_average_4",
+    "prompt": "Implement SIMD kernel `simd_moving_average_4`: Moving average filter with 4-tap kernel.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_moving_average_4() -> bool",
+    "verification_stub": "assert_true(simd_moving_average_4_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-036",
+    "category": "simd_vector",
+    "name": "simd_fir_filter_8",
+    "prompt": "Implement SIMD kernel `simd_fir_filter_8`: 8-tap FIR filter convolution step.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_fir_filter_8() -> bool",
+    "verification_stub": "assert_true(simd_fir_filter_8_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-037",
+    "category": "simd_vector",
+    "name": "simd_quantize_i8",
+    "prompt": "Implement SIMD kernel `simd_quantize_i8`: Quantize f32 tensor to symmetric int8.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_quantize_i8() -> bool",
+    "verification_stub": "assert_true(simd_quantize_i8_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-038",
+    "category": "simd_vector",
+    "name": "simd_dequantize_f32",
+    "prompt": "Implement SIMD kernel `simd_dequantize_f32`: Dequantize int8 buffer back to f32.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_dequantize_f32() -> bool",
+    "verification_stub": "assert_true(simd_dequantize_f32_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-039",
+    "category": "simd_vector",
+    "name": "simd_hamming_weight_256",
+    "prompt": "Implement SIMD kernel `simd_hamming_weight_256`: Hardware POPCNT over 256-bit YMM register.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_hamming_weight_256() -> bool",
+    "verification_stub": "assert_true(simd_hamming_weight_256_verify());"
+  },
+  {
+    "task_id": "EVAL-SIMD-040",
+    "category": "simd_vector",
+    "name": "simd_string_search_16",
+    "prompt": "Implement SIMD kernel `simd_string_search_16`: Find byte occurrence in 16-byte block via cmpeq.",
+    "difficulty": "hard",
+    "test_signature": "test_simd_string_search_16() -> bool",
+    "verification_stub": "assert_true(simd_string_search_16_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-001",
+    "category": "data_structures",
+    "name": "ring_buffer",
+    "prompt": "Implement data structure `ring_buffer`: Bounded circular queue with head and tail pointers.",
+    "difficulty": "medium",
+    "test_signature": "test_ring_buffer() -> bool",
+    "verification_stub": "assert_true(ring_buffer_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-002",
+    "category": "data_structures",
+    "name": "min_heap",
+    "prompt": "Implement data structure `min_heap`: Binary min-heap with push and pop operations.",
+    "difficulty": "medium",
+    "test_signature": "test_min_heap() -> bool",
+    "verification_stub": "assert_true(min_heap_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-003",
+    "category": "data_structures",
+    "name": "max_heap",
+    "prompt": "Implement data structure `max_heap`: Binary max-heap with push and pop operations.",
+    "difficulty": "medium",
+    "test_signature": "test_max_heap() -> bool",
+    "verification_stub": "assert_true(max_heap_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-004",
+    "category": "data_structures",
+    "name": "priority_queue",
+    "prompt": "Implement data structure `priority_queue`: Priority queue with custom comparator.",
+    "difficulty": "medium",
+    "test_signature": "test_priority_queue() -> bool",
+    "verification_stub": "assert_true(priority_queue_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-005",
+    "category": "data_structures",
+    "name": "stack_bounded",
+    "prompt": "Implement data structure `stack_bounded`: Fixed-capacity LIFO stack with overflow guard.",
+    "difficulty": "medium",
+    "test_signature": "test_stack_bounded() -> bool",
+    "verification_stub": "assert_true(stack_bounded_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-006",
+    "category": "data_structures",
+    "name": "deque_circular",
+    "prompt": "Implement data structure `deque_circular`: Double-ended queue on contiguous ring buffer.",
+    "difficulty": "medium",
+    "test_signature": "test_deque_circular() -> bool",
+    "verification_stub": "assert_true(deque_circular_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-007",
+    "category": "data_structures",
+    "name": "bloom_filter",
+    "prompt": "Implement data structure `bloom_filter`: Space-efficient probabilistic set with 3 hash functions.",
+    "difficulty": "medium",
+    "test_signature": "test_bloom_filter() -> bool",
+    "verification_stub": "assert_true(bloom_filter_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-008",
+    "category": "data_structures",
+    "name": "lru_cache_bounded",
+    "prompt": "Implement data structure `lru_cache_bounded`: Least Recently Used cache with bounded capacity.",
+    "difficulty": "medium",
+    "test_signature": "test_lru_cache_bounded() -> bool",
+    "verification_stub": "assert_true(lru_cache_bounded_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-009",
+    "category": "data_structures",
+    "name": "swiss_table_probe",
+    "prompt": "Implement data structure `swiss_table_probe`: Linear probing with 1-byte H2 hash metadata.",
+    "difficulty": "medium",
+    "test_signature": "test_swiss_table_probe() -> bool",
+    "verification_stub": "assert_true(swiss_table_probe_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-010",
+    "category": "data_structures",
+    "name": "robin_hood_hash",
+    "prompt": "Implement data structure `robin_hood_hash`: Hash map with Robin Hood displacement collision resolution.",
+    "difficulty": "medium",
+    "test_signature": "test_robin_hood_hash() -> bool",
+    "verification_stub": "assert_true(robin_hood_hash_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-011",
+    "category": "data_structures",
+    "name": "trie_prefix_tree",
+    "prompt": "Implement data structure `trie_prefix_tree`: 26-ary trie for lowercase English word prefixes.",
+    "difficulty": "medium",
+    "test_signature": "test_trie_prefix_tree() -> bool",
+    "verification_stub": "assert_true(trie_prefix_tree_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-012",
+    "category": "data_structures",
+    "name": "bitset_64",
+    "prompt": "Implement data structure `bitset_64`: Stack-allocated bitset with popcount and find_first.",
+    "difficulty": "medium",
+    "test_signature": "test_bitset_64() -> bool",
+    "verification_stub": "assert_true(bitset_64_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-013",
+    "category": "data_structures",
+    "name": "bitset_256",
+    "prompt": "Implement data structure `bitset_256`: 256-bit bitset with bitwise operations.",
+    "difficulty": "medium",
+    "test_signature": "test_bitset_256() -> bool",
+    "verification_stub": "assert_true(bitset_256_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-014",
+    "category": "data_structures",
+    "name": "interval_tree",
+    "prompt": "Implement data structure `interval_tree`: Augmented tree for querying overlapping intervals.",
+    "difficulty": "medium",
+    "test_signature": "test_interval_tree() -> bool",
+    "verification_stub": "assert_true(interval_tree_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-015",
+    "category": "data_structures",
+    "name": "segment_tree_sum",
+    "prompt": "Implement data structure `segment_tree_sum`: Segment tree supporting range sum and point updates.",
+    "difficulty": "medium",
+    "test_signature": "test_segment_tree_sum() -> bool",
+    "verification_stub": "assert_true(segment_tree_sum_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-016",
+    "category": "data_structures",
+    "name": "fenwick_tree_bit",
+    "prompt": "Implement data structure `fenwick_tree_bit`: Binary Indexed Tree for prefix sums.",
+    "difficulty": "medium",
+    "test_signature": "test_fenwick_tree_bit() -> bool",
+    "verification_stub": "assert_true(fenwick_tree_bit_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-017",
+    "category": "data_structures",
+    "name": "sparse_table_rmq",
+    "prompt": "Implement data structure `sparse_table_rmq`: Sparse table for O(1) Range Minimum Queries.",
+    "difficulty": "medium",
+    "test_signature": "test_sparse_table_rmq() -> bool",
+    "verification_stub": "assert_true(sparse_table_rmq_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-018",
+    "category": "data_structures",
+    "name": "disjoint_set_union",
+    "prompt": "Implement data structure `disjoint_set_union`: Union-Find with path compression and rank heuristic.",
+    "difficulty": "medium",
+    "test_signature": "test_disjoint_set_union() -> bool",
+    "verification_stub": "assert_true(disjoint_set_union_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-019",
+    "category": "data_structures",
+    "name": "skip_list",
+    "prompt": "Implement data structure `skip_list`: Probabilistic skip list supporting ordered operations.",
+    "difficulty": "medium",
+    "test_signature": "test_skip_list() -> bool",
+    "verification_stub": "assert_true(skip_list_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-020",
+    "category": "data_structures",
+    "name": "b_tree_node",
+    "prompt": "Implement data structure `b_tree_node`: B-tree node split and search routines.",
+    "difficulty": "medium",
+    "test_signature": "test_b_tree_node() -> bool",
+    "verification_stub": "assert_true(b_tree_node_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-021",
+    "category": "data_structures",
+    "name": "radix_tree",
+    "prompt": "Implement data structure `radix_tree`: Compact trie where each node with one child is merged.",
+    "difficulty": "medium",
+    "test_signature": "test_radix_tree() -> bool",
+    "verification_stub": "assert_true(radix_tree_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-022",
+    "category": "data_structures",
+    "name": "quad_tree_2d",
+    "prompt": "Implement data structure `quad_tree_2d`: 2D spatial partition tree for points in bounding box.",
+    "difficulty": "medium",
+    "test_signature": "test_quad_tree_2d() -> bool",
+    "verification_stub": "assert_true(quad_tree_2d_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-023",
+    "category": "data_structures",
+    "name": "octree_3d",
+    "prompt": "Implement data structure `octree_3d`: 3D spatial partition tree for voxel collision.",
+    "difficulty": "medium",
+    "test_signature": "test_octree_3d() -> bool",
+    "verification_stub": "assert_true(octree_3d_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-024",
+    "category": "data_structures",
+    "name": "k_d_tree_2d",
+    "prompt": "Implement data structure `k_d_tree_2d`: 2D k-d tree for nearest neighbor search.",
+    "difficulty": "medium",
+    "test_signature": "test_k_d_tree_2d() -> bool",
+    "verification_stub": "assert_true(k_d_tree_2d_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-025",
+    "category": "data_structures",
+    "name": "arena_allocator",
+    "prompt": "Implement data structure `arena_allocator`: Contiguous monotonic bump allocator with bulk reset.",
+    "difficulty": "medium",
+    "test_signature": "test_arena_allocator() -> bool",
+    "verification_stub": "assert_true(arena_allocator_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-026",
+    "category": "data_structures",
+    "name": "pool_allocator",
+    "prompt": "Implement data structure `pool_allocator`: Fixed-size block pool allocator with freelist.",
+    "difficulty": "medium",
+    "test_signature": "test_pool_allocator() -> bool",
+    "verification_stub": "assert_true(pool_allocator_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-027",
+    "category": "data_structures",
+    "name": "quarantine_freelist",
+    "prompt": "Implement data structure `quarantine_freelist`: Delayed recycling freelist for use-after-free mitigation.",
+    "difficulty": "medium",
+    "test_signature": "test_quarantine_freelist() -> bool",
+    "verification_stub": "assert_true(quarantine_freelist_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-028",
+    "category": "data_structures",
+    "name": "canary_buffer",
+    "prompt": "Implement data structure `canary_buffer`: Memory buffer surrounded by 64-bit integrity canary words.",
+    "difficulty": "medium",
+    "test_signature": "test_canary_buffer() -> bool",
+    "verification_stub": "assert_true(canary_buffer_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-029",
+    "category": "data_structures",
+    "name": "work_stealing_deque",
+    "prompt": "Implement data structure `work_stealing_deque`: Chase-Lev lock-free work-stealing deque.",
+    "difficulty": "medium",
+    "test_signature": "test_work_stealing_deque() -> bool",
+    "verification_stub": "assert_true(work_stealing_deque_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-030",
+    "category": "data_structures",
+    "name": "atomic_ring_buffer",
+    "prompt": "Implement data structure `atomic_ring_buffer`: Single-producer single-consumer lock-free queue.",
+    "difficulty": "medium",
+    "test_signature": "test_atomic_ring_buffer() -> bool",
+    "verification_stub": "assert_true(atomic_ring_buffer_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-031",
+    "category": "data_structures",
+    "name": "seqlock_data",
+    "prompt": "Implement data structure `seqlock_data`: Sequence lock for atomic snapshot reads.",
+    "difficulty": "medium",
+    "test_signature": "test_seqlock_data() -> bool",
+    "verification_stub": "assert_true(seqlock_data_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-032",
+    "category": "data_structures",
+    "name": "csr_matrix",
+    "prompt": "Implement data structure `csr_matrix`: Compressed Sparse Row matrix representation.",
+    "difficulty": "medium",
+    "test_signature": "test_csr_matrix() -> bool",
+    "verification_stub": "assert_true(csr_matrix_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-033",
+    "category": "data_structures",
+    "name": "csc_matrix",
+    "prompt": "Implement data structure `csc_matrix`: Compressed Sparse Column matrix representation.",
+    "difficulty": "medium",
+    "test_signature": "test_csc_matrix() -> bool",
+    "verification_stub": "assert_true(csc_matrix_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-034",
+    "category": "data_structures",
+    "name": "adjacency_list_graph",
+    "prompt": "Implement data structure `adjacency_list_graph`: Directed graph represented as adjacency lists.",
+    "difficulty": "medium",
+    "test_signature": "test_adjacency_list_graph() -> bool",
+    "verification_stub": "assert_true(adjacency_list_graph_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-035",
+    "category": "data_structures",
+    "name": "graph_bfs",
+    "prompt": "Implement data structure `graph_bfs`: Breadth-First Search traversal with visited BitSet.",
+    "difficulty": "medium",
+    "test_signature": "test_graph_bfs() -> bool",
+    "verification_stub": "assert_true(graph_bfs_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-036",
+    "category": "data_structures",
+    "name": "graph_dfs",
+    "prompt": "Implement data structure `graph_dfs`: Depth-First Search traversal with recursion stack.",
+    "difficulty": "medium",
+    "test_signature": "test_graph_dfs() -> bool",
+    "verification_stub": "assert_true(graph_dfs_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-037",
+    "category": "data_structures",
+    "name": "dijkstra_shortest_path",
+    "prompt": "Implement data structure `dijkstra_shortest_path`: Shortest path in non-negative weighted graph.",
+    "difficulty": "medium",
+    "test_signature": "test_dijkstra_shortest_path() -> bool",
+    "verification_stub": "assert_true(dijkstra_shortest_path_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-038",
+    "category": "data_structures",
+    "name": "topological_sort",
+    "prompt": "Implement data structure `topological_sort`: Kahn's algorithm for DAG topological ordering.",
+    "difficulty": "medium",
+    "test_signature": "test_topological_sort() -> bool",
+    "verification_stub": "assert_true(topological_sort_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-039",
+    "category": "data_structures",
+    "name": "tarjan_scc",
+    "prompt": "Implement data structure `tarjan_scc`: Find strongly connected components in directed graph.",
+    "difficulty": "medium",
+    "test_signature": "test_tarjan_scc() -> bool",
+    "verification_stub": "assert_true(tarjan_scc_verify());"
+  },
+  {
+    "task_id": "EVAL-DS-040",
+    "category": "data_structures",
+    "name": "kruskal_mst",
+    "prompt": "Implement data structure `kruskal_mst`: Minimum spanning tree via DSU and sorted edges.",
+    "difficulty": "medium",
+    "test_signature": "test_kruskal_mst() -> bool",
+    "verification_stub": "assert_true(kruskal_mst_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-001",
+    "category": "bug_fixing",
+    "name": "fix_off_by_one_loop",
+    "prompt": "Identify and fix the bug in `fix_off_by_one_loop`: Correct loop boundary `< N` instead of `<= N`.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_off_by_one_loop() -> bool",
+    "verification_stub": "assert_true(fix_off_by_one_loop_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-002",
+    "category": "bug_fixing",
+    "name": "fix_uninitialized_stack_var",
+    "prompt": "Identify and fix the bug in `fix_uninitialized_stack_var`: Ensure local variable is initialized before read.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_uninitialized_stack_var() -> bool",
+    "verification_stub": "assert_true(fix_uninitialized_stack_var_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-003",
+    "category": "bug_fixing",
+    "name": "fix_secret_timing_branch",
+    "prompt": "Identify and fix the bug in `fix_secret_timing_branch`: Replace conditional branch with constant_time_eq.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_secret_timing_branch() -> bool",
+    "verification_stub": "assert_true(fix_secret_timing_branch_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-004",
+    "category": "bug_fixing",
+    "name": "fix_integer_overflow_shift",
+    "prompt": "Identify and fix the bug in `fix_integer_overflow_shift`: Cast 32-bit integer to 64-bit before shifting >> 32.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_integer_overflow_shift() -> bool",
+    "verification_stub": "assert_true(fix_integer_overflow_shift_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-005",
+    "category": "bug_fixing",
+    "name": "fix_null_dereference",
+    "prompt": "Identify and fix the bug in `fix_null_dereference`: Check pointer against nullptr before member access.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_null_dereference() -> bool",
+    "verification_stub": "assert_true(fix_null_dereference_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-006",
+    "category": "bug_fixing",
+    "name": "fix_use_after_free_quarantine",
+    "prompt": "Identify and fix the bug in `fix_use_after_free_quarantine`: Prevent read from pointer after deallocate().",
+    "difficulty": "medium",
+    "test_signature": "test_fix_use_after_free_quarantine() -> bool",
+    "verification_stub": "assert_true(fix_use_after_free_quarantine_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-007",
+    "category": "bug_fixing",
+    "name": "fix_dangling_reference_return",
+    "prompt": "Identify and fix the bug in `fix_dangling_reference_return`: Do not return reference to stack-local object.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_dangling_reference_return() -> bool",
+    "verification_stub": "assert_true(fix_dangling_reference_return_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-008",
+    "category": "bug_fixing",
+    "name": "fix_buffer_overflow_copy",
+    "prompt": "Identify and fix the bug in `fix_buffer_overflow_copy`: Ensure destination buffer length >= source length.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_buffer_overflow_copy() -> bool",
+    "verification_stub": "assert_true(fix_buffer_overflow_copy_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-009",
+    "category": "bug_fixing",
+    "name": "fix_unbounded_recursion",
+    "prompt": "Identify and fix the bug in `fix_unbounded_recursion`: Add base case condition to prevent stack overflow.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_unbounded_recursion() -> bool",
+    "verification_stub": "assert_true(fix_unbounded_recursion_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-010",
+    "category": "bug_fixing",
+    "name": "fix_deadlock_lock_order",
+    "prompt": "Identify and fix the bug in `fix_deadlock_lock_order`: Enforce consistent acquisition order for two mutexes.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_deadlock_lock_order() -> bool",
+    "verification_stub": "assert_true(fix_deadlock_lock_order_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-011",
+    "category": "bug_fixing",
+    "name": "fix_division_by_zero",
+    "prompt": "Identify and fix the bug in `fix_division_by_zero`: Guard divisor against zero before division.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_division_by_zero() -> bool",
+    "verification_stub": "assert_true(fix_division_by_zero_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-012",
+    "category": "bug_fixing",
+    "name": "fix_signed_unsigned_comparison",
+    "prompt": "Identify and fix the bug in `fix_signed_unsigned_comparison`: Avoid signed/unsigned mismatch in comparison.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_signed_unsigned_comparison() -> bool",
+    "verification_stub": "assert_true(fix_signed_unsigned_comparison_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-013",
+    "category": "bug_fixing",
+    "name": "fix_unterminated_string",
+    "prompt": "Identify and fix the bug in `fix_unterminated_string`: Ensure null terminator is placed at buffer[len].",
+    "difficulty": "medium",
+    "test_signature": "test_fix_unterminated_string() -> bool",
+    "verification_stub": "assert_true(fix_unterminated_string_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-014",
+    "category": "bug_fixing",
+    "name": "fix_memory_leak_early_return",
+    "prompt": "Identify and fix the bug in `fix_memory_leak_early_return`: Ensure resources are released on early return path.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_memory_leak_early_return() -> bool",
+    "verification_stub": "assert_true(fix_memory_leak_early_return_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-015",
+    "category": "bug_fixing",
+    "name": "fix_wrong_operator_precedence",
+    "prompt": "Identify and fix the bug in `fix_wrong_operator_precedence`: Add parentheses around bitwise AND in `x & 1 == 0`.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_wrong_operator_precedence() -> bool",
+    "verification_stub": "assert_true(fix_wrong_operator_precedence_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-016",
+    "category": "bug_fixing",
+    "name": "fix_missing_break_switch",
+    "prompt": "Identify and fix the bug in `fix_missing_break_switch`: Add break statements to prevent fallthrough in switch.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_missing_break_switch() -> bool",
+    "verification_stub": "assert_true(fix_missing_break_switch_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-017",
+    "category": "bug_fixing",
+    "name": "fix_macro_variable_capture",
+    "prompt": "Identify and fix the bug in `fix_macro_variable_capture`: Use hygienic macro variable naming prefix.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_macro_variable_capture() -> bool",
+    "verification_stub": "assert_true(fix_macro_variable_capture_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-018",
+    "category": "bug_fixing",
+    "name": "fix_float_equality_comparison",
+    "prompt": "Identify and fix the bug in `fix_float_equality_comparison`: Use epsilon tolerance instead of exact `a == b`.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_float_equality_comparison() -> bool",
+    "verification_stub": "assert_true(fix_float_equality_comparison_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-019",
+    "category": "bug_fixing",
+    "name": "fix_array_bounds_check",
+    "prompt": "Identify and fix the bug in `fix_array_bounds_check`: Check index < size before accessing array element.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_array_bounds_check() -> bool",
+    "verification_stub": "assert_true(fix_array_bounds_check_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-020",
+    "category": "bug_fixing",
+    "name": "fix_iterator_invalidation",
+    "prompt": "Identify and fix the bug in `fix_iterator_invalidation`: Do not erase from vector while iterating with index.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_iterator_invalidation() -> bool",
+    "verification_stub": "assert_true(fix_iterator_invalidation_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-021",
+    "category": "bug_fixing",
+    "name": "fix_double_free_pointer",
+    "prompt": "Identify and fix the bug in `fix_double_free_pointer`: Set pointer to nullptr after freeing to avoid double free.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_double_free_pointer() -> bool",
+    "verification_stub": "assert_true(fix_double_free_pointer_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-022",
+    "category": "bug_fixing",
+    "name": "fix_data_race_atomic",
+    "prompt": "Identify and fix the bug in `fix_data_race_atomic`: Use std::atomic or atomic_fetch_add instead of raw ++.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_data_race_atomic() -> bool",
+    "verification_stub": "assert_true(fix_data_race_atomic_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-023",
+    "category": "bug_fixing",
+    "name": "fix_unaligned_simd_load",
+    "prompt": "Identify and fix the bug in `fix_unaligned_simd_load`: Use _mm256_loadu_ps instead of aligned _mm256_load_ps.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_unaligned_simd_load() -> bool",
+    "verification_stub": "assert_true(fix_unaligned_simd_load_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-024",
+    "category": "bug_fixing",
+    "name": "fix_type_truncation_warning",
+    "prompt": "Identify and fix the bug in `fix_type_truncation_warning`: Explicitly cast 64-bit size to 32-bit count.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_type_truncation_warning() -> bool",
+    "verification_stub": "assert_true(fix_type_truncation_warning_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-025",
+    "category": "bug_fixing",
+    "name": "fix_zip_bomb_unbounded_read",
+    "prompt": "Identify and fix the bug in `fix_zip_bomb_unbounded_read`: Check expansion ratio before reading archive stream.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_zip_bomb_unbounded_read() -> bool",
+    "verification_stub": "assert_true(fix_zip_bomb_unbounded_read_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-026",
+    "category": "bug_fixing",
+    "name": "fix_json_depth_stack_overflow",
+    "prompt": "Identify and fix the bug in `fix_json_depth_stack_overflow`: Limit recursion depth when parsing nested objects.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_json_depth_stack_overflow() -> bool",
+    "verification_stub": "assert_true(fix_json_depth_stack_overflow_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-027",
+    "category": "bug_fixing",
+    "name": "fix_bad_hash_distribution",
+    "prompt": "Identify and fix the bug in `fix_bad_hash_distribution`: Use avalanche multiplier in integer hash function.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_bad_hash_distribution() -> bool",
+    "verification_stub": "assert_true(fix_bad_hash_distribution_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-028",
+    "category": "bug_fixing",
+    "name": "fix_missing_const_generic_check",
+    "prompt": "Identify and fix the bug in `fix_missing_const_generic_check`: Enforce matrix dimension equality K1 == K2.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_missing_const_generic_check() -> bool",
+    "verification_stub": "assert_true(fix_missing_const_generic_check_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-029",
+    "category": "bug_fixing",
+    "name": "fix_unhandled_error_result",
+    "prompt": "Identify and fix the bug in `fix_unhandled_error_result`: Unwrap Result<T, E> checking is_ok() before get().",
+    "difficulty": "medium",
+    "test_signature": "test_fix_unhandled_error_result() -> bool",
+    "verification_stub": "assert_true(fix_unhandled_error_result_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-030",
+    "category": "bug_fixing",
+    "name": "fix_corrupted_canary_offset",
+    "prompt": "Identify and fix the bug in `fix_corrupted_canary_offset`: Align footer canary struct with 8-byte boundary.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_corrupted_canary_offset() -> bool",
+    "verification_stub": "assert_true(fix_corrupted_canary_offset_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-031",
+    "category": "bug_fixing",
+    "name": "fix_race_condition_seqlock",
+    "prompt": "Identify and fix the bug in `fix_race_condition_seqlock`: Retry read sequence if seqlock counter changed.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_race_condition_seqlock() -> bool",
+    "verification_stub": "assert_true(fix_race_condition_seqlock_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-032",
+    "category": "bug_fixing",
+    "name": "fix_slice_subslice_overflow",
+    "prompt": "Identify and fix the bug in `fix_slice_subslice_overflow`: Clamp end index to slice length in subslice.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_slice_subslice_overflow() -> bool",
+    "verification_stub": "assert_true(fix_slice_subslice_overflow_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-033",
+    "category": "bug_fixing",
+    "name": "fix_wildcard_pattern_shadowing",
+    "prompt": "Identify and fix the bug in `fix_wildcard_pattern_shadowing`: Move specific patterns before wildcard `_`.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_wildcard_pattern_shadowing() -> bool",
+    "verification_stub": "assert_true(fix_wildcard_pattern_shadowing_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-034",
+    "category": "bug_fixing",
+    "name": "fix_escaped_variable_lambda",
+    "prompt": "Identify and fix the bug in `fix_escaped_variable_lambda`: Capture variables by value instead of dangling reference.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_escaped_variable_lambda() -> bool",
+    "verification_stub": "assert_true(fix_escaped_variable_lambda_verify());"
+  },
+  {
+    "task_id": "EVAL-BUG-035",
+    "category": "bug_fixing",
+    "name": "fix_missing_return_non_void",
+    "prompt": "Identify and fix the bug in `fix_missing_return_non_void`: Ensure all control paths return a value in non-void function.",
+    "difficulty": "medium",
+    "test_signature": "test_fix_missing_return_non_void() -> bool",
+    "verification_stub": "assert_true(fix_missing_return_non_void_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-001",
+    "category": "cpp_to_veloc",
+    "name": "cpp_vector_to_slice",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_vector_to_slice`: Translate `std::vector<int>` function to VeloC `Slice<i32>`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_vector_to_slice() -> bool",
+    "verification_stub": "assert_true(cpp_vector_to_slice_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-002",
+    "category": "cpp_to_veloc",
+    "name": "cpp_unique_ptr_to_raii",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_unique_ptr_to_raii`: Translate `std::unique_ptr<T>` to VeloC RAII struct.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_unique_ptr_to_raii() -> bool",
+    "verification_stub": "assert_true(cpp_unique_ptr_to_raii_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-003",
+    "category": "cpp_to_veloc",
+    "name": "cpp_shared_ptr_to_arc",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_shared_ptr_to_arc`: Translate `std::shared_ptr<T>` to VeloC reference counter.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_shared_ptr_to_arc() -> bool",
+    "verification_stub": "assert_true(cpp_shared_ptr_to_arc_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-004",
+    "category": "cpp_to_veloc",
+    "name": "cpp_unordered_map_to_swisstable",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_unordered_map_to_swisstable`: Translate `std::unordered_map` to `SwissTable<K, V>`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_unordered_map_to_swisstable() -> bool",
+    "verification_stub": "assert_true(cpp_unordered_map_to_swisstable_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-005",
+    "category": "cpp_to_veloc",
+    "name": "cpp_pair_to_tuple",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_pair_to_tuple`: Translate `std::pair<A, B>` to VeloC `Tuple<A, B>`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_pair_to_tuple() -> bool",
+    "verification_stub": "assert_true(cpp_pair_to_tuple_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-006",
+    "category": "cpp_to_veloc",
+    "name": "cpp_optional_to_option",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_optional_to_option`: Translate `std::optional<T>` to VeloC `Option<T>`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_optional_to_option() -> bool",
+    "verification_stub": "assert_true(cpp_optional_to_option_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-007",
+    "category": "cpp_to_veloc",
+    "name": "cpp_variant_to_enum",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_variant_to_enum`: Translate `std::variant<A, B, C>` to VeloC tagged enum.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_variant_to_enum() -> bool",
+    "verification_stub": "assert_true(cpp_variant_to_enum_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-008",
+    "category": "cpp_to_veloc",
+    "name": "cpp_chrono_to_stopwatch",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_chrono_to_stopwatch`: Translate `std::chrono::high_resolution_clock` to `Stopwatch`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_chrono_to_stopwatch() -> bool",
+    "verification_stub": "assert_true(cpp_chrono_to_stopwatch_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-009",
+    "category": "cpp_to_veloc",
+    "name": "cpp_iota_to_range",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_iota_to_range`: Translate `std::iota` to VeloC `0..N` iterator.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_iota_to_range() -> bool",
+    "verification_stub": "assert_true(cpp_iota_to_range_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-010",
+    "category": "cpp_to_veloc",
+    "name": "cpp_transform_to_map",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_transform_to_map`: Translate `std::transform` to VeloC `.map().collect()`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_transform_to_map() -> bool",
+    "verification_stub": "assert_true(cpp_transform_to_map_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-011",
+    "category": "cpp_to_veloc",
+    "name": "cpp_accumulate_to_sum",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_accumulate_to_sum`: Translate `std::accumulate` to VeloC `.sum()`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_accumulate_to_sum() -> bool",
+    "verification_stub": "assert_true(cpp_accumulate_to_sum_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-012",
+    "category": "cpp_to_veloc",
+    "name": "cpp_copy_if_to_filter",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_copy_if_to_filter`: Translate `std::copy_if` to VeloC `.filter().collect()`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_copy_if_to_filter() -> bool",
+    "verification_stub": "assert_true(cpp_copy_if_to_filter_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-013",
+    "category": "cpp_to_veloc",
+    "name": "cpp_all_of_to_all",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_all_of_to_all`: Translate `std::all_of` to VeloC `.all()` predicate.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_all_of_to_all() -> bool",
+    "verification_stub": "assert_true(cpp_all_of_to_all_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-014",
+    "category": "cpp_to_veloc",
+    "name": "cpp_any_of_to_any",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_any_of_to_any`: Translate `std::any_of` to VeloC `.any()` predicate.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_any_of_to_any() -> bool",
+    "verification_stub": "assert_true(cpp_any_of_to_any_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-015",
+    "category": "cpp_to_veloc",
+    "name": "cpp_sort_to_sort",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_sort_to_sort`: Translate `std::sort` to VeloC in-place sort.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_sort_to_sort() -> bool",
+    "verification_stub": "assert_true(cpp_sort_to_sort_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-016",
+    "category": "cpp_to_veloc",
+    "name": "cpp_binary_search_to_search",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_binary_search_to_search`: Translate `std::binary_search` to VeloC binary search.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_binary_search_to_search() -> bool",
+    "verification_stub": "assert_true(cpp_binary_search_to_search_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-017",
+    "category": "cpp_to_veloc",
+    "name": "cpp_reverse_to_reverse",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_reverse_to_reverse`: Translate `std::reverse` to VeloC `.rev()`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_reverse_to_reverse() -> bool",
+    "verification_stub": "assert_true(cpp_reverse_to_reverse_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-018",
+    "category": "cpp_to_veloc",
+    "name": "cpp_min_max_element",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_min_max_element`: Translate `std::minmax_element` to VeloC `.min()` and `.max()`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_min_max_element() -> bool",
+    "verification_stub": "assert_true(cpp_min_max_element_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-019",
+    "category": "cpp_to_veloc",
+    "name": "cpp_string_view_to_bytespan",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_string_view_to_bytespan`: Translate `std::string_view` to VeloC `ByteSpan`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_string_view_to_bytespan() -> bool",
+    "verification_stub": "assert_true(cpp_string_view_to_bytespan_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-020",
+    "category": "cpp_to_veloc",
+    "name": "cpp_format_to_println",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_format_to_println`: Translate `std::format` to VeloC `println(f\"...\")`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_format_to_println() -> bool",
+    "verification_stub": "assert_true(cpp_format_to_println_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-021",
+    "category": "cpp_to_veloc",
+    "name": "cpp_filesystem_path_to_path",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_filesystem_path_to_path`: Translate `std::filesystem::path` to VeloC `Path`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_filesystem_path_to_path() -> bool",
+    "verification_stub": "assert_true(cpp_filesystem_path_to_path_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-022",
+    "category": "cpp_to_veloc",
+    "name": "cpp_thread_to_threadpool",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_thread_to_threadpool`: Translate `std::thread` to VeloC `ThreadPool`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_thread_to_threadpool() -> bool",
+    "verification_stub": "assert_true(cpp_thread_to_threadpool_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-023",
+    "category": "cpp_to_veloc",
+    "name": "cpp_mutex_to_seqlock",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_mutex_to_seqlock`: Translate `std::mutex` read section to VeloC `SeqLock`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_mutex_to_seqlock() -> bool",
+    "verification_stub": "assert_true(cpp_mutex_to_seqlock_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-024",
+    "category": "cpp_to_veloc",
+    "name": "cpp_atomic_to_atomic",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_atomic_to_atomic`: Translate `std::atomic<int>` to VeloC `std::atomic<i32>`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_atomic_to_atomic() -> bool",
+    "verification_stub": "assert_true(cpp_atomic_to_atomic_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-025",
+    "category": "cpp_to_veloc",
+    "name": "cpp_fstream_to_mmap",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_fstream_to_mmap`: Translate `std::ifstream` to zero-copy `MmapFile`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_fstream_to_mmap() -> bool",
+    "verification_stub": "assert_true(cpp_fstream_to_mmap_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-026",
+    "category": "cpp_to_veloc",
+    "name": "cpp_memcpy_to_slice_copy",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_memcpy_to_slice_copy`: Translate `memcpy` to safe `Slice::copy_from`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_memcpy_to_slice_copy() -> bool",
+    "verification_stub": "assert_true(cpp_memcpy_to_slice_copy_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-027",
+    "category": "cpp_to_veloc",
+    "name": "cpp_memset_to_slice_fill",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_memset_to_slice_fill`: Translate `memset` to safe `Slice::fill`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_memset_to_slice_fill() -> bool",
+    "verification_stub": "assert_true(cpp_memset_to_slice_fill_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-028",
+    "category": "cpp_to_veloc",
+    "name": "cpp_struct_destructor_to_drop",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_struct_destructor_to_drop`: Translate C++ destructor `~Foo()` to VeloC RAII.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_struct_destructor_to_drop() -> bool",
+    "verification_stub": "assert_true(cpp_struct_destructor_to_drop_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-029",
+    "category": "cpp_to_veloc",
+    "name": "cpp_operator_overload_to_fn",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_operator_overload_to_fn`: Translate C++ `operator+` to VeloC method.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_operator_overload_to_fn() -> bool",
+    "verification_stub": "assert_true(cpp_operator_overload_to_fn_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-030",
+    "category": "cpp_to_veloc",
+    "name": "cpp_template_fn_to_generic",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_template_fn_to_generic`: Translate C++ template function to VeloC generic function.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_template_fn_to_generic() -> bool",
+    "verification_stub": "assert_true(cpp_template_fn_to_generic_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-031",
+    "category": "cpp_to_veloc",
+    "name": "cpp_template_class_to_generic_struct",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_template_class_to_generic_struct`: Translate C++ template class to VeloC generic struct.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_template_class_to_generic_struct() -> bool",
+    "verification_stub": "assert_true(cpp_template_class_to_generic_struct_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-032",
+    "category": "cpp_to_veloc",
+    "name": "cpp_const_expr_to_comptime",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_const_expr_to_comptime`: Translate `constexpr` computation to VeloC compile-time const.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_const_expr_to_comptime() -> bool",
+    "verification_stub": "assert_true(cpp_const_expr_to_comptime_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-033",
+    "category": "cpp_to_veloc",
+    "name": "cpp_enum_class_to_enum",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_enum_class_to_enum`: Translate `enum class` to VeloC scoped enum.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_enum_class_to_enum() -> bool",
+    "verification_stub": "assert_true(cpp_enum_class_to_enum_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-034",
+    "category": "cpp_to_veloc",
+    "name": "cpp_auto_to_let",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_auto_to_let`: Translate C++ `auto` type deduction to VeloC `let`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_auto_to_let() -> bool",
+    "verification_stub": "assert_true(cpp_auto_to_let_verify());"
+  },
+  {
+    "task_id": "EVAL-CPP-035",
+    "category": "cpp_to_veloc",
+    "name": "cpp_range_based_for_to_for_in",
+    "prompt": "Migrate C++ idiom to VeloC in `cpp_range_based_for_to_for_in`: Translate `for (const auto& x : vec)` to `for (x in vec)`.",
+    "difficulty": "medium",
+    "test_signature": "test_cpp_range_based_for_to_for_in() -> bool",
+    "verification_stub": "assert_true(cpp_range_based_for_to_for_in_verify());"
+  }
+]

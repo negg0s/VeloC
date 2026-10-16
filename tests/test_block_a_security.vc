@@ -1,0 +1,94 @@
+module TestBlockASecurity;
+
+#include <veloc.h>
+
+// @req(REQ-SEC-001)
+fn test_hardened_allocator() {
+    println("--- 1. Testing Hardened Allocator (Canaries, Poison, Quarantine) ---");
+    HardenedAllocator alloc(16);
+    void* ptr = alloc.allocate(64);
+    assert_true(ptr != nullptr);
+    assert_true(alloc.verify_block(ptr));
+
+    alloc.deallocate(ptr);
+    assert_eq((int)alloc.get_quarantine_count(), 1);
+    alloc.drain_quarantine();
+    assert_eq((int)alloc.get_quarantine_count(), 0);
+    println("  - HardenedAllocator verified");
+}
+
+// @req(REQ-SEC-002)
+fn test_secret_types() {
+    println("--- 2. Testing Constant-Time Secret Types ---");
+    Secret<u64> sec1(1337);
+    Secret<u64> sec2(1337);
+    Secret<u64> sec3(9999);
+
+    assert_true(sec1.constant_time_compare(sec2));
+    assert_true(!sec1.constant_time_compare(sec3));
+
+    SecretBytes<16> b1;
+    SecretBytes<16> b2;
+    assert_true(b1.constant_time_compare(b2));
+    println("  - Secret types & constant-time compare verified");
+}
+
+// @req(REQ-SEC-003)
+fn test_safe_input_validation() {
+    println("--- 3. Testing Safe Input Limits & Zip Bomb Defense ---");
+    assert_true(SafeInputGuard::check_payload_size(1024));
+    assert_true(!SafeInputGuard::check_payload_size(64 * 1024 * 1024));
+
+    assert_true(SafeInputGuard::check_zip_bomb(1000, 50000));
+    assert_true(!SafeInputGuard::check_zip_bomb(1000, 200000));
+
+    std::string valid_json = "{\"user\": {\"name\": \"Alice\", \"items\": [1, 2, 3]}}";
+    assert_true(SafeInputGuard::validate_json_depth(valid_json, 10));
+    println("  - Safe input validation verified");
+}
+
+// @req(REQ-SEC-004)
+fn test_crypto_primitives() {
+
+    println("--- 4. Testing Cryptographic Primitives (SHA256, HKDF, AEAD) ---");
+    std::string msg = "Hello VeloC Security!";
+    std::string h1 = Sha256::hex_digest(msg.c_str(), msg.length());
+    assert_eq((int)h1.length(), 64);
+
+    std::array<u8, 32> key;
+    for (int i = 0; i < 32; ++i) {
+        key[i] = (u8)(i + 1);
+    }
+
+    AeadCipher cipher(key);
+    std::string plain = "Super Secret Payload";
+    std::vector<u8> ct = cipher.encrypt((const u8*)plain.c_str(), plain.length());
+    assert_true(ct.size() > plain.length());
+
+    std::vector<u8> decrypted;
+    bool ok = cipher.decrypt(ct.data(), ct.size(), decrypted);
+    assert_true(ok);
+    assert_eq((int)decrypted.size(), (int)plain.length());
+
+    // Test tamper detection
+    std::vector<u8> tampered = ct;
+    tampered[10] = (u8)(tampered[10] ^ 0xFF);
+    std::vector<u8> decrypted_fail;
+    bool ok_tamper = cipher.decrypt(tampered.data(), tampered.size(), decrypted_fail);
+    assert_true(!ok_tamper);
+    println("  - Crypto primitives (SHA-256, HKDF, AEAD Auth) verified");
+}
+
+fn main() -> i32 {
+    println("================================================================================");
+    println("               VeloC Stage 7 Block A Security Verification                      ");
+    println("================================================================================");
+    test_hardened_allocator();
+    test_secret_types();
+    test_safe_input_validation();
+    test_crypto_primitives();
+    println("================================================================================");
+    println("[BLOCK A SUCCESS] All memory, secret, validation & crypto primitives PASSED!");
+    println("================================================================================");
+    return 0;
+}

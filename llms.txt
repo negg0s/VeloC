@@ -24,5 +24,10 @@ VeloC is a high-performance systems programming language transpiled into pure mo
 ## Common LLM Hallucinations & Mistakes to Avoid
 - ❌ Do NOT emit Rust's `fn main() -> ()` or `println!("...")` with an exclamation mark.
 - ❌ Do NOT emit C++ `std::cout <<` when writing VeloC code — use `println(...)`.
+- ❌ Do NOT emit `vec.push_back(...)` — use `vec.push(...)`.
+- ❌ Do NOT write `if (secret == token)` — use `secret.constant_time_compare(token)`.
 - ❌ Do NOT use `const let x = ...` — use `let x = ...` (already immutable).
-- ❌ Do NOT create raw heap linked lists for performance-critical loops — use contiguous arrays or `SmallVec`.
+- ❌ Do NOT create raw heap linked lists for performance-critical loops — use contiguous arrays or `BitSet<N>`.
+- ❌ In `--profile=safety`, never use `while (true)` or `malloc` — use bounded iterations and stack buffers.
+- 💡 For AI tools, connect to `veloc mcp` for diagnostics, compilation, and AST checking.
+

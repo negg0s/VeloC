@@ -132,12 +132,33 @@ class MacroExpander:
             code = call_pat.sub(replace_call, code)
         return code
 
-    def expand_source(self, code: str) -> str:
+    def expand_source(self, code: str, max_depth: int = 64) -> str:
+        if len(code) > 16 * 1024 * 1024:
+            raise ValueError("E0903: Source code / literal size limit exceeded (>16MB)")
+
         code_without_defs = self.parse_and_strip_macros(code)
-        return self.expand_invocations(code_without_defs)
+        current = code_without_defs
+        passes = 0
+
+        while passes < max_depth:
+            has_macros = any(re.search(rf'\b{m}!\s*\(', current) for m in self.macros)
+            if not has_macros:
+                break
+            prev = current
+            current = self.expand_invocations(current)
+            passes += 1
+            if current == prev:
+                raise RecursionError("E0901: Infinite recursive macro expansion loop detected")
+
+        if passes >= max_depth:
+            raise RecursionError("E0901: Maximum macro expansion depth exceeded (possible recursive macro bomb)")
+
+        return current
+
 
 def expand_file(source_path: str) -> str:
     from pathlib import Path
     content = Path(source_path).read_text(encoding="utf-8")
     expander = MacroExpander()
     return expander.expand_source(content)
+

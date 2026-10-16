@@ -1,0 +1,9 @@
+module TestSafetyViolation;
+
+#include <veloc.h>
+
+fn bad_loop() {
+    while (true) {
+        println("infinite");
+    }
+}

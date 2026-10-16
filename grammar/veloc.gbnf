@@ -1,0 +1,30 @@
+# VeloC GBNF Grammar for llama.cpp / Ollama constrained LLM decoding
+
+root ::= (top-level)*
+
+top-level ::= module-decl | include-decl | function-decl | struct-decl
+
+module-decl ::= "module " [a-zA-Z_] [a-zA-Z0-9_]* ";" "\n"
+include-decl ::= "#include <" [a-zA-Z0-9_./]+ ">" "\n"
+
+function-decl ::= ("fn" | "def") " " [a-zA-Z_] [a-zA-Z0-9_]* "(" [param-list] ")" (" -> " type)? " " block "\n"
+param-list ::= param (", " param)*
+param ::= [a-zA-Z_] [a-zA-Z0-9_]* ": " type
+
+struct-decl ::= "struct " [a-zA-Z_] [a-zA-Z0-9_]* " {" "\n" (field-decl)* "}" "\n"
+field-decl ::= "    " [a-zA-Z_] [a-zA-Z0-9_]* ": " type ";" "\n"
+
+block ::= "{" "\n" (statement)* "}"
+statement ::= "    " (let-stmt | assign-stmt | if-stmt | return-stmt | expr-stmt) "\n"
+
+let-stmt ::= "let " ("mut ")? [a-zA-Z_] [a-zA-Z0-9_]* (": " type)? (" = " expr)? ";"
+assign-stmt ::= [a-zA-Z_] [a-zA-Z0-9_]* " = " expr ";"
+if-stmt ::= "if (" expr ") " block
+return-stmt ::= "return " expr? ";"
+expr-stmt ::= expr ";"
+
+expr ::= primary ((" + " | " - " | " * " | " / " | " == " | " != ") primary)*
+primary ::= [a-zA-Z_] [a-zA-Z0-9_]* ("(" [expr-list] ")")? | [0-9]+ | "\"" [a-zA-Z0-9_ ]* "\"" | "true" | "false"
+expr-list ::= expr (", " expr)*
+
+type ::= "i32" | "i64" | "u32" | "u64" | "f32" | "f64" | "bool" | "void" | "usize"

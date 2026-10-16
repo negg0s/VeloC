@@ -1,0 +1,10 @@
+module TestAISample;
+
+#include <veloc.h>
+
+fn test_ai_mistakes() {
+    let mut vec: std::vector<i32>;
+    vec.push_back(42);
+    std::cout << "Number: " << 42;
+    println!("Rust style macro!");
+}

@@ -19,3 +19,11 @@
   - [x] Блок F: Lock-Free (SeqLock, Chase-Lev deque, Loom schedule model checker [R])
   - [x] Блок G: Наблюдаемость (Chrome Trace/Perfetto spans, Flamegraph HTML, `veloc perf-diff`, `perf-budget.toml`)
   - [x] Итоговый отчет: `docs/perf/notes.md` (модель ожиданий vs факт, расхождения $\le 18.3\%$) и `docs/perf/roofline.md`
+- [x] **ЭТАП 7**: Безопасность кода, Цепочка поставок, Сертификация, Формальная верификация, ИИ-инструменты (VeloC 12.0). (Выполнен 2026-10-17).
+  - [x] Блок A: Безопасность кода и рантайма (Hardening release флагов, `veloc harden-check` 100/100, Capability security [R], Sandbox плагинов, Hardened allocator, Secret<T> & ct-linter [R], Валидация ввода, Крипто-примитивы)
+  - [x] Блок B: Цепочка поставок и воспроизводимость (Реестр с Ed25519 подписями, lockfile integrity, Transparency log, MVS, `veloc audit`, SBOM CycloneDX/SPDX, SLSA Provenance, `veloc verify-repro`, `veloc licenses`, Защита компилятора от DoS)
+  - [x] Блок C: Сертификация и критичные системы (Safety-critical profile `--profile=safety`, MISRA-VeloC правила, Трассируемость `#[req("...")]` и матрица, Подготовительные артефакты DO-178C/ISO 26262, Детерминированная арифметика)
+  - [x] Блок D: Формальная верификация [R] (Формально проверенное ядро stdlib SMT/контракты, Метаморфное тестирование, Translation validation IR, Доказанные гарантии в `docs/safety/guarantees.md`)
+  - [x] Блок E: ИИ-инструменты и экосистема агентов (MCP-сервер и JSON-RPC `veloc mcp`, Грамматика для constrained decoding EBNF/GBNF, Бенчмарк VeloC-Eval из 200 задач, Каталог ошибок ИИ в `docs/ai/common-pitfalls.md`, `veloc ai-check`, `veloc context`, Property & Mutation testing)
+
+

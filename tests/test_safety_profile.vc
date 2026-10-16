@@ -1,0 +1,20 @@
+module TestSafetyProfile;
+
+#include <veloc.h>
+
+// @req(REQ-SEC-005)
+fn bounded_computation(x: i32) -> i32 {
+    let mut acc: i32 = x;
+    // Bounded deterministic iteration
+    for (int i = 0; i < 64; ++i) {
+        acc = acc + 1;
+    }
+    return acc;
+}
+
+fn main() -> i32 {
+    let res = bounded_computation(10);
+    assert_eq(res, 74);
+    println("Safety critical bounded computation verified!");
+    return 0;
+}

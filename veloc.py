@@ -5,7 +5,9 @@ import argparse
 import time
 import shutil
 import hashlib
+import json
 from pathlib import Path
+
 
 # Paths strictly on D:\
 ROOT_DIR = Path("D:/VeloC")
@@ -132,7 +134,30 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     t_transpile = (time.perf_counter() - t0) * 1000.0
 
-    # Compile with Clang 20 with extreme optimization flags
+    # Security & Safety Checks
+    if profile == "safety":
+        from safety_profile import SafetyCriticalChecker
+        safety_checker = SafetyCriticalChecker(source_str, str(source_path))
+        violations = safety_checker.check()
+        if violations:
+            print(f"\n[VeloC Safety Profile Violation] {len(violations)} safety rule breaches detected:")
+            for v in violations:
+                print(f"  - [{v['rule']}] Line {v['line']}: {v['message']} ({v['snippet']})")
+            sys.exit(1)
+
+    from security import CapabilitySecurity, SecretBranchLinter
+    cap_sec = CapabilitySecurity(ROOT_DIR / "veloc.toml")
+    cap_violations = cap_sec.verify_source(source_str, str(source_path))
+    if cap_violations:
+        for cv in cap_violations:
+            print(f"[VeloC Security Error] {cv['code']}: {cv['message']}")
+        sys.exit(1)
+
+    for sw in SecretBranchLinter(source_str, str(source_path)).lint():
+        print(f"[VeloC Security Warning] {sw['rule']}: Line {sw['line']}: {sw['message']}")
+
+    # Compile with Clang 20 with extreme optimization and security hardening flags
+    math_flags = ["-ffast-math"] if profile != "safety" else ["-fno-fast-math", "-frounding-math"]
     cmd = [
         str(CLANG_PATH),
         str(cpp_target),
@@ -141,8 +166,12 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         "-march=native",
         "-static",
         "-fwrapv",
+        "-fstack-protector-strong",
+        "-ftrivial-auto-var-init=zero",
+        "-Wl,--dynamicbase",
+        "-Wl,--nxcompat",
         "-Wl,--no-insert-timestamp",
-        "-ffast-math",
+        *math_flags,
         "-fno-exceptions",
         "-fno-rtti",
         "-fomit-frame-pointer",
@@ -157,6 +186,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         f"-I{ROOT_DIR / 'packages' / 'veloc-cli' / 'include'}",
         "-lws2_32"
     ]
+
 
     if verbose:
         print("[Cmd]:", " ".join(cmd))
@@ -335,8 +365,9 @@ def main():
     build_p.add_argument("file", help="Path to .vc file")
     build_p.add_argument("-o", "--output", help="Output executable path")
     build_p.add_argument("-O", "--opt", default="-O3", help="Optimization level (-O0, -O2, -O3, -Ofast)")
-    build_p.add_argument("--profile", default=None, choices=["fast-compile", "balanced", "max-perf", "min-size"], help="Compilation profile")
+    build_p.add_argument("--profile", default=None, choices=["fast-compile", "balanced", "max-perf", "min-size", "safety"], help="Compilation profile")
     build_p.add_argument("--opt-report", action="store_true", help="Print detailed optimization report")
+
     build_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     run_p = subparsers.add_parser("run", help="Compile and run a .vc source file")
@@ -420,7 +451,38 @@ def main():
     pdiff_p.add_argument("file_a", help="Baseline benchmark JSON file")
     pdiff_p.add_argument("file_b", help="New benchmark JSON file")
 
+    harden_p = subparsers.add_parser("harden-check", help="Inspect binary for ASLR, DEP, Stack Protection, and exploit mitigations")
+    harden_p.add_argument("binary", help="Path to executable binary")
+
+    audit_p = subparsers.add_parser("audit", help="Audit project dependencies against local vulnerability database")
+    audit_p.add_argument("--lock", action="store_true", help="Generate/update veloc.lock file")
+
+    lic_p = subparsers.add_parser("licenses", help="Check package license compatibility matrix")
+
+    sbom_p = subparsers.add_parser("sbom", help="Generate Software Bill of Materials (SBOM)")
+    sbom_p.add_argument("--format", choices=["cyclonedx", "spdx"], default="cyclonedx", help="SBOM format")
+
+    prov_p = subparsers.add_parser("provenance", help="Generate SLSA Provenance attestation for an artifact")
+    prov_p.add_argument("artifact", help="Path to binary artifact")
+
+    repro_p = subparsers.add_parser("verify-repro", help="Verify bit-for-bit reproducibility of build across clean environments")
+    repro_p.add_argument("file", help="Path to source .vc file")
+
+    trace_p = subparsers.add_parser("trace-reqs", help="Scan requirement annotations and generate traceability matrix")
+
+    mcp_p = subparsers.add_parser("mcp", help="Run Model Context Protocol (MCP) and JSON-RPC 2.0 stdio server")
+
+    eval_p = subparsers.add_parser("eval", help="Run VeloC-Eval benchmark suite (200 tasks)")
+    eval_p.add_argument("--sample-size", type=int, default=50, help="Number of tasks to evaluate")
+
+    ai_p = subparsers.add_parser("ai-check", help="Audit AI-generated code for hallucinations, injections, and side-channel risks")
+    ai_p.add_argument("file", help="Path to .vc file")
+
+    ctx_p = subparsers.add_parser("context", help="Bundle prioritized project context for LLM prompt")
+    ctx_p.add_argument("--tokens", type=int, default=4000, help="Maximum token budget")
+
     args = parser.parse_args()
+
 
     if args.command == "build":
         build_veloc(Path(args.file), Path(args.output) if args.output else None, 
@@ -528,6 +590,57 @@ def main():
         vc_code = transpile_cpp_to_veloc(cpp_code)
         out_path.write_text(vc_code, encoding="utf-8")
         print(f"[VeloC From-C++] Transpiled {src_path.name} -> {out_path.name} successfully.")
+    elif args.command == "harden-check":
+        from security import PEHardenChecker
+        PEHardenChecker(args.binary).print_report()
+    elif args.command == "audit":
+        from supply_chain import SupplyChainAuditor
+        auditor = SupplyChainAuditor(ROOT_DIR)
+        if args.lock:
+            lp = auditor.generate_lockfile()
+            print(f"[VeloC Supply Chain] Generated lockfile: {lp.name}")
+        auditor.print_audit_report()
+    elif args.command == "licenses":
+        from supply_chain import LicenseChecker
+        LicenseChecker(ROOT_DIR).print_report()
+    elif args.command == "sbom":
+        from sbom import SBOMGenerator
+        gen = SBOMGenerator(ROOT_DIR)
+        res = gen.generate_cyclonedx() if args.format == "cyclonedx" else gen.generate_spdx()
+        print(json.dumps(res, indent=2))
+    elif args.command == "provenance":
+        from sbom import SBOMGenerator
+        res = SBOMGenerator(ROOT_DIR).generate_slsa_provenance(args.artifact)
+        print(json.dumps(res, indent=2))
+    elif args.command == "verify-repro":
+        from sbom import ReproducibilityVerifier
+        res = ReproducibilityVerifier(ROOT_DIR / "veloc.py").verify(args.file)
+        print(json.dumps(res, indent=2))
+    elif args.command == "trace-reqs":
+        from safety_profile import RequirementTraceability
+        tr = RequirementTraceability(ROOT_DIR)
+        md = tr.generate_matrix_markdown()
+        out_f = ROOT_DIR / "docs" / "safety" / "traceability_matrix.md"
+        out_f.parent.mkdir(parents=True, exist_ok=True)
+        out_f.write_text(md, encoding="utf-8")
+        print(f"[VeloC Traceability] Matrix generated and saved to {out_f.name}:")
+        print(md)
+    elif args.command == "mcp":
+        from mcp_server import VeloCMcpServer
+        VeloCMcpServer(ROOT_DIR).run_stdio_loop()
+    elif args.command == "eval":
+        from eval_runner import VeloCEvalRunner
+        VeloCEvalRunner(ROOT_DIR).print_report(sample_size=args.sample_size)
+    elif args.command == "ai-check":
+        from ai_check import AIChecker
+        f_path = Path(args.file)
+        if not f_path.exists():
+            print(f"[Error] File not found: {f_path}")
+            sys.exit(1)
+        AIChecker(f_path.read_text(encoding="utf-8"), str(f_path)).print_report()
+    elif args.command == "context":
+        from context_bundler import ContextBundler
+        print(ContextBundler(ROOT_DIR, max_tokens=args.tokens).bundle())
     elif args.command == "bench":
         if hasattr(args, "incremental") and args.incremental:
             subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "bench_incremental.py")])
@@ -541,6 +654,7 @@ def main():
             subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "run_benchmarks.py")])
     else:
         parser.print_help()
+
 
 if __name__ == "__main__":
     main()

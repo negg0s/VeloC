@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "veloc": {
+      "command": "python",
+      "args": ["D:\\VeloC\\veloc.py", "mcp"]
+    }
+  }
+}

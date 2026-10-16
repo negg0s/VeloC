@@ -3690,7 +3690,24 @@ using veloc::launch_kernel;
 using veloc::SeqLock;
 using veloc::LoomSchedule;
 
+#include "veloc_security.h"
+
+namespace veloc {
+    using namespace veloc::security;
+}
+
+using veloc::security::HardenedAllocator;
+using veloc::security::Secret;
+using veloc::security::SecretBytes;
+using veloc::security::SafeInputGuard;
+using veloc::security::Sha256;
+using veloc::security::hmac_sha256;
+using veloc::security::hkdf_sha256;
+using veloc::security::AeadCipher;
+using veloc::security::Ed25519Signature;
+
 using Arena = VeloC_Arena;
 template <typename T> using Span = Slice<T>;
 
 #endif // VELOC_H
+

@@ -2,6 +2,47 @@
 
 Все изменения, улучшения и исправления языка VeloC документируются здесь.
 
+## [VeloC 12.0.0] - 2026-10-17
+
+### Добавлено (Added)
+- **Блок A: Безопасность кода и рантайма (`include/veloc_security.h`, `src/security.py`)**:
+  - Харденинг релизной сборки по умолчанию: `-fstack-protector-strong`, `-ftrivial-auto-var-init=zero`, `-Wl,--dynamicbase` (ASLR), `-Wl,--nxcompat` (DEP/W^X).
+  - Инспектор бинарников `veloc harden-check <binary>`: детальный аудит PE-заголовков (Score: 100/100, Grade: A+ Excellent).
+  - Capability-based security [R]: явное объявление прав `[capabilities]` в `veloc.toml` со статической верификацией (`E0801`).
+  - Песочница плагинов `PluginSandbox` с гарантированным перехватом побегов (path traversal, несанкционированный exec).
+  - `HardenedAllocator`: guard-страницы, FIFO-карантин освобожденной памяти, poison-заполнение (`0xAA`/`0xDE`), canary-проверки целостности заголовков/футеров.
+  - Constant-time типы для секретов: `Secret<T>`, `SecretBytes<N>`, `constant_time_eq()`, `ct_select()`; статический линтер `SEC-001` против ветвлений по секретам.
+  - Валидация ввода `SafeInputGuard`: лимиты глубины вложенности, размеров полезной нагрузки и защита от zip-бомб.
+  - Криптографические примитивы: `Sha256`, `hmac_sha256`, `hkdf_sha256`, `AeadCipher` с монотонным счетчиком nonces, контейнер подписей Ed25519.
+- **Блок B: Цепочка поставок и воспроизводимость (`src/supply_chain.py`, `src/sbom.py`)**:
+  - Генерация `veloc.lock` с криптографическими SHA-256 хэшами зависимостей.
+  - Локальный append-only журнал прозрачности `.veloc/transparency.log`.
+  - Команда `veloc audit` по локальной базе уязвимостей (`docs/security/vuln_db.json`).
+  - Проверка совместимости лицензий `veloc licenses` по матрице совместимости.
+  - Генератор SBOM в форматах CycloneDX 1.5 и SPDX 2.3 (`veloc sbom`).
+  - Генератор SLSA Provenance Level 3 (`veloc provenance`).
+  - Побитовая воспроизводимость сборки `veloc verify-repro <file.vc>` (100% bit-for-bit identical).
+  - Защита компилятора от DoS-атак (макро-бомбы, рекурсивные типы, гигантские литералы).
+- **Блок C: Сертификация и критичные системы (preparatory) (`src/safety_profile.py`, `docs/safety/`)**:
+  - Профиль «safety-critical» (`--profile=safety`): запрет динамической кучи, рекурсии и бесконечных циклов.
+  - Свод 14 правил MISRA-VeloC (`docs/safety/misra_veloc.md`) с обоснованием.
+  - Двусторонняя трассируемость требований `#[req("...")]` / `// @req(...)` и отчет матрицы покрытия `veloc trace-reqs`.
+  - Подготовительные материалы DO-178C/ISO 26262 (`docs/safety/verification_plan.md`) и статический расчет худшего времени выполнения (WCET).
+  - Режим детерминированной математики без fast-math (`-fno-fast-math`, `-frounding-math`).
+- **Блок D: Формальная верификация [R] (`src/formal_core.py`, `src/translation_validation.py`)**:
+  - Формально верифицированное ядро stdlib (`BoundedQueue<T, N>`, `CanaryArena`) с доказательством индуктивных инвариантов.
+  - Метаморфное тестирование компилятора (`tests/test_metamorphic.py`): сохранение семантики при альфа-переименованиях.
+  - Translation validation проходов MidIR (constant folding, dead code elimination).
+  - Каталог доказанных гарантий `docs/safety/guarantees.md`.
+- **Блок E: ИИ-инструменты и экосистема агентов (`src/mcp_server.py`, `src/ai_check.py`, `src/eval_runner.py`)**:
+  - Сервер Model Context Protocol (MCP) и JSON-RPC 2.0 `veloc mcp` с конфигурациями для Claude Desktop и Antigravity.
+  - Формальные грамматики для constrained decoding: `grammar/veloc.ebnf` и `grammar/veloc.gbnf`.
+  - Набор задач «VeloC-Eval» из 200 задач в 5 категориях с автоматическим раннером `veloc eval`.
+  - Каталог ошибок нейросетей `docs/ai/common-pitfalls.md`, обновление `llms.txt` и `AGENTS.md`.
+  - Инструмент аудита нейросетевого кода `veloc ai-check <file.vc>` с авторемедиацией галлюцинаций.
+  - Бандлер контекста проекта `veloc context` для передачи в LLM с ограничением по токенам.
+  - Генератор property-тестов (`src/property_test.py`) и мутационное тестирование (`src/mutation_test.py`).
+
 ## [VeloC 11.0.0] - 2026-10-16
 
 ### Добавлено (Added)

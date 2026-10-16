@@ -187,4 +187,26 @@
   6. Внедрен модуль трассировки и профилирования `src/observability.py` (экспорт в Chrome Trace / Perfetto JSON, генератор HTML флеймграфов и CLI `veloc perf-diff A B`).
   7. Создан CI бюджет производительности `perf-budget.toml`.
 
+### ADR-0020: Безопасность кода, Цепочка поставок, Safety-Profile и ИИ-инструментарий (Stage 7)
+* **Дата:** 2026-10-17
+* **Контекст:**
+  1. Для использования VeloC в критических инфраструктурах и агентных пайплайнах требуются защитные механизмы компилятора: ASLR, DEP, Stack Protection, изоляция capabilities, и защита секретов от side-channel атак.
+  2. Риск генерации галлюцинированного или вредоносного кода нейросетевыми ассистентами требует автоматизированных проверок (`veloc ai-check`), формального протокола MCP (`veloc mcp`), грамматик constrained decoding (GBNF/EBNF) и тестового бенчмарка VeloC-Eval (200 задач).
+* **Решение:**
+  1. **Харденинг компилятора по умолчанию**: в `build_veloc` интегрированы флаги `-fstack-protector-strong`, `-ftrivial-auto-var-init=zero`, `-Wl,--dynamicbase`, `-Wl,--nxcompat`. Разработан `PEHardenChecker` (`veloc harden-check`), подтвердивший оценку 100/100 (A+).
+  2. **Capability-based security [R]**: манифест `[capabilities]` в `veloc.toml` со статической валидацией в `src/security.py`. Запрещенные операции прерывают сборку ошибкой `E0801`.
+  3. **Песочница плагинов и Hardened Allocator**: `PluginSandbox` с перехватом побегов; `HardenedAllocator` с guard-границами, карантином и poison (`0xAA`/`0xDE`).
+  4. **Секреты и Constant-Time**: типы `Secret<T>` с гарантированным занулением в деструкторе, move-only семантикой и `constant_time_eq()`; статический линтер `SEC-001` против ветвлений по секретам.
+  5. **Цепочка поставок**: генерация `veloc.lock` с SHA-256 хэшами, append-only Transparency Log (`.veloc/transparency.log`), аудит уязвимостей (`veloc audit`), проверка совместимости лицензий (`veloc licenses`), генерация SBOM CycloneDX 1.5 / SPDX 2.3 и SLSA Provenance.
+  6. **100% побитовая воспроизводимость**: `veloc verify-repro` гарантирует побитовое совпадение бинарников в изолированных окружениях благодаря `-Wl,--no-insert-timestamp`.
+  7. **Safety-Critical Profile (`--profile=safety`)**: подмножество языка без кучи (`malloc`/`new`), рекурсии и бесконечных циклов (`while(true)`). Codified 14 правил MISRA-VeloC (`docs/safety/misra_veloc.md`) и двусторонняя трассируемость `#[req("...")]` (`veloc trace-reqs`).
+  8. **Формальная верификация [R]**: доказательство индуктивной инвариантности `BoundedQueue<T, N>` (`src/formal_core.py`), метаморфное тестирование компилятора и translation validation для constant folding / DCE.
+  9. **ИИ-экосистема**:
+     - Полнофункциональный MCP сервер `veloc mcp` (stdio JSON-RPC 2.0).
+     - Формальные грамматики `grammar/veloc.ebnf` и `grammar/veloc.gbnf`.
+     - Бенчмарк VeloC-Eval из 200 задач (`eval/tasks.json`).
+     - Аудитор нейросетевого кода `veloc ai-check` с авторемедиацией.
+     - Контекст-бандлер `veloc context` для LLM промптов.
+
+
 

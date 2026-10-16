@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "algorithm": "sha256",
+  "packages": [
+    {
+      "name": "veloc-ai",
+      "version": "0.1.0",
+      "sha256": "3c7d986a6e815004b513373a28c2d6ecf8c0c130cea2f465cdc37b5a41670993",
+      "license": "MIT"
+    },
+    {
+      "name": "veloc-cli",
+      "version": "0.1.0",
+      "sha256": "d36944c0cc990f1f4171884994f01383b255e01d90af0ad7f38da1c220ff86bf",
+      "license": "MIT"
+    },
+    {
+      "name": "veloc-data",
+      "version": "0.1.0",
+      "sha256": "7c784e3f8696f7c91e389becc2690caf98ccb59fc7bc8637e2e05dc7a60928cd",
+      "license": "MIT"
+    },
+    {
+      "name": "veloc-embedded",
+      "version": "0.1.0",
+      "sha256": "0dadc81c39f147468e8f9aedf45f08cf02b34013845d6d8c3bf14c6e562ff766",
+      "license": "MIT"
+    },
+    {
+      "name": "veloc-game",
+      "version": "0.1.0",
+      "sha256": "e0f1922fc354aef139c59f8958b4cf24f4cd85c9c51071155919449fd931b01e",
+      "license": "MIT"
+    },
+    {
+      "name": "veloc-net",
+      "version": "0.1.0",
+      "sha256": "cd08da00adc14dc945e327f9fda410faffa573da8844f0b80440066a13575bc9",
+      "license": "MIT"
+    },
+    {
+      "name": "veloc-sci",
+      "version": "0.1.0",
+      "sha256": "64ca9008c79cad0109f936a07118ba0aaec7dd8505551e51450dff22b34555ba",
+      "license": "MIT"
+    }
+  ]
+}

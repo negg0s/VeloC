@@ -1,0 +1,10 @@
+{
+  "name": "veloc-language-server-mcp",
+  "version": "12.0.0",
+  "transport": "stdio",
+  "command": "python",
+  "args": ["D:\\VeloC\\veloc.py", "mcp"],
+  "env": {
+    "VELOC_ROOT": "D:\\VeloC"
+  }
+}
