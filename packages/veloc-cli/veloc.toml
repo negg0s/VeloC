@@ -1,0 +1,12 @@
+[package]
+name = "veloc-cli"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "High-performance CLI framework and SIMD search tool for VeloC: Argument parser, ANSI formatting, and AVX2 grep"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "avx2"

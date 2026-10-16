@@ -1,0 +1,72 @@
+#include <veloc.h>
+#include <veloc_cli.h>
+#include <cstdio>
+#include <vector>
+#include <string>
+#include <chrono>
+
+const usize BUFFER_SIZE = 16777216; // 16 MB Document
+static char text_buffer[BUFFER_SIZE];
+
+// Naive scalar string search (strstr loop)
+usize scalar_search(const char* text, usize text_len, const char* pattern, usize pat_len) {
+    usize count = 0;
+    const char* cur = text;
+    const char* end = text + text_len;
+    while ((cur = strstr(cur, pattern)) != nullptr && cur + pat_len <= end) {
+        count++;
+        cur += pat_len;
+    }
+    return count;
+}
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("     VeloC CLI Benchmark: AVX2 SIMD Grep vs Standard C strstr    \n");
+    printf("=================================================================\n");
+
+    // Fill 16MB buffer with repetitive text and sparse keyword targets
+    const char* sentence = "The quick brown fox jumps over the lazy dog. Routine background text filling memory. ";
+    usize sent_len = strlen(sentence);
+    for (usize i = 0; i < BUFFER_SIZE; i += sent_len) {
+        usize chunk = (i + sent_len <= BUFFER_SIZE) ? sent_len : (BUFFER_SIZE - i);
+        memcpy(&text_buffer[i], sentence, chunk);
+    }
+
+    // Insert target pattern at 1,000 sparse locations
+    const char* pattern = "UNIQUE_VeloC_NEEDLE_42";
+    usize pat_len = strlen(pattern);
+    for (usize k = 0; k < 1000; k++) {
+        usize offset = (k * 16000) % (BUFFER_SIZE - pat_len);
+        memcpy(&text_buffer[offset], pattern, pat_len);
+    }
+
+    // 1. Scalar strstr search
+    auto t0 = std::chrono::high_resolution_clock::now();
+    usize scalar_matches = 0;
+    for (usize iter = 0; iter < 10; iter++) {
+        scalar_matches = scalar_search(text_buffer, BUFFER_SIZE, pattern, pat_len);
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 scalar_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count() / 10.0;
+    f64 scalar_gbps = ((f64)BUFFER_SIZE / 1e9) / (scalar_ms / 1000.0);
+    printf("  [Scalar strstr Scan] 16 MB Buffer: %.2f ms (Throughput: %.2f GB/s, Found: %lld)\n",
+           scalar_ms, scalar_gbps, (long long)scalar_matches);
+
+    // 2. AVX2 SIMDGrep search
+    auto t2 = std::chrono::high_resolution_clock::now();
+    usize simd_matches = 0;
+    for (usize iter = 0; iter < 50; iter++) {
+        simd_matches = veloc::cli::SIMDGrep::search(text_buffer, BUFFER_SIZE, pattern, pat_len);
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+    f64 simd_ms = std::chrono::duration<f64, std::milli>(t3 - t2).count() / 50.0;
+    f64 simd_gbps = ((f64)BUFFER_SIZE / 1e9) / (simd_ms / 1000.0);
+    f64 speedup = scalar_ms / simd_ms;
+    printf("  [AVX2 SIMD Grep Scan] 16 MB Buffer: %.2f ms (Throughput: %.2f GB/s, Speedup: %.1fx, Found: %lld)\n",
+           simd_ms, simd_gbps, speedup, (long long)simd_matches);
+
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY]\n");
+    return 0;
+}

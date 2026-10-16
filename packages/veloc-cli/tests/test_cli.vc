@@ -1,0 +1,35 @@
+#include <veloc.h>
+#include <veloc_cli.h>
+#include <cassert>
+#include <cstdio>
+#include <string>
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-cli ArgParser, TerminalTable, SIMD Grep...\n");
+
+    // 1. ArgParser test
+    const char* mock_argv[] = {"app.exe", "--input", "dataset.csv", "-v", "--threads=8", "extra_arg"};
+    int mock_argc = 6;
+    veloc::cli::ArgParser parser("my_tool");
+    parser.parse(mock_argc, (char**)mock_argv);
+
+    assert(parser.has("input"));
+    assert(parser.get("input") == "dataset.csv");
+    assert(parser.has("v"));
+    assert(parser.get("threads") == "8");
+    assert(parser.positional.size() == 1 && parser.positional[0] == "extra_arg");
+
+    // 2. TerminalTable test
+    veloc::cli::TerminalTable table({"Metric", "Value"});
+    table.add_row({"Compiler", "Clang 20"});
+    table.add_row({"Architecture", "x86_64 AVX2"});
+    assert(table.rows.size() == 2);
+
+    // 3. AVX2 SIMDGrep test
+    std::string document = "VeloC is ultra fast. VeloC uses AVX2. VeloC crushes bloatware.";
+    usize count = veloc::cli::SIMDGrep::search(document.data(), document.size(), "VeloC", 5);
+    assert(count == 3);
+
+    printf("[TEST PASS]: veloc-cli components verified successfully!\n");
+    return 0;
+}

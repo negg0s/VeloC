@@ -1,0 +1,39 @@
+#include <veloc.h>
+#include <veloc_cli.h>
+#include <cstdio>
+#include <string>
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("   VeloC CLI: High-Speed Terminal Diagnostics & SIMD Search      \n");
+    printf("=================================================================\n");
+
+    // 1. Terminal Table Generator Demo
+    veloc::cli::TerminalTable table({"Package", "Category", "SIMD Target", "Status"});
+    table.add_row({"veloc-game", "Game Engine / ECS", "AVX2 (8-wide)", "Verified"});
+    table.add_row({"veloc-ai", "Deep Learning & Tensors", "AVX2 + FMA3", "Verified"});
+    table.add_row({"veloc-sci", "Numerical & ODE Math", "AVX2 + FMA3", "Verified"});
+    table.add_row({"veloc-data", "Columnar DataFrame & LSM", "AVX2 (4-wide dbl)", "Verified"});
+    table.add_row({"veloc-net", "Winsock & Rollback Engine", "Scalar / Network", "Verified"});
+    table.add_row({"veloc-embedded", "Freestanding Realtime", "No-Heap / Q16.16", "Verified"});
+    table.add_row({"veloc-cli", "Tooling & SIMD Grep", "AVX2 32-byte", "Verified"});
+
+    printf("[System Ecosystem Overview]:\n\n");
+    table.print();
+
+    // 2. SIMD Search Demo
+    std::string text_corpus = 
+        "VeloC Version 5.0 Core Release.\n"
+        "Engine: veloc-game with 1M entity capacity.\n"
+        "AI: veloc-ai with FMA accelerated GEMM.\n"
+        "Data: veloc-data with LSM-tree WAL storage.\n";
+
+    printf("\n[SIMD Grep Query]: Searching for keyword 'veloc'...\n");
+    usize matches = veloc::cli::SIMDGrep::search(text_corpus.data(), text_corpus.size(), "veloc", 5);
+    printf("  Found %lld matching instances in text corpus with zero regex overhead.\n",
+           (long long)matches);
+
+    printf("=================================================================\n");
+    printf("[DEMO SUCCESS]: CLI utilities and formatted output rendered cleanly.\n");
+    return 0;
+}
