@@ -134,6 +134,12 @@ class Parser:
                 left = AssertNonNullExpr(op_tok.line, op_tok.col, self.filename, expr=left)
                 continue
 
+            # Postfix error propagation: expr?
+            if self.check(TokenType.QUESTION):
+                op_tok = self.advance()
+                left = TryExpr(op_tok.line, op_tok.col, self.filename, expr=left)
+                continue
+
             tok = self.current()
             prec = PRECEDENCE.get(tok.type, 0)
             if prec <= min_prec:

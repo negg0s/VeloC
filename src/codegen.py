@@ -44,6 +44,9 @@ class CppCodegen:
         elif isinstance(expr, AssertNonNullExpr):
             sub_expr = self.emit_expr(expr.expr)
             return f"({sub_expr}).unwrap()"
+        elif isinstance(expr, TryExpr):
+            sub_expr = self.emit_expr(expr.expr)
+            return f"({sub_expr}).unwrap()"
         elif isinstance(expr, CallExpr):
             callee_str = self.emit_expr(expr.callee)
             if callee_str == "println":

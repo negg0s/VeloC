@@ -245,8 +245,17 @@ def main():
     test_p.add_argument("file", help="Path to .vc file containing tests")
     test_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
-    init_p = subparsers.add_parser("init", help="Scaffold a new VeloC project")
-    init_p.add_argument("name", help="Name of new project")
+    init_p = subparsers.add_parser("init", help="Scaffold a new VeloC project in current directory")
+    init_p.add_argument("name", nargs="?", default="veloc_app", help="Name of new project")
+
+    new_p = subparsers.add_parser("new", help="Create a new VeloC project in a dedicated folder")
+    new_p.add_argument("name", help="Name of new project")
+
+    add_p = subparsers.add_parser("add", help="Add a dependency to veloc.toml")
+    add_p.add_argument("package", help="Package or library name")
+
+    remove_p = subparsers.add_parser("remove", help="Remove a dependency from veloc.toml")
+    remove_p.add_argument("package", help="Package or library name")
 
     subparsers.add_parser("info", help="Display CPU and compiler hardware information")
 
@@ -276,7 +285,22 @@ def main():
     elif args.command == "test":
         test_veloc(Path(args.file), verbose=args.verbose)
     elif args.command == "init":
-        init_project(args.name)
+        from pkg.manager import PackageManager
+        pm = PackageManager(ROOT_DIR)
+        pm.create_project(Path.cwd(), args.name)
+    elif args.command == "new":
+        from pkg.manager import PackageManager
+        pm = PackageManager(ROOT_DIR)
+        target = ROOT_DIR / "projects" / args.name
+        pm.create_project(target, args.name)
+    elif args.command == "add":
+        from pkg.manager import PackageManager
+        pm = PackageManager(ROOT_DIR)
+        pm.add_dependency(Path.cwd(), args.package)
+    elif args.command == "remove":
+        from pkg.manager import PackageManager
+        pm = PackageManager(ROOT_DIR)
+        pm.remove_dependency(Path.cwd(), args.package)
     elif args.command == "info":
         show_info()
     elif args.command == "clean":

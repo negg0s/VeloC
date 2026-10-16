@@ -1,0 +1,6 @@
+module Tests;
+
+test "sanity check" {
+    assert_eq(2 + 2, 4);
+    assert_true(100 > 50);
+}

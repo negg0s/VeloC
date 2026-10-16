@@ -1,0 +1,11 @@
+module Main;
+
+fn main() -> i32 {
+    println("==================================================");
+    println("      Welcome to GameEngine powered by VeloC 9.0!     ");
+    println("==================================================");
+
+    let mut count = 1000;
+    println(f"Running application with count = {count}");
+    return 0;
+}

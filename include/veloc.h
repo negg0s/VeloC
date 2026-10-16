@@ -231,6 +231,89 @@ struct VeloC_Arena {
     }
 };
 
+// TrackingAllocator: Monitors total allocated bytes, peak memory usage, and detects leaks
+struct TrackingAllocator {
+    usize total_allocated;
+    usize active_allocated;
+    usize peak_allocated;
+    usize alloc_count;
+    usize free_count;
+
+    TrackingAllocator() : total_allocated(0), active_allocated(0), peak_allocated(0), alloc_count(0), free_count(0) {}
+
+    void* alloc(usize size, usize alignment = 32) {
+        usize total_req = size + alignment + sizeof(usize) * 2;
+        u8* raw = (u8*)veloc_aligned_alloc(alignment, total_req);
+        if (!raw) return NULL;
+
+        usize current = (usize)(raw + sizeof(usize) * 2);
+        usize aligned = (current + alignment - 1) & ~(alignment - 1);
+        usize* meta = (usize*)(aligned - sizeof(usize) * 2);
+        meta[0] = size;
+        meta[1] = (usize)raw;
+
+        total_allocated += size;
+        active_allocated += size;
+        if (active_allocated > peak_allocated) peak_allocated = active_allocated;
+        alloc_count++;
+
+        return (void*)aligned;
+    }
+
+    void free(void* ptr) {
+        if (!ptr) return;
+        u8* p = (u8*)ptr;
+        usize* meta = (usize*)(p - sizeof(usize) * 2);
+        usize size = meta[0];
+        void* raw = (void*)meta[1];
+
+        if (active_allocated >= size) active_allocated -= size;
+        free_count++;
+
+        veloc_aligned_free(raw);
+    }
+
+    void report() const {
+        printf("[TrackingAllocator Report]\n");
+        printf("  Active Allocated: %llu bytes\n", (unsigned long long)active_allocated);
+        printf("  Peak Allocated:   %llu bytes\n", (unsigned long long)peak_allocated);
+        printf("  Total Allocs:     %llu\n", (unsigned long long)alloc_count);
+        printf("  Total Frees:      %llu\n", (unsigned long long)free_count);
+        if (active_allocated > 0) {
+            printf("  \033[1;31m[LEAK DETECTED]: %llu bytes unfreed!\033[0m\n", (unsigned long long)active_allocated);
+        } else {
+            printf("  \033[1;32m[OK]: Zero memory leaks detected!\033[0m\n");
+        }
+    }
+};
+
+// TempAllocator: Scoped thread-local scratch buffer for zero-overhead temporaries
+template <usize Size = 64 * 1024>
+struct TempAllocator {
+    alignas(64) u8 buffer[Size];
+    usize offset;
+
+    TempAllocator() : offset(0) {}
+
+    void* alloc(usize size, usize alignment = 8) {
+        usize current = (usize)(buffer + offset);
+        usize aligned = (current + alignment - 1) & ~(alignment - 1);
+        usize new_offset = (aligned - (usize)buffer) + size;
+        if (new_offset > Size) return NULL;
+        offset = new_offset;
+        return (void*)aligned;
+    }
+
+    template <typename T>
+    T* alloc_array(usize count) {
+        return (T*)alloc(sizeof(T) * count, alignof(T));
+    }
+
+    void reset() { offset = 0; }
+    usize get_marker() const { return offset; }
+    void reset_to_marker(usize m) { if (m <= Size) offset = m; }
+};
+
 // ============================================================================
 // FixedPool<T, Capacity>: Zero-Allocation Cache-Coherent Object Pool
 // (O(1) alloc and free in 2 CPU cycles, zero heap fragmentation)
@@ -2453,6 +2536,108 @@ namespace veloc {
 }
 #endif
 
+namespace veloc {
+    // ========================================================================
+    // AVX2 High-Performance GEMV (Matrix-Vector Multiplication: y = A * x)
+    // AI inference layer kernel: FMA unrolled 4x for peak throughput
+    // ========================================================================
+    static inline void simd_gemv_f32(const f32* VELOC_RESTRICT A, const f32* VELOC_RESTRICT x, 
+                                     f32* VELOC_RESTRICT y, usize rows, usize cols) {
+        for (usize r = 0; r < rows; r++) {
+            const f32* row = &A[r * cols];
+            f32x8 sum0 = _mm256_setzero_ps();
+            f32x8 sum1 = _mm256_setzero_ps();
+            usize c = 0;
+            usize vec_end = cols & ~15;
+            for (; c < vec_end; c += 16) {
+                f32x8 a0 = _mm256_loadu_ps(&row[c]);
+                f32x8 x0 = _mm256_loadu_ps(&x[c]);
+                sum0 = f32x8_fmadd(a0, x0, sum0);
+
+                f32x8 a1 = _mm256_loadu_ps(&row[c + 8]);
+                f32x8 x1 = _mm256_loadu_ps(&x[c + 8]);
+                sum1 = f32x8_fmadd(a1, x1, sum1);
+            }
+            f32x8 total = _mm256_add_ps(sum0, sum1);
+            f32 dot = f32x8_hsum(total);
+            for (; c < cols; c++) {
+                dot += row[c] * x[c];
+            }
+            y[r] = dot;
+        }
+    }
+
+    // ========================================================================
+    // AVX2 High-Performance GEMM (Tiled Matrix Multiplication: C = A * B)
+    // Tiled 32x32 block matrix multiplication with FMA accumulation
+    // ========================================================================
+    static inline void simd_gemm_f32(const f32* VELOC_RESTRICT A, const f32* VELOC_RESTRICT B,
+                                     f32* VELOC_RESTRICT C, usize M, usize N, usize K) {
+        for (usize i = 0; i < M * N; i++) C[i] = 0.0f;
+
+        const usize BLOCK = 32;
+        for (usize i0 = 0; i0 < M; i0 += BLOCK) {
+            usize imax = (i0 + BLOCK < M) ? i0 + BLOCK : M;
+            for (usize k0 = 0; k0 < K; k0 += BLOCK) {
+                usize kmax = (k0 + BLOCK < K) ? k0 + BLOCK : K;
+                for (usize j0 = 0; j0 < N; j0 += BLOCK) {
+                    usize jmax = (j0 + BLOCK < N) ? j0 + BLOCK : N;
+                    for (usize i = i0; i < imax; i++) {
+                        for (usize k = k0; k < kmax; k++) {
+                            f32x8 a_val = _mm256_set1_ps(A[i * K + k]);
+                            usize j = j0;
+                            usize j_vec = j0 + ((jmax - j0) & ~7);
+                            for (; j < j_vec; j += 8) {
+                                f32x8 b_val = _mm256_loadu_ps(&B[k * N + j]);
+                                f32x8 c_val = _mm256_loadu_ps(&C[i * N + j]);
+                                c_val = f32x8_fmadd(a_val, b_val, c_val);
+                                _mm256_storeu_ps(&C[i * N + j], c_val);
+                            }
+                            for (; j < jmax; j++) {
+                                C[i * N + j] += A[i * K + k] * B[k * N + j];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ========================================================================
+    // AVX2 Symmetric INT8 Quantization (simd_quantize_f32_to_i8)
+    // Transforms 32-bit floats into 8-bit quantized weights for LLM/AI models
+    // ========================================================================
+    static inline void simd_quantize_f32_to_i8(const f32* VELOC_RESTRICT in, i8* VELOC_RESTRICT out, 
+                                              usize count, f32 scale) {
+        f32 inv_scale = (scale > 1e-8f) ? (1.0f / scale) : 1.0f;
+        f32x8 v_inv_scale = _mm256_set1_ps(inv_scale);
+        f32x8 v_min = _mm256_set1_ps(-128.0f);
+        f32x8 v_max = _mm256_set1_ps(127.0f);
+
+        usize i = 0;
+        usize vec_end = count & ~7;
+        for (; i < vec_end; i += 8) {
+            f32x8 v = _mm256_loadu_ps(&in[i]);
+            f32x8 scaled = _mm256_mul_ps(v, v_inv_scale);
+            f32x8 clamped = _mm256_min_ps(_mm256_max_ps(scaled, v_min), v_max);
+            f32x8 rounded = _mm256_round_ps(clamped, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+            __m256i i32_vec = _mm256_cvtps_epi32(rounded);
+            // Extract and pack 8 32-bit ints to 8 8-bit bytes
+            i32 buf[8];
+            _mm256_storeu_si256((__m256i*)buf, i32_vec);
+            for (int k = 0; k < 8; k++) {
+                out[i + k] = (i8)buf[k];
+            }
+        }
+        for (; i < count; i++) {
+            f32 val = in[i] * inv_scale;
+            if (val < -128.0f) val = -128.0f;
+            if (val > 127.0f) val = 127.0f;
+            out[i] = (i8)roundf(val);
+        }
+    }
+}
+
 // Global ergonomics using declarations
 using veloc::range;
 using veloc::radix_sort_u32;
@@ -2483,5 +2668,8 @@ using veloc::simd_clamp_array;
 using veloc::simd_prefix_sum_u32;
 using veloc::simd_cross_entropy_loss;
 using veloc::simd_argmax;
+using veloc::simd_gemv_f32;
+using veloc::simd_gemm_f32;
+using veloc::simd_quantize_f32_to_i8;
 
 #endif // VELOC_H

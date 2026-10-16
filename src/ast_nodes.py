@@ -68,6 +68,10 @@ class AssertNonNullExpr(Expr): # opt!
     expr: Expr = field(default_factory=Expr)
 
 @dataclass
+class TryExpr(Expr): # expr?
+    expr: Expr = field(default_factory=Expr)
+
+@dataclass
 class CallExpr(Expr):
     callee: Expr = field(default_factory=Expr)
     args: List[Expr] = field(default_factory=list)

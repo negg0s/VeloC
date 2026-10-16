@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "manifest_hash": "e9b003488b2ea6db71bcc5d8d4c1121e7e1df82bc9023e01ec608e05c32c3b76",
+  "packages": [
+    {
+      "name": "GameEngine",
+      "version": "0.1.0",
+      "dependencies": []
+    }
+  ]
+}

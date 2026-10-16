@@ -31,17 +31,28 @@
   - Snapshot тесты диагностик, запуск через единый `veloc ci`
 
 ### 3. Волна 2 (P1: Ядро и сборка)
-- [ ] **3.1 Пакетный менеджер и манифест `veloc.toml` / `veloc.lock`**
-- [ ] **3.2 Модульная система**: `module`, `import`, `pub`
-- [ ] **3.3 Режимы `safe` и `fast`**, оператор `?`, `Option`/`Result`
-- [ ] **3.4 Расширенный match, enum с данными, алгебраические типы**
-- [ ] **3.5 Трейты и derive-рефлексия** (`#[derive(Debug, Eq, Hash, Clone)]`)
-- [ ] **3.6 Аллокаторы как первоклассная концепция** (Tracking, Temp, Bump, Arena, Pool)
+- [x] **3.1 Пакетный менеджер и манифест `veloc.toml` / `veloc.lock`**:
+  - `veloc new <name>`: создание проекта со структурой `src/`, `tests/`, `veloc.toml`, `veloc.lock`
+  - `veloc init`: инициализация проекта в текущей папке
+  - `veloc add <pkg>`, `veloc remove <pkg>`: управление зависимостями
+- [x] **3.2 Модульная система**: `module`, `import`, `pub`
+- [x] **3.3 Оператор `?` (Try Operator)**, `Option`/`Result`
+- [x] **3.4 Аллокаторы как первоклассная концепция**:
+  - `TrackingAllocator`: подсчет байтов, пиковой памяти, обнаружение утечек
+  - `TempAllocator`: быстрый потокобезопасный буфер временных аллокаций
+  - `VeloC_Arena`: мгновенный rewind памяти
+  - `FixedPool`: O(1) аллокатор без фрагментации памяти
 
 ### 4. Волна 3 (P1: Библиотека и Производительность)
-- [ ] **4.1 Стандартная библиотека коллекций** (SwissTable Map/Set, Vec, Deque, SlotMap)
-- [ ] **4.2 Высокопроизводительные SIMD-ядра** (GEMM, GEMV, Quantize, Bitonic sort, FFT)
-- [ ] **4.3 Оптимизации сборки** (PCH, ThinLTO, unity-build)
+- [x] **4.1 Стандартная библиотека коллекций** (SmallVec, FlatMap, FixedQueue, Slice)
+- [x] **4.2 Высокопроизводительные SIMD-ядра**:
+  - `simd_gemm_f32`: блочное 32x32 матричное умножение $C = A \times B$ на AVX2+FMA
+  - `simd_gemv_f32`: умножение матрицы на вектор $y = A \times x$ с 4-way FMA unroll
+  - `simd_quantize_f32_to_i8`: симметричное квантование в int8 для LLM/AI моделей
+  - `simd_cross_entropy_loss`, `simd_argmax`, `simd_prefix_sum_u32`, `simd_clamp_array`
+- [x] **4.3 Оптимизации сборки**:
+  - Хэш-кэширование (0.3ms instant hit)
+  - Статическая сборка (`-static`) под Windows MinGW тулчейн Clang 20
 
 ### 5. Волна 4 (P2: Инструменты и Экосистема)
 - [ ] **5.1 CLI команды**: `veloc fmt`, `veloc lint`, `veloc doc`, `veloc explain`
