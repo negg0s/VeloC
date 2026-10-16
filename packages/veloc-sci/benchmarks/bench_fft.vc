@@ -1,0 +1,70 @@
+#include <veloc.h>
+#include <veloc_sci.h>
+#include <cstdio>
+#include <vector>
+#include <chrono>
+
+const usize FFT_SIZE = 16384; // 16k points
+
+// Direct Discrete Fourier Transform (O(N^2)) for comparison
+void dft_naive(const std::vector<veloc::sci::c64>& in, std::vector<veloc::sci::c64>& out) {
+    usize N = in.size();
+    out.assign(N, 0.0);
+    for (usize k = 0; k < N; k++) {
+        for (usize n = 0; n < N; n++) {
+            f64 angle = -2.0 * 3.14159265358979323846 * (f64)(k * n) / (f64)N;
+            out[k] += in[n] * veloc::sci::c64(cos(angle), sin(angle));
+        }
+    }
+}
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("         VeloC Sci Benchmark: Cooley-Tukey FFT vs Direct DFT     \n");
+    printf("=================================================================\n");
+
+    // 1. Direct DFT on 2048 points (O(N^2))
+    const usize N_SMALL = 2048;
+    std::vector<veloc::sci::c64> signal_small(N_SMALL);
+    for (usize i = 0; i < N_SMALL; i++) {
+        signal_small[i] = sin(2.0 * 3.1415926535 * 50.0 * (f64)i / (f64)N_SMALL);
+    }
+    std::vector<veloc::sci::c64> dft_out(N_SMALL);
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+    dft_naive(signal_small, dft_out);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 dft_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count();
+    printf("  [Direct Naive DFT] 2,048 points: %.2f ms\n", dft_ms);
+
+    // 2. Cooley-Tukey Radix-2 FFT on 2048 points
+    std::vector<veloc::sci::c64> fft_small = signal_small;
+    auto t2 = std::chrono::high_resolution_clock::now();
+    for (usize iter = 0; iter < 100; iter++) {
+        fft_small = signal_small;
+        veloc::sci::fft_radix2(fft_small, false);
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+    f64 fft_small_ms = std::chrono::duration<f64, std::milli>(t3 - t2).count() / 100.0;
+    f64 speedup = dft_ms / fft_small_ms;
+    printf("  [Cooley-Tukey FFT] 2,048 points: %.4f ms (Speedup vs DFT: %.1fx)\n", fft_small_ms, speedup);
+
+    // 3. Cooley-Tukey Radix-2 FFT on 16,384 points
+    std::vector<veloc::sci::c64> signal_large(FFT_SIZE);
+    for (usize i = 0; i < FFT_SIZE; i++) {
+        signal_large[i] = cos(2.0 * 3.1415926535 * 440.0 * (f64)i / (f64)FFT_SIZE);
+    }
+    auto t4 = std::chrono::high_resolution_clock::now();
+    for (usize iter = 0; iter < 50; iter++) {
+        std::vector<veloc::sci::c64> tmp = signal_large;
+        veloc::sci::fft_radix2(tmp, false);
+    }
+    auto t5 = std::chrono::high_resolution_clock::now();
+    f64 fft_large_ms = std::chrono::duration<f64, std::milli>(t5 - t4).count() / 50.0;
+    printf("  [Cooley-Tukey FFT] 16,384 points: %.2f ms (Throughput: %.2f M samples/s)\n",
+           fft_large_ms, ((f64)FFT_SIZE / 1e6) / (fft_large_ms / 1000.0));
+
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY]\n");
+    return 0;
+}

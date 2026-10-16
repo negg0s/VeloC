@@ -1,0 +1,12 @@
+[package]
+name = "veloc-sci"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "Scientific computing package for VeloC: Linear Algebra (LU, Cholesky, QR, SVD, CG), FFT, RK4 ODE solver, and Monte Carlo"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "avx2"

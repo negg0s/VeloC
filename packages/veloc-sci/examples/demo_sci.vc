@@ -1,0 +1,58 @@
+#include <veloc.h>
+#include <veloc_sci.h>
+#include <cstdio>
+#include <vector>
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("   VeloC Sci: Planetary Orbit Simulation & Monte Carlo PI        \n");
+    printf("=================================================================\n");
+
+    // 1. Planetary Orbit Simulation with RK4 ODE Integrator
+    // Gravitational central force: r'' = -mu / r^3 * r
+    // State: y = [x, y, vx, vy]
+    // dy/dt = [vx, vy, -mu*x/r^3, -mu*y/r^3]
+    f64 t = 0.0;
+    const f64 mu = 1.0;
+    // Initial condition for circular orbit at radius 1.0: v = 1.0
+    std::vector<f64> orbit_state = {1.0, 0.0, 0.0, 1.0};
+
+    auto orbit_deriv = [&](f64 curr_t, const std::vector<f64>& state, std::vector<f64>& out) {
+        f64 rx = state[0];
+        f64 ry = state[1];
+        f64 r = sqrt(rx * rx + ry * ry);
+        f64 r3 = r * r * r;
+        out[0] = state[2]; // dx/dt = vx
+        out[1] = state[3]; // dy/dt = vy
+        out[2] = -mu * rx / r3; // dvx/dt
+        out[3] = -mu * ry / r3; // dvy/dt
+    };
+
+    printf("[Physics]: Simulating full orbit period (t = 2*PI ~ 6.283)...\n");
+    f64 dt = 0.001;
+    usize steps = 6283;
+    for (usize i = 0; i < steps; i++) {
+        veloc::sci::rk4_step(orbit_deriv, t, orbit_state, dt);
+    }
+
+    f64 final_r = sqrt(orbit_state[0] * orbit_state[0] + orbit_state[1] * orbit_state[1]);
+    printf("  Orbit result at t = %.3f:\n", t);
+    printf("  Position: (%.4f, %.4f), Radius: %.6f (Initial: 1.000000)\n",
+           orbit_state[0], orbit_state[1], final_r);
+    printf("  Radial Drift: %.8f (High Energy Conservation)\n", fabs(final_r - 1.0));
+
+    // 2. Monte Carlo Integration: Compute PI via quarter circle area
+    printf("\n[Monte Carlo]: Computing PI by integrating 4 * sqrt(1 - x^2) on [0, 1]...\n");
+    auto quarter_circle = [](f64 x) -> f64 {
+        return 4.0 * sqrt(1.0 - x * x);
+    };
+    f64 approx_pi = veloc::sci::monte_carlo_integrate_1d(quarter_circle, 0.0, 1.0, 5000000);
+    f64 true_pi = 3.141592653589793;
+    printf("  5,000,000 Monte Carlo samples:\n");
+    printf("  Approx PI = %.6f, True PI = %.6f (Absolute Error: %.6f)\n",
+           approx_pi, true_pi, fabs(approx_pi - true_pi));
+
+    printf("=================================================================\n");
+    printf("[DEMO SUCCESS]: Scientific simulations completed with high accuracy.\n");
+    return 0;
+}

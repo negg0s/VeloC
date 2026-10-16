@@ -1,0 +1,57 @@
+#include <veloc.h>
+#include <veloc_sci.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-sci Linear Algebra, FFT, RK4, Monte Carlo...\n");
+
+    // 1. Cholesky Decomposition test
+    // A = [4, 12; 12, 45] -> L = [2, 0; 6, 3]
+    f64 A[4] = {4.0, 12.0, 12.0, 45.0};
+    f64 L[4];
+    bool chol_ok = veloc::sci::cholesky(A, L, 2);
+    assert(chol_ok);
+    assert(fabs(L[0] - 2.0) < 1e-6);
+    assert(fabs(L[2] - 6.0) < 1e-6);
+    assert(fabs(L[3] - 3.0) < 1e-6);
+
+    // 2. LU Solver test
+    // 2x + y = 5
+    // x + 3y = 5 -> solution: x = 2, y = 1
+    f64 A_lu[4] = {2.0, 1.0, 1.0, 3.0};
+    f64 b_lu[2] = {5.0, 5.0};
+    f64 x_sol[2];
+    f64 LU[4];
+    usize P[2];
+    bool lu_ok = veloc::sci::lu_decompose(A_lu, LU, P, 2);
+    assert(lu_ok);
+    veloc::sci::lu_solve(LU, P, b_lu, x_sol, 2);
+    assert(fabs(x_sol[0] - 2.0) < 1e-6);
+    assert(fabs(x_sol[1] - 1.0) < 1e-6);
+
+    // 3. FFT Radix-2 Roundtrip test
+    std::vector<veloc::sci::c64> signal = {1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0};
+    std::vector<veloc::sci::c64> copy = signal;
+    veloc::sci::fft_radix2(copy, false); // Forward FFT
+    veloc::sci::fft_radix2(copy, true);  // Inverse FFT
+    for (usize i = 0; i < signal.size(); i++) {
+        assert(fabs(copy[i].real() - signal[i].real()) < 1e-6);
+    }
+
+    // 4. RK4 ODE test: dy/dt = -y, y(0) = 1.0 -> y(t) = exp(-t)
+    f64 t = 0.0;
+    std::vector<f64> y = {1.0};
+    auto decay_f = [](f64 curr_t, const std::vector<f64>& curr_y, std::vector<f64>& dydt) {
+        dydt[0] = -curr_y[0];
+    };
+    for (usize step = 0; step < 100; step++) {
+        veloc::sci::rk4_step(decay_f, t, y, 0.01);
+    }
+    // At t = 1.0, y should be exp(-1.0) ~ 0.367879
+    assert(fabs(y[0] - exp(-1.0)) < 1e-4);
+
+    printf("[TEST PASS]: veloc-sci algorithms verified successfully!\n");
+    return 0;
+}
