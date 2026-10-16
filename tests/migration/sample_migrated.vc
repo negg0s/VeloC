@@ -1,0 +1,10 @@
+
+pub fn main() -> i32 {
+    let mut sum = 0;
+    std::vector<int> numbers = {10, 20, 30, 40};
+    for (size_t i = 0; i < numbers.size(); i++) {
+        sum += numbers[i];
+    }
+    println(f"Sum is: {sum}");
+    return 0;
+}

@@ -739,7 +739,10 @@ class Parser:
         if has_paren:
             self.expect(TokenType.RPAREN, "Expected ')' after while condition")
 
-        body = self.parse_block()
+        if self.check(TokenType.LBRACE):
+            body = self.parse_block()
+        else:
+            body = BlockStmt(start_tok.line, start_tok.col, self.filename, statements=[self.parse_stmt()])
         return WhileStmt(start_tok.line, start_tok.col, self.filename, condition=cond, body=body)
 
     def parse_for_stmt(self) -> Stmt:
@@ -791,9 +794,15 @@ class Parser:
                 if t.type == TokenType.LPAREN: paren_depth += 1
                 elif t.type == TokenType.RPAREN: paren_depth -= 1
 
-        body = self.parse_block()
+        if self.check(TokenType.LBRACE):
+            body = self.parse_block()
+            body_cpp = CppCodegen("<include>").emit_stmt(body)
+        else:
+            body = self.parse_stmt()
+            # Strip any line directives in single statement
+            body_cpp = "{ " + CppCodegen("<include>").emit_stmt(body).strip() + " }"
+            body_cpp = re.sub(r'#line\s+\d+\s+"[^"]*"\n?', '', body_cpp)
         raw_header = format_raw_tokens(raw_tokens)
-        body_cpp = CppCodegen("<include>").emit_stmt(body)
         return RawCppStmt(start_tok.line, start_tok.col, self.filename, code=f"{raw_header} {body_cpp}")
 
     def parse_match_stmt(self) -> MatchStmt:

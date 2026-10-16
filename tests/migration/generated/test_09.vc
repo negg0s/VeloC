@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int mask = (1 << 4); println(f"{mask}"); return 0; }

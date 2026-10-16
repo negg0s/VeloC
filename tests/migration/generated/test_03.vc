@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { double x = 2.5; double y = 4.0; println(f"{(x * y)}"); return 0; }

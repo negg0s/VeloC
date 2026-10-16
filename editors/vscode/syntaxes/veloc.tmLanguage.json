@@ -1,0 +1,72 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "VeloC",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#types"
+        },
+        {
+            "include": "#numbers"
+        }
+    ],
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.veloc",
+                    "match": "\\b(if|else|while|for|in|match|return|break|continue|defer|bench|test|module|import|pub|mut|let|soa|struct|enum|as)\\b"
+                }
+            ]
+        },
+        "types": {
+            "patterns": [
+                {
+                    "name": "entity.name.type.veloc",
+                    "match": "\\b(i8|i16|i32|i64|u8|u16|u32|u64|f32|f64|usize|bool|char|Option|Result|Slice|Span|Vec|String)\\b"
+                }
+            ]
+        },
+        "strings": {
+            "name": "string.quoted.double.veloc",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.veloc",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.double-slash.veloc",
+                    "match": "//.*$"
+                },
+                {
+                    "name": "comment.block.veloc",
+                    "begin": "/\\*",
+                    "end": "\\*/"
+                }
+            ]
+        },
+        "numbers": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.veloc",
+                    "match": "\\b[0-9]+(\\.[0-9]+)?(f32|f64)?\\b"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.veloc"
+}

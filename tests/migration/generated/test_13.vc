@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int val = 42; int& ref = val; ref = 99; println(f"{val}"); return 0; }

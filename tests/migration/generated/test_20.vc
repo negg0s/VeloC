@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { std::string s = "veloc"; println(f"{s[0]}"); return 0; }

@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int x = 50; println(f"{(x >> 1)}"); return 0; }

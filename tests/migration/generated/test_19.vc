@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { std::string s = "hello"; println(f"{s.size()}"); return 0; }

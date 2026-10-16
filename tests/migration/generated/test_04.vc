@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int a = 15; int b = 4; println(f"{(a / b)}"); return 0; }

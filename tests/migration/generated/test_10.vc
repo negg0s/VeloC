@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int a = 12; int b = 25; println(f"{(a & b)}"); return 0; }

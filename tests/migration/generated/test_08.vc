@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int count = 0; while (count < 5) count++; println(f"{count}"); return 0; }

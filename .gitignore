@@ -6,3 +6,5 @@ __pycache__/
 *.o
 *.hash
 projects/bench_incremental/
+*.log
+game_frame_trace.json

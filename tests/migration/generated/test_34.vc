@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int a = 5, b = 10; println(f"{std::max(a, b)}"); return 0; }

@@ -1,0 +1,50 @@
+{
+    "name": "veloc-vscode",
+    "displayName": "VeloC Language Support",
+    "description": "Rich language support for the high-performance VeloC programming language",
+    "version": "1.0.0",
+    "publisher": "veloc-lang",
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "veloc",
+                "aliases": [
+                    "VeloC",
+                    "veloc"
+                ],
+                "extensions": [
+                    ".vc",
+                    ".veloc"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "veloc",
+                "scopeName": "source.veloc",
+                "path": "./syntaxes/veloc.tmLanguage.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "veloc.run",
+                "title": "VeloC: Run Current File"
+            },
+            {
+                "command": "veloc.test",
+                "title": "VeloC: Run Tests"
+            },
+            {
+                "command": "veloc.check",
+                "title": "VeloC: Run Static Bounds Check"
+            }
+        ]
+    }
+}

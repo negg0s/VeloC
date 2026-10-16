@@ -1,0 +1,2 @@
+#include <algorithm>
+struct Pt { int x, y; }; pub fn main() -> i32 { Pt p = {3, 7}; println(f"{(p.x + p.y)}"); return 0; }

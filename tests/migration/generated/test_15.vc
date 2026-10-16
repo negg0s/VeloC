@@ -1,0 +1,2 @@
+#include <algorithm>
+struct Box { int w, h; }; pub fn main() -> i32 { Box b = {5, 6}; println(f"{(b.w * b.h)}"); return 0; }

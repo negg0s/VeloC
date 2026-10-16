@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { std::vector<int> v; v.push_back(100); println(f"{v[0]}"); return 0; }

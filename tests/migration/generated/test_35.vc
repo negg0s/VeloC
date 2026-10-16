@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { std::vector<int> v = {1, 2, 3}; int sum = 0; for (auto x : v) sum += x; println(f"{sum}"); return 0; }

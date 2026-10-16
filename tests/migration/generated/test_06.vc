@@ -1,0 +1,2 @@
+#include <algorithm>
+int sq(int x) { return x * x; } pub fn main() -> i32 { println(f"{sq(7)}"); return 0; }

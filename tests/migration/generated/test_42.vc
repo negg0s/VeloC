@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int a[5] = {5, 4, 3, 2, 1}; println(f"{(a[0] + a[4])}"); return 0; }

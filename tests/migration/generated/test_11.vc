@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int arr[4] = {1, 2, 3, 4}; println(f"{arr[2]}"); return 0; }

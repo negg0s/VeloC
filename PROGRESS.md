@@ -158,3 +158,29 @@
   - Тесты: `packages/veloc-cli/tests/test_cli.vc` (PASSED)
   - Бенчмарк: `bench_grep.vc` — сканирование 16 МБ буфера за 1.63 ms
   - Демо: `packages/veloc-cli/examples/demo_cli.vc` — рендеринг таблицы компонентов и поиск по корпусу
+
+### 10. Этап 4: Самохостинг, Миграция, Playground, Инструменты (Tooling & Ecosystem)
+- [x] **10.1 Bootstrap компилятор на VeloC (`src/bootstrap/veloc_stage1.vc`)**:
+  - Нативный лексер, токенизатор и генератор кода на чистом VeloC
+  - Сборка: `python veloc.py build src/bootstrap/veloc_stage1.vc -o bin/veloc_stage1.exe`
+  - Автономный запуск `bin/veloc_stage1.exe` успешно выполнен, self-test green (exit code 0)
+- [x] **10.2 Автоматический переводчик C++ -> VeloC (`src/from_cpp.py`, `veloc from-cpp`)**:
+  - Трансляция STL, циклов, функций, шаблонов, потоков `<<`
+  - Набор из 50 программ (`tests/migration/run_migration_suite.py`): **48 / 50 собраны Clang (96.0% success rate)**
+  - Миграционные руководства: `docs/migration/cpp_to_veloc.md` и `docs/migration/other_languages_to_veloc.md`
+- [x] **10.3 Документация, Книга и Playground**:
+  - Web Playground HTTP сервер: `src/playground.py` (`python veloc.py playground`)
+  - "The VeloC Book": структура и 25 глав в `docs/book/README.md`
+  - Performance Guide: `docs/performance_guide.md`
+  - Честная матрица сравнения языков: `docs/comparison.md`
+  - Промпт-спецификация для ИИ-ассистентов: `llms.txt`
+- [x] **10.4 Пакетный реестр и Безопасность**:
+  - Спецификация реестра и шаблоны: `docs/registry_and_templates.md`
+  - Политика безопасности: `SECURITY.md`
+- [x] **10.5 Редактор и IDE**:
+  - VS Code расширение и грамматика TextMate: `editors/vscode/package.json`, `editors/vscode/syntaxes/veloc.tmLanguage.json`
+- [x] **10.6 Единый бенчмарк-лидерборд и Финальный аудит**:
+  - Сводный лидерборд по 7 вертикалям: `docs/benchmark_leaderboard.md`
+  - Финальный аудит: `AUDIT_FINAL.md`
+- [x] **10.7 Автопилот непрерывного улучшения**:
+  - Регламент и журнал: `AUTOPILOT.md`

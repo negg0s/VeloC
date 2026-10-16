@@ -1,0 +1,28 @@
+# VeloC Assistant Instructions (LLMs / Agents)
+
+VeloC is a high-performance systems programming language transpiled into pure modern C++ with Clang 20 on x86_64 architectures (AVX2/FMA3).
+
+## Core Syntax Rules for AI Models
+1. **Entry Point**: Always use `pub fn main() -> i32 { ... return 0; }` or standard `i32 main()`.
+2. **Variables**:
+   - Immutable by default: `let x = 42;`
+   - Mutable: `let mut count = 0;`
+3. **Strings & Printing**:
+   - F-strings: `println(f"Hello {name}, score: {score}");`
+   - Standard: `println("Static string");`
+4. **Ranges**:
+   - `for (let i in range(0, 10))` or `for (let i in range(0, 10, 2))`
+5. **Data-Oriented Programming (SoA)**:
+   - Use `soa struct Particle { x: f32, y: f32, vx: f32, vy: f32 }` for bulk SIMD processing.
+6. **Error Handling**:
+   - Return `Result<T, const char*>` or `Option<T>`.
+   - Propagate errors with `?` (e.g. `let val = read_file(path)?;`).
+7. **Pointers & Memory**:
+   - Never return references to local variables on the stack.
+   - Use `veloc::game::SparseSet` or `veloc_aligned_alloc(32, bytes)` for continuous buffers.
+
+## Common LLM Hallucinations & Mistakes to Avoid
+- ❌ Do NOT emit Rust's `fn main() -> ()` or `println!("...")` with an exclamation mark.
+- ❌ Do NOT emit C++ `std::cout <<` when writing VeloC code — use `println(...)`.
+- ❌ Do NOT use `const let x = ...` — use `let x = ...` (already immutable).
+- ❌ Do NOT create raw heap linked lists for performance-critical loops — use contiguous arrays or `SmallVec`.

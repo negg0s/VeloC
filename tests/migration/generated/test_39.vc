@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int x = 12; int y = 25; println(f"{(x ^ y)}"); return 0; }

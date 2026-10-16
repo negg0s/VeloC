@@ -356,6 +356,10 @@ def main():
     semver_p.add_argument("old_file", help="Path to baseline .vc file")
     semver_p.add_argument("new_file", help="Path to new/updated .vc file")
 
+    from_cpp_p = subparsers.add_parser("from-cpp", help="Migrate a C++ file to idiomatic VeloC")
+    from_cpp_p.add_argument("file", help="Path to .cpp file to transpile")
+    from_cpp_p.add_argument("-o", "--output", help="Optional output .vc file path")
+
     args = parser.parse_args()
 
     if args.command == "build":
@@ -403,6 +407,17 @@ def main():
         run_static_check(Path(args.file), bounds_report=args.bounds_report)
     elif args.command == "semver-check":
         run_semver_check(Path(args.old_file), Path(args.new_file))
+    elif args.command == "from-cpp":
+        from from_cpp import transpile_cpp_to_veloc
+        src_path = Path(args.file)
+        if not src_path.exists():
+            print(f"[Error] Source file not found: {src_path}")
+            sys.exit(1)
+        out_path = Path(args.output) if args.output else src_path.with_suffix(".vc")
+        cpp_code = src_path.read_text(encoding="utf-8")
+        vc_code = transpile_cpp_to_veloc(cpp_code)
+        out_path.write_text(vc_code, encoding="utf-8")
+        print(f"[VeloC From-C++] Transpiled {src_path.name} -> {out_path.name} successfully.")
     elif args.command == "bench":
         if hasattr(args, "incremental") and args.incremental:
             subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "bench_incremental.py")])

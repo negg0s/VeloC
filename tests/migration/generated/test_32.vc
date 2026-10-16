@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int a = 10, b = 20; std::swap(a, b); println(f"{a}"); return 0; }

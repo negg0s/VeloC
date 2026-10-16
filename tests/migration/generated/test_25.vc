@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int x = -42; println(f"{(x < 0 ? -x : x)}"); return 0; }

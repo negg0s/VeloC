@@ -1,0 +1,2 @@
+#include <algorithm>
+pub fn main() -> i32 { int val = 100; let mut p = &val; println(f"{*p}"); return 0; }
