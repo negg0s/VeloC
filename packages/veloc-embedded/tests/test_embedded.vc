@@ -1,0 +1,73 @@
+#include <veloc.h>
+#include <veloc_embedded.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+
+struct SensorPacket {
+    u32 timestamp;
+    i16 temperature;
+    i16 pressure;
+};
+
+enum DeviceState {
+    PowerOff,
+    Standby,
+    ActiveSampling,
+    Fault
+};
+
+enum DeviceEvent {
+    PowerButton,
+    SensorReady,
+    ErrorDetected,
+    ResetButton
+};
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-embedded Zero-Heap Pool, Fixed16, CRC32, FSM...\n");
+
+    // 1. Zero-heap Static Pool test
+    veloc::embedded::StaticPool<SensorPacket, 8> pool;
+    assert(pool.available() == 8);
+    SensorPacket* p1 = pool.allocate();
+    assert(p1 != nullptr);
+    assert(pool.available() == 7);
+    p1->timestamp = 1000;
+    p1->temperature = 250;
+
+    bool freed = pool.deallocate(p1);
+    assert(freed);
+    assert(pool.available() == 8);
+
+    // 2. Q16.16 Fixed-Point Math test
+    veloc::embedded::Fixed16 a(2.5f);
+    veloc::embedded::Fixed16 b(1.5f);
+    veloc::embedded::Fixed16 sum = a + b;
+    veloc::embedded::Fixed16 prod = a * b;
+    assert(fabs(sum.to_float() - 4.0f) < 0.01f);
+    assert(fabs(prod.to_float() - 3.75f) < 0.01f);
+
+    // 3. CRC32 Checksum test
+    const char* payload = "VeloC_Embedded_Telemetry_12345";
+    u32 crc = veloc::embedded::crc32((const u8*)payload, strlen(payload));
+    assert(crc != 0);
+
+    // 4. FSM Table test
+    veloc::embedded::FSM<DeviceState, DeviceEvent, 16> fsm(PowerOff);
+    fsm.add_transition(PowerOff, PowerButton, Standby);
+    fsm.add_transition(Standby, SensorReady, ActiveSampling);
+    fsm.add_transition(ActiveSampling, ErrorDetected, Fault);
+    fsm.add_transition(Fault, ResetButton, Standby);
+
+    assert(fsm.state() == PowerOff);
+    assert(fsm.handle_event(PowerButton));
+    assert(fsm.state() == Standby);
+    assert(fsm.handle_event(SensorReady));
+    assert(fsm.state() == ActiveSampling);
+    assert(fsm.handle_event(ErrorDetected));
+    assert(fsm.state() == Fault);
+
+    printf("[TEST PASS]: veloc-embedded components verified successfully!\n");
+    return 0;
+}

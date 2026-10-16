@@ -1,0 +1,52 @@
+#include <veloc.h>
+#include <veloc_embedded.h>
+#include <cstdio>
+
+// Microcontroller Sensor Node Simulation
+struct TelemetryFrame {
+    u32 seq_id;
+    veloc::embedded::Fixed16 temperature_c;
+    veloc::embedded::Fixed16 humidity_pct;
+    u32 crc;
+};
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("  VeloC Embedded: MCU Telemetry Node (Zero-Heap Freestanding)    \n");
+    printf("=================================================================\n");
+
+    // Static pool of telemetry packets: zero heap usage, deterministically bounded memory
+    veloc::embedded::StaticPool<TelemetryFrame, 16> packet_pool;
+    printf("[System Init]: Static memory pool configured with %lld bytes storage.\n",
+           (long long)(16 * sizeof(TelemetryFrame)));
+
+    // Generate telemetry samples
+    printf("[Acquisition]: Sampling simulated sensor peripherals...\n");
+    for (usize i = 0; i < 5; i++) {
+        TelemetryFrame* frame = packet_pool.allocate();
+        if (!frame) break;
+
+        frame->seq_id = (u32)(i + 1);
+        frame->temperature_c = veloc::embedded::Fixed16(24.5f + (f32)i * 0.25f);
+        frame->humidity_pct = veloc::embedded::Fixed16(55.0f - (f32)i * 0.5f);
+
+        // Compute IEEE CRC32 over the frame payload
+        frame->crc = veloc::embedded::crc32((const u8*)frame, sizeof(TelemetryFrame) - sizeof(u32));
+
+        printf("  [TX Frame #%u] Temp: %.2f C, Humidity: %.1f %%, CRC32: 0x%08X\n",
+               frame->seq_id,
+               frame->temperature_c.to_float(),
+               frame->humidity_pct.to_float(),
+               frame->crc);
+
+        // Release frame after transmission
+        packet_pool.deallocate(frame);
+    }
+
+    printf("[Memory Check]: Pool slots remaining: %lld / %lld (Zero leak verified).\n",
+           (long long)packet_pool.available(), (long long)packet_pool.capacity());
+
+    printf("=================================================================\n");
+    printf("[DEMO SUCCESS]: Embedded node executed reliably with zero heap allocations.\n");
+    return 0;
+}

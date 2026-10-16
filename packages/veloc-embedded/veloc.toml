@@ -1,0 +1,12 @@
+[package]
+name = "veloc-embedded"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "Freestanding embedded systems runtime for VeloC: zero-heap static pools, FSM tables, fixed-point math, and hardware CRC32"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "none"

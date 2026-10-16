@@ -1,0 +1,44 @@
+#include <veloc.h>
+#include <veloc_embedded.h>
+#include <cstdio>
+#include <chrono>
+
+const usize ITERATIONS = 10000000; // 10 Million Ops
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("       VeloC Embedded: Fixed-Point vs Floating-Point Benchmark   \n");
+    printf("=================================================================\n");
+
+    // 1. Hardware Floating-Point Operations
+    auto t0 = std::chrono::high_resolution_clock::now();
+    volatile f32 f_res = 1.0f;
+    f32 f_mul = 1.000001f;
+    f32 f_add = 0.5f;
+    for (usize i = 0; i < ITERATIONS; i++) {
+        f_res = (f_res + f_add) * f_mul;
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 float_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count();
+    f64 float_mops = ((f64)ITERATIONS / 1e6) / (float_ms / 1000.0);
+    printf("  [Floating-Point (f32)] 10,000,000 ops: %.2f ms (Throughput: %.2f MOPS)\n",
+           float_ms, float_mops);
+
+    // 2. Q16.16 Fixed-Point Operations (Zero FPU reliance)
+    auto t2 = std::chrono::high_resolution_clock::now();
+    veloc::embedded::Fixed16 fix_res(1.0f);
+    veloc::embedded::Fixed16 fix_mul(1.0001f);
+    veloc::embedded::Fixed16 fix_add(0.5f);
+    for (usize i = 0; i < ITERATIONS; i++) {
+        fix_res = (fix_res + fix_add) * fix_mul;
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+    f64 fix_ms = std::chrono::duration<f64, std::milli>(t3 - t2).count();
+    f64 fix_mops = ((f64)ITERATIONS / 1e6) / (fix_ms / 1000.0);
+    printf("  [Fixed-Point (Q16.16)] 10,000,000 ops: %.2f ms (Throughput: %.2f MOPS)\n",
+           fix_ms, fix_mops);
+
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY] Checksum: %.4f\n", fix_res.to_float());
+    return 0;
+}
