@@ -1,0 +1,54 @@
+// VeloC 8.5: AVX2 SIMD Cross-Entropy Loss, ArgMax & defer blocks
+fn test_simd_loss_and_argmax() -> void {
+    println("--- 1. Testing AVX2 SIMD Cross-Entropy Loss & ArgMax (LLM Inference/Training) ---");
+    let vocab_size: usize = 32768; // 32k vocabulary
+    let logits = (f32*)veloc_aligned_alloc(32, sizeof(f32) * vocab_size);
+    defer {
+        veloc_aligned_free(logits);
+        println("Multi-statement defer block executed successfully!");
+    }
+
+    for (let i in range(0, vocab_size as i64, 1)) {
+        logits[i] = ((i % 100) as f32) * 0.1f - 5.0f;
+    }
+    // Set a clear maximum peak
+    logits[1337] = 25.0f;
+
+    let target_token: usize = 1337;
+    let mut loss: f32 = 0.0f;
+
+    bench "AVX2 SIMD Cross-Entropy Loss (32k vocab)" {
+        loss = simd_cross_entropy_loss(logits, vocab_size, target_token);
+    }
+
+    let mut best_token: usize = 0;
+    bench "AVX2 SIMD ArgMax (32k vocab)" {
+        best_token = simd_argmax(logits, vocab_size);
+    }
+
+    println(f"Calculated Loss for target token {target_token}: {loss} (Expected small loss due to high logit)");
+    println(f"ArgMax predicted token: {best_token} (Expected: 1337)");
+
+    assert_eq(best_token, 1337);
+    assert_true(loss >= 0.0f && loss < 0.1f);
+}
+
+fn test_defer_blocks() -> void {
+    println("--- 2. Testing Defer Blocks with multiple statements ---");
+    let mut step = 1;
+    {
+        defer {
+            step += 10;
+        }
+        assert_eq(step, 1);
+    }
+    assert_eq(step, 11);
+    println(f"Step after defer block = {step} (Expected: 11)");
+}
+
+int main() {
+    test_simd_loss_and_argmax();
+    test_defer_blocks();
+    println("ALL VELOC 8.5 CHECKS PASSED WITH ABSOLUTE PERFECTION!");
+    return 0;
+}

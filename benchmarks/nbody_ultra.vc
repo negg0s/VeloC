@@ -1,0 +1,158 @@
+module UltraNBody;
+
+soa struct Particle3D {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 mass;
+};
+
+// VeloC ULTRA Kernel: Dual-Issue AVX2 FMA (16 particles/loop)
+// Simultaneously loads two chunks and feeds Port 0 and Port 1 in parallel!
+VELOC_INLINE void compute_nbody_ultra(Particle3D_SoA& p, usize start, usize end, f32 dt) {
+    const f32 G = 6.674e-5f;
+    const f32 EPS = 1e-3f;
+    f32x8 g_vec = f32x8_set1(G);
+    f32x8 eps_vec = f32x8_set1(EPS);
+    f32x8 dt_vec = f32x8_set1(dt);
+    usize n = p.count;
+
+    for (usize i = start; i < end; i++) {
+        f32x8 xi = f32x8_set1(p.x[i]);
+        f32x8 yi = f32x8_set1(p.y[i]);
+        f32x8 zi = f32x8_set1(p.z[i]);
+
+        // Dual accumulators to break dependency chains
+        f32x8 acc_fx0 = f32x8_set1(0.0f), acc_fy0 = f32x8_set1(0.0f), acc_fz0 = f32x8_set1(0.0f);
+        f32x8 acc_fx1 = f32x8_set1(0.0f), acc_fy1 = f32x8_set1(0.0f), acc_fz1 = f32x8_set1(0.0f);
+
+        usize j = 0;
+        // Inner loop: 16 particles per iteration
+        for (; j + 15 < n; j += 16) {
+            veloc_prefetch(&p.x[j + 64]);
+            veloc_prefetch(&p.y[j + 64]);
+            veloc_prefetch(&p.z[j + 64]);
+
+            // Chunk 0 (8 particles)
+            f32x8 xj0 = f32x8_load(&p.x[j]);
+            f32x8 yj0 = f32x8_load(&p.y[j]);
+            f32x8 zj0 = f32x8_load(&p.z[j]);
+            f32x8 mj0 = f32x8_load(&p.mass[j]);
+
+            // Chunk 1 (8 particles)
+            f32x8 xj1 = f32x8_load(&p.x[j + 8]);
+            f32x8 yj1 = f32x8_load(&p.y[j + 8]);
+            f32x8 zj1 = f32x8_load(&p.z[j + 8]);
+            f32x8 mj1 = f32x8_load(&p.mass[j + 8]);
+
+            // Distance vectors
+            f32x8 dx0 = _mm256_sub_ps(xj0, xi), dy0 = _mm256_sub_ps(yj0, yi), dz0 = _mm256_sub_ps(zj0, zi);
+            f32x8 dx1 = _mm256_sub_ps(xj1, xi), dy1 = _mm256_sub_ps(yj1, yi), dz1 = _mm256_sub_ps(zj1, zi);
+
+            // Distance squared
+            f32x8 dsq0 = f32x8_fmadd(dz0, dz0, f32x8_fmadd(dy0, dy0, f32x8_fmadd(dx0, dx0, eps_vec)));
+            f32x8 dsq1 = f32x8_fmadd(dz1, dz1, f32x8_fmadd(dy1, dy1, f32x8_fmadd(dx1, dx1, eps_vec)));
+
+            // Hardware RSQRT
+            f32x8 inv0 = _mm256_rsqrt_ps(dsq0);
+            f32x8 inv1 = _mm256_rsqrt_ps(dsq1);
+
+            // inv^3
+            f32x8 inv0_3 = _mm256_mul_ps(_mm256_mul_ps(inv0, inv0), inv0);
+            f32x8 inv1_3 = _mm256_mul_ps(_mm256_mul_ps(inv1, inv1), inv1);
+
+            f32x8 f0 = _mm256_mul_ps(_mm256_mul_ps(g_vec, mj0), inv0_3);
+            f32x8 f1 = _mm256_mul_ps(_mm256_mul_ps(g_vec, mj1), inv1_3);
+
+            // Dual FMA accumulation (parallel issue to Port 0 & Port 1)
+            acc_fx0 = f32x8_fmadd(f0, dx0, acc_fx0);
+            acc_fx1 = f32x8_fmadd(f1, dx1, acc_fx1);
+
+            acc_fy0 = f32x8_fmadd(f0, dy0, acc_fy0);
+            acc_fy1 = f32x8_fmadd(f1, dy1, acc_fy1);
+
+            acc_fz0 = f32x8_fmadd(f0, dz0, acc_fz0);
+            acc_fz1 = f32x8_fmadd(f1, dz1, acc_fz1);
+        }
+
+        // Remainder 8 particles
+        for (; j + 7 < n; j += 8) {
+            f32x8 xj = f32x8_load(&p.x[j]);
+            f32x8 yj = f32x8_load(&p.y[j]);
+            f32x8 zj = f32x8_load(&p.z[j]);
+            f32x8 mj = f32x8_load(&p.mass[j]);
+
+            f32x8 dx = _mm256_sub_ps(xj, xi), dy = _mm256_sub_ps(yj, yi), dz = _mm256_sub_ps(zj, zi);
+            f32x8 dsq = f32x8_fmadd(dz, dz, f32x8_fmadd(dy, dy, f32x8_fmadd(dx, dx, eps_vec)));
+            f32x8 inv = _mm256_rsqrt_ps(dsq);
+            f32x8 inv3 = _mm256_mul_ps(_mm256_mul_ps(inv, inv), inv);
+            f32x8 f = _mm256_mul_ps(_mm256_mul_ps(g_vec, mj), inv3);
+
+            acc_fx0 = f32x8_fmadd(f, dx, acc_fx0);
+            acc_fy0 = f32x8_fmadd(f, dy, acc_fy0);
+            acc_fz0 = f32x8_fmadd(f, dz, acc_fz0);
+        }
+
+        // Combine dual accumulators
+        f32x8 sum_fx = _mm256_add_ps(acc_fx0, acc_fx1);
+        f32x8 sum_fy = _mm256_add_ps(acc_fy0, acc_fy1);
+        f32x8 sum_fz = _mm256_add_ps(acc_fz0, acc_fz1);
+
+        f32 total_fx = f32x8_hsum(sum_fx);
+        f32 total_fy = f32x8_hsum(sum_fy);
+        f32 total_fz = f32x8_hsum(sum_fz);
+
+        p.vx[i] += total_fx * dt;
+        p.vy[i] += total_fy * dt;
+        p.vz[i] += total_fz * dt;
+        p.x[i] += p.vx[i] * dt;
+        p.y[i] += p.vy[i] * dt;
+        p.z[i] += p.vz[i] * dt;
+    }
+}
+
+int main() {
+    const usize NUM_PARTICLES = 16384;
+    println("==========================================================");
+    println("      VeloC ULTRA Engine (Dual-Issue AVX2 FMA + RSQRT)    ");
+    println("==========================================================");
+
+    Particle3D_SoA particles = Particle3D_SoA::create(NUM_PARTICLES);
+    defer particles.destroy();
+
+    for (usize i = 0; i < NUM_PARTICLES; i++) {
+        particles.x[i] = (f32)(i % 100);
+        particles.y[i] = (f32)(i % 200);
+        particles.z[i] = (f32)(i % 50);
+        particles.vx[i] = 0.0f;
+        particles.vy[i] = 0.0f;
+        particles.vz[i] = 0.0f;
+        particles.mass[i] = 10.0f;
+    }
+    particles.count = NUM_PARTICLES;
+
+    // Warm-up threads
+    veloc::parallel_for(1000, 12, [&](usize s, usize e){});
+
+    VeloC_Timer timer;
+    timer.start();
+
+    // 12 threads with Dual-Issue AVX2 FMA & Core Pinning
+    veloc::parallel_for(NUM_PARTICLES, 12, [&](usize start, usize end) {
+        compute_nbody_ultra(particles, start, end, 0.016f);
+    });
+
+    f64 ms = timer.elapsed_ms();
+    f64 gflops = ((f64)NUM_PARTICLES * NUM_PARTICLES * 20.0) / (ms / 1000.0) / 1e9;
+
+    println("Complete!");
+    println("VeloC ULTRA Step Time:   %.2f ms", ms);
+    println("VeloC ULTRA Throughput:  %.2f GFLOPS", gflops);
+    println("Sample Particle 0 pos:   (%.2f, %.2f, %.2f)", particles.x[0], particles.y[0], particles.z[0]);
+    println("==========================================================");
+
+    return 0;
+}

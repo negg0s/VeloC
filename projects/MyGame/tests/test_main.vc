@@ -1,0 +1,12 @@
+module Tests;
+
+test "sanity test" {
+    assert_eq(2 + 2, 4);
+    assert_true(10 > 5);
+}
+
+test "result type test" {
+    let res = Result<i32, const char*>::Ok(42);
+    assert_true(res.is_ok());
+    assert_eq(res.unwrap(), 42);
+}

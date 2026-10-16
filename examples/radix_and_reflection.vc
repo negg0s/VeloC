@@ -1,0 +1,108 @@
+// ============================================================================
+// VeloC 4.0: Radix Sort, Enum Reflection, SIMD Min/Max, and Fast Trig
+// ============================================================================
+#include <algorithm>
+#include <math.h>
+
+veloc_enum(PlayerState, Idle, Running, Jumping, Attacking, Dead);
+
+int main() {
+    println("===============================================================");
+    println("      VeloC 4.0: Advanced Systems & Extreme Algorithms         ");
+    println("===============================================================");
+
+    // 1. Zero-Cost Enum Reflection (Reddit #1 Wishlist Item for 30 years)
+    println("1. Zero-Cost Enum Reflection:");
+    let state = PlayerState::Attacking;
+    println(f"   Player state: {state}");
+    let next_state = PlayerState::Running;
+    println(f"   Next state:   {next_state}");
+
+    // 2. Python/Rust-like Range Loop: for (let i in range(...))
+    println("\n2. Range-based Iteration (Zero Boilerplate):");
+    print("   Evens up to 10: ");
+    for (let i in range(0, 10, 2)) {
+        printf("%lld ", (long long)i);
+    }
+    println("");
+
+    // 3. Fast Trigonometric Polynomial Approximation (fast_sin vs sinf)
+    println("\n3. Ultra-Fast Trigonometric Approximations:");
+    f32 angle = 0.785398f; // ~PI/4
+    f32 approx_val = fast_sin(angle);
+    f32 exact_val  = sinf(angle);
+    println(f"   Angle PI/4: fast_sin = {approx_val}, std::sin = {exact_val} (diff = {approx_val - exact_val})");
+
+    const usize TRIG_COUNT = 1000000;
+    f32 trig_sum_fast = 0;
+    bench "fast_sin (1,000,000 calls)" {
+        for (usize i = 0; i < TRIG_COUNT; i++) {
+            trig_sum_fast += fast_sin((f32)i * 0.001f);
+        }
+    }
+
+    f32 trig_sum_std = 0;
+    bench "std::sinf (1,000,000 calls)" {
+        for (usize i = 0; i < TRIG_COUNT; i++) {
+            trig_sum_std += sinf((f32)i * 0.001f);
+        }
+    }
+
+    // 4. AVX2 SIMD Min/Max on 1,000,000 Floats
+    println("\n4. AVX2 SIMD Min/Max Reduction (1,000,000 Floats):");
+    const usize FLOAT_COUNT = 1000000;
+    f32* float_arr = (f32*)veloc_aligned_alloc(32, sizeof(f32) * FLOAT_COUNT);
+    defer veloc_aligned_free(float_arr);
+
+    veloc::FastRng rng(12345);
+    for (usize i = 0; i < FLOAT_COUNT; i++) {
+        float_arr[i] = rng.next_f32() * 1000.0f;
+    }
+    float_arr[42] = -999.0f;
+    float_arr[1337] = 9999.0f;
+
+    f32 min_val = 0, max_val = 0;
+    bench "AVX2 SIMD Min/Max (1M floats)" {
+        simd_min_max_f32(float_arr, FLOAT_COUNT, &min_val, &max_val);
+    }
+    println(f"   Calculated Min: {min_val}, Max: {max_val}");
+
+    // 5. Branchless 8-bit LSD Radix Sort vs std::sort (1,000,000 Integers)
+    println("\n5. Extreme Sorting Benchmark (1,000,000 32-bit Integers):");
+    const usize INT_COUNT = 1000000;
+    u32* radix_arr = (u32*)veloc_aligned_alloc(32, sizeof(u32) * INT_COUNT);
+    u32* std_arr   = (u32*)veloc_aligned_alloc(32, sizeof(u32) * INT_COUNT);
+    defer veloc_aligned_free(radix_arr);
+    defer veloc_aligned_free(std_arr);
+
+    for (usize i = 0; i < INT_COUNT; i++) {
+        u32 r = (u32)rng.next_u64();
+        radix_arr[i] = r;
+        std_arr[i] = r;
+    }
+
+    bench "veloc::radix_sort_u32 (1M ints)" {
+        radix_sort_u32(radix_arr, INT_COUNT);
+    }
+
+    bench "std::sort (1M ints)" {
+        std::sort(std_arr, std_arr + INT_COUNT);
+    }
+
+    // Verify sort correctness
+    bool sorted_correct = true;
+    for (usize i = 1; i < INT_COUNT; i++) {
+        if (radix_arr[i] < radix_arr[i - 1]) {
+            sorted_correct = false;
+            break;
+        }
+    }
+    const char* sort_status = sorted_correct ? "YES" : "NO";
+    println(f"   Radix sort verified: {sort_status}");
+    println(f"   First 3: [{radix_arr[0]}, {radix_arr[1]}, {radix_arr[2]}], Last: {radix_arr[INT_COUNT - 1]}");
+
+    println("===============================================================");
+    println("      All VeloC 4.0 Systems & Benchmarks Completed!            ");
+    println("===============================================================");
+    return 0;
+}

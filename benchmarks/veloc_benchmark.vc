@@ -1,0 +1,55 @@
+module Benchmark;
+
+soa struct Particle {
+    f32 x;
+    f32 y;
+    f32 vx;
+    f32 vy;
+};
+
+VELOC_INLINE void update_particles(f32* noalias x, f32* noalias y, 
+                                  const f32* noalias vx, const f32* noalias vy, 
+                                  usize count, f32 dt) {
+    #pragma clang loop vectorize(enable)
+    for (usize i = 0; i < count; i++) {
+        x[i] += vx[i] * dt;
+        y[i] += vy[i] * dt;
+    }
+}
+
+int main() {
+    const usize NUM_PARTICLES = 5000000;
+    const int STEPS = 20;
+
+    println("[VeloC] Initializing %llu particles using SoA...", (unsigned long long)NUM_PARTICLES);
+    VeloC_Timer timer;
+    timer.start();
+
+    Particle_SoA particles = Particle_SoA::create(NUM_PARTICLES);
+    defer particles.destroy();
+
+    for (usize i = 0; i < NUM_PARTICLES; i++) {
+        particles.x[i] = (f32)(i % 100);
+        particles.y[i] = (f32)(i % 200);
+        particles.vx[i] = 1.5f;
+        particles.vy[i] = -0.5f;
+    }
+    particles.count = NUM_PARTICLES;
+
+    f64 init_ms = timer.elapsed_ms();
+    println("[VeloC] Init Time: %.2f ms", init_ms);
+
+    println("[VeloC] Running %d simulation steps...", STEPS);
+    timer.start();
+
+    for (int s = 0; s < STEPS; s++) {
+        update_particles(particles.x, particles.y, particles.vx, particles.vy, particles.count, 0.016f);
+    }
+
+    f64 sim_ms = timer.elapsed_ms();
+    println("[VeloC] Simulation Time: %.2f ms", sim_ms);
+    println("[VeloC] Per step: %.3f ms", sim_ms / STEPS);
+    println("[VeloC] Sample pos: (%.2f, %.2f)", particles.x[0], particles.y[0]);
+
+    return 0;
+}

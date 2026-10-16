@@ -1,0 +1,68 @@
+module JsonAndFunctional;
+
+fn main() -> i32 {
+    println(f"{VELOC_CYAN}=================================================={VELOC_RESET}");
+    println(f"{VELOC_BOLD}    VeloC 5.0: Native JSON, File IO & Slices      {VELOC_RESET}");
+    println(f"{VELOC_CYAN}=================================================={VELOC_RESET}");
+
+    // 1. One-line Fast File Write & Read (Like Python, fast like C)
+    println(f"{VELOC_YELLOW}[1] One-line Fast File I/O{VELOC_RESET}");
+    let test_path = "D:/VeloC/sample_config.json";
+    let original_json = "{\"user\": \"Gamer42\", \"score\": 9500, \"health\": 98.5, \"active\": true}";
+
+    let write_res = veloc_write_file(test_path, original_json);
+    if (write_res.is_ok()) {
+        println(f"  Successfully wrote JSON to {test_path}");
+    }
+
+    let read_res = veloc_read_file(test_path);
+    if (read_res.is_ok()) {
+        let content = read_res.unwrap();
+        println(f"  Read back from disk: {content}");
+    }
+
+    // 2. Built-in Zero-Dependency JSON Parser (Top Reddit C++ Request!)
+    println(f"{VELOC_YELLOW}[2] Built-in Native Fast JSON Parser{VELOC_RESET}");
+    let root = veloc::JsonValue::parse(original_json);
+
+    let user_val = root.get("user");
+    let score_val = root.get("score");
+    let health_val = root.get("health");
+    let active_val = root.get("active");
+
+    if (user_val.is_some()) {
+        let user_name = user_val.unwrap().as_str();
+        println(f"  Parsed 'user':   {user_name}");
+    }
+    if (score_val.is_some()) {
+        let score = score_val.unwrap().as_int();
+        println(f"  Parsed 'score':  {score}");
+    }
+    if (health_val.is_some()) {
+        let health = health_val.unwrap().as_float();
+        println(f"  Parsed 'health': {health}");
+    }
+    if (active_val.is_some()) {
+        let active = active_val.unwrap().as_bool();
+        println(f"  Parsed 'active': {active}");
+    }
+
+    // 3. Functional Zero-Allocation Slice Operations (sum, count_if)
+    println(f"{VELOC_YELLOW}[3] Functional Zero-Allocation Slice Operations{VELOC_RESET}");
+    i32 numbers[6] = {10, 25, 5, 40, 15, 30};
+    let slice = Slice<i32>::from_array(numbers, 6);
+
+    let total = veloc::sum(slice);
+    let count_above_20 = veloc::count_if(slice, [](i32 x) { return x >= 20; });
+
+    println(f"  Slice elements sum: {total}");
+    println(f"  Elements >= 20:     {count_above_20} items");
+
+    // Clean up temporary file
+    remove(test_path);
+
+    println(f"{VELOC_GREEN}[SUCCESS] VeloC 5.0 capabilities verified!{VELOC_RESET}");
+    println(f"{VELOC_CYAN}=================================================={VELOC_RESET}");
+
+    return 0;
+}

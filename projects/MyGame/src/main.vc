@@ -1,0 +1,8 @@
+module Main;
+
+fn main() -> i32 {
+    let app_name = "AwesomeApp";
+    let mut version = 1.0;
+    println(f"Welcome to {app_name} v{version} written in VeloC!");
+    return 0;
+}

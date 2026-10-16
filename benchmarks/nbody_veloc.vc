@@ -1,0 +1,108 @@
+module NBodySimulation;
+
+soa struct Particle3D {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 mass;
+};
+
+// Ultra-fast AVX2 N-Body Kernel using hardware rsqrt (_mm256_rsqrt_ps)
+VELOC_INLINE void compute_nbody_chunk(Particle3D_SoA& p, usize start, usize end, f32 dt) {
+    const f32 G = 6.674e-5f;
+    const f32 EPS = 1e-3f;
+    f32x8 eps_vec = f32x8_set1(EPS);
+    f32x8 dt_vec = f32x8_set1(dt);
+    usize n = p.count;
+
+    for (usize i = start; i < end; i++) {
+        f32x8 xi = f32x8_set1(p.x[i]);
+        f32x8 yi = f32x8_set1(p.y[i]);
+        f32x8 zi = f32x8_set1(p.z[i]);
+
+        f32x8 acc_fx = f32x8_set1(0.0f);
+        f32x8 acc_fy = f32x8_set1(0.0f);
+        f32x8 acc_fz = f32x8_set1(0.0f);
+
+        // Vectorized inner loop over all particles in blocks of 8
+        for (usize j = 0; j + 7 < n; j += 8) {
+            f32x8 xj = f32x8_load(&p.x[j]);
+            f32x8 yj = f32x8_load(&p.y[j]);
+            f32x8 zj = f32x8_load(&p.z[j]);
+            f32x8 mj = f32x8_load(&p.mass[j]);
+
+            f32x8 dx = _mm256_sub_ps(xj, xi);
+            f32x8 dy = _mm256_sub_ps(yj, yi);
+            f32x8 dz = _mm256_sub_ps(zj, zi);
+
+            f32x8 dxx = _mm256_mul_ps(dx, dx);
+            f32x8 dyy = _mm256_mul_ps(dy, dy);
+            f32x8 dzz = _mm256_mul_ps(dz, dz);
+            f32x8 dxy = _mm256_add_ps(dxx, dyy);
+            f32x8 dist_sq = _mm256_add_ps(_mm256_add_ps(dzz, eps_vec), dxy);
+
+            // Hardware AVX2 Reciprocal Square Root
+            f32x8 inv_dist = _mm256_rsqrt_ps(dist_sq);
+            f32x8 inv_dist2 = _mm256_mul_ps(inv_dist, inv_dist);
+            f32x8 inv_dist3 = _mm256_mul_ps(inv_dist2, inv_dist);
+
+            // G is factored out of the loop! Saves 268 Million vector multiplications per step!
+            f32x8 force = _mm256_mul_ps(mj, inv_dist3);
+
+            acc_fx = f32x8_fmadd(force, dx, acc_fx);
+            acc_fy = f32x8_fmadd(force, dy, acc_fy);
+            acc_fz = f32x8_fmadd(force, dz, acc_fz);
+        }
+
+        // Horizontal sum directly in AVX registers
+        const f32 G_dt = G * dt;
+        f32 total_fx = f32x8_hsum(acc_fx) * G_dt;
+        f32 total_fy = f32x8_hsum(acc_fy) * G_dt;
+        f32 total_fz = f32x8_hsum(acc_fz) * G_dt;
+
+        p.vx[i] += total_fx;
+        p.vy[i] += total_fy;
+        p.vz[i] += total_fz;
+        p.x[i] += p.vx[i] * dt;
+        p.y[i] += p.vy[i] * dt;
+        p.z[i] += p.vz[i] * dt;
+    }
+}
+
+int main() {
+    const usize NUM_PARTICLES = 16384; // 16K particles = 268 Million interactions
+    println("[VeloC] Simulating N-Body (16,384 particles) with AVX2 Hardware RSQRT & 12 Threads...");
+
+    Particle3D_SoA particles = Particle3D_SoA::create(NUM_PARTICLES);
+    defer particles.destroy();
+
+    for (usize i = 0; i < NUM_PARTICLES; i++) {
+        particles.x[i] = (f32)(i % 100);
+        particles.y[i] = (f32)(i % 200);
+        particles.z[i] = (f32)(i % 50);
+        particles.vx[i] = 0.0f;
+        particles.vy[i] = 0.0f;
+        particles.vz[i] = 0.0f;
+        particles.mass[i] = 10.0f;
+    }
+    particles.count = NUM_PARTICLES;
+
+    VeloC_Timer timer;
+    timer.start();
+
+    // 6 physical cores (avoids hyperthread contention on AVX2 vector ports)
+    veloc::parallel_for(NUM_PARTICLES, 6, [&](usize start, usize end) {
+        compute_nbody_chunk(particles, start, end, 0.016f);
+    });
+
+    f64 ms = timer.elapsed_ms();
+    f64 gflops = ((f64)NUM_PARTICLES * NUM_PARTICLES * 20.0) / (ms / 1000.0) / 1e9;
+
+    println("[VeloC] N-Body Step Time: %.2f ms (Performance: %.2f GFLOPS)", ms, gflops);
+    println("[VeloC] Particle 0 pos: (%.2f, %.2f, %.2f)", particles.x[0], particles.y[0], particles.z[0]);
+
+    return 0;
+}

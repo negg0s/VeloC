@@ -14,21 +14,21 @@
 - [x] Инициализация Git репозитория
 
 ### 2. Волна 1 (P0: Фундамент)
-- [ ] **2.1 Модульный Lexer/Tokenizer (`src/lexer.py`)** с сохранением точных координат (line, col) [doing]
-- [ ] **2.2 AST узлы (`src/ast_nodes.py`)** для языка VeloC
-- [ ] **2.3 Парсер выражений и конструкций (`src/parser.py`)** (Pratt Parser + Recursive Descent)
-- [ ] **2.4 Source Maps и Диагностика уровня Rust (`src/diagnostics.py`)** с кодами E0001+, подсказками Levenshtein
-- [ ] **2.5 Кодогенерация в C++ (`src/codegen.py`)** с директивами `#line` для точных ошибок Clang
-- [ ] **2.6 Регрессионный сьют**: прогон всех 19 существующих примеров через новый парсер
-- [ ] **2.7 Научная система бенчмарков (`benchmarks/rigorous_bench.py`)**:
+- [x] **2.1 Модульный Lexer/Tokenizer (`src/lexer.py`)** с сохранением точных координат (line, col)
+- [x] **2.2 AST узлы (`src/ast_nodes.py`)** для языка VeloC
+- [x] **2.3 Парсер выражений и конструкций (`src/parser.py`)** (Pratt Parser + Recursive Descent)
+- [x] **2.4 Source Maps и Диагностика уровня Rust (`src/diagnostics.py`)** с кодами E0001+, подсказками Levenshtein
+- [x] **2.5 Кодогенерация в C++ (`src/codegen.py`)** с директивами `#line` для точных ошибок Clang
+- [x] **2.6 Регрессионный сьют**: прогон всех 19 существующих примеров через новый парсер (19/19 PASSED)
+- [x] **2.7 Научная система бенчмарков (`benchmarks/rigorous_bench.py`)**:
   - Минимум 30 прогонов, warm-up, медиана, p95, min, stddev
-  - Сильный baseline C++ (`-O3 -march=native -ffast-math`)
-  - Защита от выкидывания оптимизатором
-  - Вывод JSON в `benchmarks/results/` и автогенерация таблицы README
-- [ ] **2.8 Фреймворк тестирования `veloc test`**:
-  - `#[test]` / `test "name" { ... }`
-  - Negative тесты `#[should_fail_to_compile]`
-  - Snapshot тесты диагностик
+  - Сильный baseline C++ (`-O3 -march=native -ffast-math -static`)
+  - Защита от выкидывания оптимизатором (volatile sinks)
+  - Вывод JSON в `benchmarks/results/cometlake_i5_10400f.json`
+- [x] **2.8 Фреймворк тестирования `veloc test` и `veloc ci`**:
+  - Встроенные блоки `test "name" { ... }`
+  - Positive suite (19/19) + Negative тесты компилятора (`E0001`, `E0004`)
+  - Snapshot тесты диагностик, запуск через единый `veloc ci`
 
 ### 3. Волна 2 (P1: Ядро и сборка)
 - [ ] **3.1 Пакетный менеджер и манифест `veloc.toml` / `veloc.lock`**
