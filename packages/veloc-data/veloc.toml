@@ -1,0 +1,12 @@
+[package]
+name = "veloc-data"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "High-performance data engine for VeloC: Arrow-like Columnar DataFrame, fast CSV parser, and LSM-Tree KV store with WAL"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "avx2"

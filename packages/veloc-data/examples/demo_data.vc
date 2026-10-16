@@ -1,0 +1,49 @@
+#include <veloc.h>
+#include <veloc_data.h>
+#include <cstdio>
+#include <string>
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("   VeloC Data: Embedded LSM Database & CSV Processing Pipeline   \n");
+    printf("=================================================================\n");
+
+    // 1. Process simulated eCommerce CSV transactions
+    std::string csv_data = 
+        "trans_id,user,amount\n"
+        "TX1001,Alice,250.50\n"
+        "TX1002,Bob,45.00\n"
+        "TX1003,Charlie,1200.75\n"
+        "TX1004,David,89.90\n"
+        "TX1005,Eve,540.25\n";
+
+    veloc::data::DataFrame df;
+    veloc::data::CSVReader::parse(csv_data, df);
+    printf("[CSV Ingestion]: Loaded %lld transaction rows into DataFrame.\n", (long long)df.row_count);
+
+    // 2. Persist high-value transactions into Embedded LSM-Tree Store
+    std::string db_dir = "D:/VeloC";
+    veloc::data::LSMTree db(db_dir);
+
+    for (usize i = 0; i < df.row_count; i++) {
+        std::string tid = df.str_cols[0][i];
+        std::string user = df.str_cols[1][i];
+        std::string amount = df.str_cols[2][i];
+        f64 amt = atof(amount.c_str());
+
+        // Store to LSM KV store
+        std::string record = "{\"user\":\"" + user + "\", \"amount\":" + amount + "}";
+        db.put(tid, record);
+        printf("  [LSM Put]: Key=%s -> Record=%s (Amount=%.2f)\n", tid.c_str(), record.c_str(), amt);
+    }
+
+    printf("\n[LSM Verification]: Point lookup verification from disk WAL...\n");
+    std::string tx_record;
+    if (db.get("TX1003", tx_record)) {
+        printf("  [Lookup Hit] TX1003: %s\n", tx_record.c_str());
+    }
+
+    printf("=================================================================\n");
+    printf("[DEMO SUCCESS]: Data pipeline executed and persisted cleanly.\n");
+    return 0;
+}

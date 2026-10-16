@@ -1,0 +1,56 @@
+#include <veloc.h>
+#include <veloc_data.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-data Columnar DataFrame, CSVReader, LSM-Tree WAL...\n");
+
+    // 1. Columnar DataFrame test
+    veloc::data::DataFrame df;
+    df.add_f64_column("price");
+    auto price_col = df.get_f64("price");
+    assert(price_col != nullptr);
+
+    price_col->push(10.5);
+    price_col->push(20.5);
+    price_col->push(30.0);
+    price_col->push(40.0);
+
+    f64 sum = df.sum_f64("price");
+    assert(fabs(sum - 101.0) < 1e-6);
+
+    // 2. CSV Reader test
+    std::string sample_csv = "id,name,role\n1,Alice,Admin\n2,Bob,Engineer\n3,Charlie,Designer\n";
+    veloc::data::DataFrame csv_df;
+    bool parsed = veloc::data::CSVReader::parse(sample_csv, csv_df);
+    assert(parsed);
+    assert(csv_df.row_count == 3);
+    assert(csv_df.str_cols.size() == 3);
+    assert(csv_df.str_cols[1][0] == "Alice");
+    assert(csv_df.str_cols[2][1] == "Engineer");
+
+    // 3. LSM-Tree & WAL Recovery test
+    {
+        veloc::data::LSMTree lsm("D:/VeloC");
+        lsm.put("user_100", "{\"name\":\"VeloC_Master\",\"level\":99}");
+        lsm.put("user_200", "{\"name\":\"SimdGod\",\"level\":100}");
+        std::string val;
+        assert(lsm.get("user_100", val));
+        assert(val.find("VeloC_Master") != std::string::npos);
+        lsm.remove("user_100");
+    }
+
+    // Recover database from disk WAL
+    {
+        veloc::data::LSMTree lsm_recovered("D:/VeloC");
+        std::string val;
+        assert(!lsm_recovered.get("user_100", val)); // Removed by tombstone
+        assert(lsm_recovered.get("user_200", val));  // Survived recovery!
+        assert(val.find("SimdGod") != std::string::npos);
+    }
+
+    printf("[TEST PASS]: veloc-data features verified successfully!\n");
+    return 0;
+}

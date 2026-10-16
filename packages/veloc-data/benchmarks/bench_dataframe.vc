@@ -1,0 +1,67 @@
+#include <veloc.h>
+#include <veloc_data.h>
+#include <cstdio>
+#include <chrono>
+
+const usize NUM_ROWS = 1000000; // 1,000,000 Rows
+
+// Row-oriented representation for comparison
+struct RowOrder {
+    f64 price;
+    f64 quantity;
+    f64 discount;
+};
+
+static RowOrder row_table[NUM_ROWS];
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("    VeloC Data Benchmark: Columnar AVX2 vs Row-Oriented Scan     \n");
+    printf("=================================================================\n");
+
+    // Initialize Columnar DataFrame
+    veloc::data::DataFrame df;
+    df.add_f64_column("price");
+    auto col = df.get_f64("price");
+    col->values.resize(NUM_ROWS);
+
+    for (usize i = 0; i < NUM_ROWS; i++) {
+        f64 p = (f64)(i % 1000) * 0.5 + 1.0;
+        col->values[i] = p;
+        row_table[i].price = p;
+        row_table[i].quantity = 2.0;
+        row_table[i].discount = 0.1;
+    }
+
+    // 1. Row-Oriented Aggregation (Cache pollution with unused quantity/discount fields)
+    auto t0 = std::chrono::high_resolution_clock::now();
+    volatile f64 row_sink = 0.0;
+    for (usize iter = 0; iter < 50; iter++) {
+        f64 row_sum = 0.0;
+        for (usize i = 0; i < NUM_ROWS; i++) {
+            row_sum += row_table[i].price;
+        }
+        row_sink = row_sum;
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 row_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count() / 50.0;
+    f64 row_gbps = ((f64)NUM_ROWS * sizeof(RowOrder) / 1e9) / (row_ms / 1000.0);
+    printf("  [Row-Oriented Scan] 1,000,000 Rows: %.2f ms (Throughput: %.2f GB/s)\n", row_ms, row_gbps);
+
+    // 2. Columnar AVX2 Vectorized Aggregation
+    auto t2 = std::chrono::high_resolution_clock::now();
+    f64 col_sum = 0.0;
+    for (usize iter = 0; iter < 100; iter++) {
+        col_sum = df.sum_f64("price");
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+    f64 col_ms = std::chrono::duration<f64, std::milli>(t3 - t2).count() / 100.0;
+    f64 col_gbps = ((f64)NUM_ROWS * sizeof(f64) / 1e9) / (col_ms / 1000.0);
+    f64 speedup = row_ms / col_ms;
+    printf("  [Columnar AVX2 Scan] 1,000,000 Values: %.2f ms (Bandwidth: %.2f GB/s, Speedup: %.1fx)\n",
+           col_ms, col_gbps, speedup);
+
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY] Checksum: %.2f\n", col_sum);
+    return 0;
+}
