@@ -46,14 +46,20 @@ def transpile_cpp_to_veloc(cpp_source: str) -> str:
                 chunks.append("".join(cur_chunk).strip())
 
             f_parts = []
-            for c in chunks:
-                if c.startswith('"') and c.endswith('"'):
-                    f_parts.append(c.strip('"'))
-                else:
-                    f_parts.append(f"{{{c}}}")
-            repl = f'println(f"{"".join(f_parts)}");'
+            if len(chunks) == 1 and (chunks[0].isalnum() or chunks[0].isdigit() or chunks[0].startswith('"')):
+                repl = f'println({chunks[0]});'
+            else:
+                for c in chunks:
+                    if c.startswith('"') and c.endswith('"'):
+                        f_parts.append(c.strip('"'))
+                    else:
+                        f_parts.append(f"{{{c}}}")
+                repl = f'println(f"{"".join(f_parts)}");'
             line = line[:m.start()] + repl + line[m.end():]
                 
+        # Transform do { ... } while (...); -> while (true) { ...; if (!cond) break; }
+        line = re.sub(r'\bdo\s*\{([^}]+)\}\s*while\s*\(([^)]+)\)\s*;', r'while (true) { \1; if (!(\2)) break; }', line)
+
         # Transform variable declarations: auto x = ... -> let mut x = ...
         line = re.sub(r'\bauto\s+([a-zA-Z_]\w*)\s*=', r'let mut \1 =', line)
         line = re.sub(r'\bconst\s+auto\s+([a-zA-Z_]\w*)\s*=', r'let \1 =', line)

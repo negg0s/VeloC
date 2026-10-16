@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "manifest_hash": "b9d655ce0346972302f8744890840cd0998719a7f5297d20cd291d8310c295bb",
+  "packages": [
+    {
+      "name": "test_cli_app",
+      "version": "0.1.0",
+      "dependencies": []
+    }
+  ]
+}

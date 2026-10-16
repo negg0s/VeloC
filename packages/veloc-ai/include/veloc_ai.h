@@ -36,6 +36,20 @@ namespace ai {
             std::memset(data, 0, bytes);
         }
 
+        Tensor(std::initializer_list<usize> dims) : shape(dims), owns_data(true) {
+            compute_strides();
+            usize bytes = total_size * sizeof(T);
+            data = (T*)veloc_aligned_alloc(32, bytes);
+            std::memset(data, 0, bytes);
+        }
+
+        Tensor(usize rows, usize cols) : shape{rows, cols}, owns_data(true) {
+            compute_strides();
+            usize bytes = total_size * sizeof(T);
+            data = (T*)veloc_aligned_alloc(32, bytes);
+            std::memset(data, 0, bytes);
+        }
+
         static Tensor wrap(T* raw_ptr, const std::vector<usize>& dims) {
             Tensor t;
             t.data = raw_ptr;

@@ -1,2 +1,2 @@
 #include <algorithm>
-pub fn main() -> i32 { int x = 2; switch (x) { case 1: println(f"{10}"); break; case 2: println(f"{20}"); break; default: println(f"{0}"); } return 0; }
+pub fn main() -> i32 { int x = 2; switch (x) { case 1: println(10); break; case 2: println(20); break; default: println(0); } return 0; }

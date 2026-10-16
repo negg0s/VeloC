@@ -1,0 +1,65 @@
+module StdlibUtilities;
+
+fn test_stopwatch_and_time() {
+    println("--- Testing Stopwatch & Time ---");
+    let mut sw = Stopwatch();
+    Time::sleep_ms(10);
+    let ms = sw.elapsed_ms();
+    let us = sw.elapsed_us();
+    println(f"Elapsed: {ms} ms, {us} us");
+    assert_true(ms >= 8.0);
+    assert_true(us >= 8000.0);
+    
+    let now = Time::now_ms();
+    assert_true(now > 0);
+}
+
+fn test_path() {
+    println("--- Testing Path & Filesystem ---");
+    let p1 = "data/subdir";
+    let p2 = "sample.txt";
+    let joined = Path::join(p1, p2);
+    println(f"Joined: {joined}");
+    assert_eq(joined, "data/subdir/sample.txt");
+    
+    let ext = Path::extension(joined);
+    let stem = Path::stem(joined);
+    let parent = Path::parent(joined);
+    println(f"Ext: {ext}, Stem: {stem}, Parent: {parent}");
+    assert_eq(ext, ".txt");
+    assert_eq(stem, "sample");
+    assert_eq(parent, "data/subdir");
+    
+    let tmp_file = "build/test_path_io.tmp";
+    let content = "Hello VeloC Stdlib!";
+    let ok = Path::write_text(tmp_file, content);
+    assert_true(ok);
+    assert_true(Path::exists(tmp_file));
+    
+    let read_back = Path::read_text(tmp_file);
+    assert_eq(read_back, content);
+}
+
+fn test_random() {
+    println("--- Testing Fast XorShift128+ RNG ---");
+    let mut rng = Rng(1337);
+    let val_u32 = rng.next_u32();
+    let val_f64 = rng.next_f64();
+    println(f"RNG u32: {val_u32}, f64: {val_f64}");
+    assert_true(val_f64 >= 0.0 && val_f64 < 1.0);
+    
+    let dice = rng.range_i32(1, 6);
+    println(f"Dice roll [1..6]: {dice}");
+    assert_true(dice >= 1 && dice <= 6);
+}
+
+fn main() -> i32 {
+    println("==================================================");
+    println("      VeloC Standard Utilities Verification      ");
+    println("==================================================");
+    test_stopwatch_and_time();
+    test_path();
+    test_random();
+    println("[ALL STDLIB UTILITY TESTS PASSED]");
+    return 0;
+}

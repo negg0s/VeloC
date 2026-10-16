@@ -1,0 +1,10 @@
+module Main;
+
+import veloc_cli;
+
+fn main() -> i32 {
+    let mut parser = ArgParser("test_cli_app");
+    println("=== test_cli_app CLI App ===");
+    println("Terminal tools powered by VeloC");
+    return 0;
+}

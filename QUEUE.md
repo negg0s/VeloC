@@ -4,4 +4,5 @@
 - [x] **ЭТАП 2**: Блоки A (Спецификация, Conformance, Fuzzing, Determinism), B (Query-based incremental compiler), E (Стабильность, Editions, Semver, ABI), F (Static Analysis, Bounds, Ownership). (Выполнен 2026-10-16).
 - [x] **ЭТАП 3**: Вертикали экосистемы (veloc-game, veloc-ai, veloc-sci, veloc-data, veloc-net, veloc-embedded, veloc-cli) со 100% реальными приложениями и замерами. (Выполнен 2026-10-16).
 - [x] **ЭТАП 4**: Самохостинг (Bootstrap), Миграция C++ -> VeloC, Документация/Книга/Playground, Установщики и Реестр, IDE & VS Code расширение, Единый бенчмарк-лидерборд, Финальный аудит, Автопилот непрерывного улучшения. (Выполнен 2026-10-16).
-- [ ] **ЭТАП 5**: Непрерывные улучшения для разработчиков (REPL, Hot-Reload Watcher, Stdlib Extensions std::json, std::fs, std::time, Debug Stack Traces). [DOING]
+- [x] **ЭТАП 5**: Непрерывные улучшения для разработчиков (REPL, Hot-Reload Watcher, Stdlib Extensions Path, Time, Rng, Templates, Type-safe Println, 100% Migration). (Выполнен 2026-10-16).
+- [ ] **ЭТАП 6**: Режим автономного мониторинга и расширения экосистемы VeloC. [DOING]

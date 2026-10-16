@@ -1,0 +1,10 @@
+module Main;
+
+import veloc_ai;
+
+fn main() -> i32 {
+    let t = Tensor<f32>(16, 16);
+    println("=== test_ai_app AI & Tensor App ===");
+    println(f"Allocated 32-byte aligned 16x16 tensor (elements: {t.total_size})");
+    return 0;
+}

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "manifest_hash": "42fe7e77c4a4d6a302047042c9700a20c0eff7b37248d1df698b6234e554e0a8",
+  "packages": [
+    {
+      "name": "test_web_app",
+      "version": "0.1.0",
+      "dependencies": []
+    }
+  ]
+}

@@ -1,2 +1,2 @@
 #include <algorithm>
-pub fn main() -> i32 { int p = 1; for (int i = 1; i <= 5; i++) p *= i; println(f"{p}"); return 0; }
+pub fn main() -> i32 { int p = 1; for (int i = 1; i <= 5; i++) p *= i; println(p); return 0; }

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "manifest_hash": "f0d3bdd20884c588de9ea5488a51c4d6ce1f0f476bcd3b0e6b23ecbd7d9ef8e9",
+  "packages": [
+    {
+      "name": "test_game_app",
+      "version": "0.1.0",
+      "dependencies": []
+    }
+  ]
+}

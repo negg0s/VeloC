@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "manifest_hash": "6c33da46733c3500f121f23b0f84df3b04da2758e64c8548ac8efe84e703c430",
+  "packages": [
+    {
+      "name": "test_ai_app",
+      "version": "0.1.0",
+      "dependencies": []
+    }
+  ]
+}

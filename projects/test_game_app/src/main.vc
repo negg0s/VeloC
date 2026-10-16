@@ -1,0 +1,11 @@
+module Main;
+
+import veloc_game;
+
+fn main() -> i32 {
+    let mut world = GameWorld();
+    let e = world.spawn();
+    println("=== test_game_app Game Engine App ===");
+    println(f"Spawned entity ID {e} in high-performance sparse-set ECS");
+    return 0;
+}

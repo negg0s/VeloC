@@ -55,7 +55,7 @@ def clean_cache(all_artifacts: bool = False):
     print(f"[VeloC Clean] Cleaned {cleaned} temporary files/directories from D:\\VeloC\\.cache")
 
 def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O3", 
-                test_mode: bool = False, verbose: bool = False) -> Path:
+                test_mode: bool = False, verbose: bool = False, quiet: bool = False) -> Path:
     ensure_dirs()
     if not source_path.exists():
         print(f"[Error] Source file not found: {source_path}")
@@ -149,7 +149,8 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         sys.exit(res.returncode)
 
     hash_target.write_text(current_hash)
-    print(f"[VeloC Build Success] {source_path.name} -> {output_exe.name} (Transpile: {t_transpile:.1f}ms, Compile: {t_compile:.1f}ms)")
+    if not quiet:
+        print(f"[VeloC Build Success] {source_path.name} -> {output_exe.name} (Transpile: {t_transpile:.1f}ms, Compile: {t_compile:.1f}ms)")
     return output_exe
 
 def run_veloc(source_path: Path, args: list = None, verbose: bool = False):
@@ -314,9 +315,11 @@ def main():
 
     init_p = subparsers.add_parser("init", help="Scaffold a new VeloC project in current directory")
     init_p.add_argument("name", nargs="?", default="veloc_app", help="Name of new project")
+    init_p.add_argument("-t", "--template", default="minimal", choices=["minimal", "cli", "game", "ai", "web"], help="Project template")
 
     new_p = subparsers.add_parser("new", help="Create a new VeloC project in a dedicated folder")
     new_p.add_argument("name", help="Name of new project")
+    new_p.add_argument("-t", "--template", default="minimal", choices=["minimal", "cli", "game", "ai", "web"], help="Project template")
 
     add_p = subparsers.add_parser("add", help="Add a dependency to veloc.toml")
     add_p.add_argument("package", help="Package or library name")
@@ -360,6 +363,11 @@ def main():
     from_cpp_p.add_argument("file", help="Path to .cpp file to transpile")
     from_cpp_p.add_argument("-o", "--output", help="Optional output .vc file path")
 
+    subparsers.add_parser("repl", help="Start an interactive read-eval-print loop")
+    pg_p = subparsers.add_parser("playground", help="Start the VeloC Web Playground local server")
+    pg_p.add_argument("--port", type=int, default=8080, help="HTTP port (default 8080)")
+    subparsers.add_parser("autopilot", help="Run autonomous continuous health and benchmark verification")
+
     args = parser.parse_args()
 
     if args.command == "build":
@@ -373,12 +381,21 @@ def main():
     elif args.command == "init":
         from pkg.manager import PackageManager
         pm = PackageManager(ROOT_DIR)
-        pm.create_project(Path.cwd(), args.name)
+        pm.create_project(Path.cwd(), args.name, template=args.template)
     elif args.command == "new":
         from pkg.manager import PackageManager
         pm = PackageManager(ROOT_DIR)
         target = ROOT_DIR / "projects" / args.name
-        pm.create_project(target, args.name)
+        pm.create_project(target, args.name, template=args.template)
+    elif args.command == "repl":
+        from repl import VeloCRepl
+        VeloCRepl().run()
+    elif args.command == "playground":
+        from playground import start_server
+        start_server(port=args.port)
+    elif args.command == "autopilot":
+        from autopilot import run_autopilot
+        run_autopilot()
     elif args.command == "add":
         from pkg.manager import PackageManager
         pm = PackageManager(ROOT_DIR)

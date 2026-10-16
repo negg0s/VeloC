@@ -1,2 +1,2 @@
 #include <algorithm>
-pub fn main() -> i32 { int x = 10; { int x = 20; } println(f"{x}"); return 0; }
+pub fn main() -> i32 { int x = 10; { int x = 20; } println(x); return 0; }

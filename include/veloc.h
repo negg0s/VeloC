@@ -11,6 +11,9 @@
 #include <string>
 #include <sstream>
 #include <new>
+#include <chrono>
+#include <thread>
+#include <fstream>
 
 namespace veloc {
     template <typename T>
@@ -21,7 +24,17 @@ namespace veloc {
     }
     static inline std::string to_str(const char* val) { return std::string(val); }
     static inline std::string to_str(const std::string& val) { return val; }
+
+    template <typename T>
+    static inline void println(const T& val) {
+        printf("%s\n", to_str(val).c_str());
+    }
+    static inline void println() {
+        printf("\n");
+    }
 }
+
+using veloc::println;
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -2719,7 +2732,185 @@ using veloc::simd_gemv_f32;
 using veloc::simd_gemm_f32;
 using veloc::simd_quantize_f32_to_i8;
 using veloc::LockFreeRingBuffer;
+// ============================================================================
+// High-Resolution Stopwatch & Monotonic Time (std::time)
+// ============================================================================
+namespace veloc {
+    struct Stopwatch {
+        std::chrono::high_resolution_clock::time_point t_start;
+        std::chrono::high_resolution_clock::time_point t_stop;
+        bool running;
+
+        Stopwatch() : running(false) {
+            start();
+        }
+
+        void start() {
+            t_start = std::chrono::high_resolution_clock::now();
+            running = true;
+        }
+
+        void stop() {
+            t_stop = std::chrono::high_resolution_clock::now();
+            running = false;
+        }
+
+        void restart() {
+            start();
+        }
+
+        double elapsed_ms() const {
+            auto end = running ? std::chrono::high_resolution_clock::now() : t_stop;
+            return std::chrono::duration<double, std::milli>(end - t_start).count();
+        }
+
+        double elapsed_us() const {
+            auto end = running ? std::chrono::high_resolution_clock::now() : t_stop;
+            return std::chrono::duration<double, std::micro>(end - t_start).count();
+        }
+
+        u64 elapsed_ns() const {
+            auto end = running ? std::chrono::high_resolution_clock::now() : t_stop;
+            return (u64)std::chrono::duration_cast<std::chrono::nanoseconds>(end - t_start).count();
+        }
+    };
+
+    struct Time {
+        static inline u64 now_ms() {
+            return (u64)std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now().time_since_epoch()).count();
+        }
+        static inline u64 now_us() {
+            return (u64)std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::steady_clock::now().time_since_epoch()).count();
+        }
+        static inline void sleep_ms(u32 ms) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+        }
+    };
+
+    // ============================================================================
+    // Cross-Platform Filesystem & Path Manipulation (std::path / std::fs)
+    // ============================================================================
+    struct Path {
+        static inline std::string normalize(const std::string& p) {
+            std::string s = p;
+            for (size_t i = 0; i < s.size(); ++i) {
+                if (s[i] == '\\') s[i] = '/';
+            }
+            return s;
+        }
+
+        static inline std::string join(const std::string& a, const std::string& b) {
+            if (a.empty()) return b;
+            if (b.empty()) return a;
+            std::string norm_a = normalize(a);
+            std::string norm_b = normalize(b);
+            if (norm_a.back() == '/') {
+                if (norm_b.front() == '/') return norm_a + norm_b.substr(1);
+                return norm_a + norm_b;
+            } else {
+                if (norm_b.front() == '/') return norm_a + norm_b;
+                return norm_a + "/" + norm_b;
+            }
+        }
+
+        static inline std::string basename(const std::string& p) {
+            std::string s = normalize(p);
+            size_t pos = s.find_last_of('/');
+            if (pos == std::string::npos) return s;
+            return s.substr(pos + 1);
+        }
+
+        static inline std::string parent(const std::string& p) {
+            std::string s = normalize(p);
+            size_t pos = s.find_last_of('/');
+            if (pos == std::string::npos) return "";
+            return s.substr(0, pos);
+        }
+
+        static inline std::string extension(const std::string& p) {
+            std::string base = basename(p);
+            size_t dot = base.find_last_of('.');
+            if (dot == std::string::npos) return "";
+            return base.substr(dot);
+        }
+
+        static inline std::string stem(const std::string& p) {
+            std::string base = basename(p);
+            size_t dot = base.find_last_of('.');
+            if (dot == std::string::npos) return base;
+            return base.substr(0, dot);
+        }
+
+        static inline bool exists(const std::string& p) {
+            std::ifstream f(p.c_str());
+            return f.good();
+        }
+
+        static inline std::string read_text(const std::string& p) {
+            std::ifstream f(p.c_str(), std::ios::in | std::ios::binary);
+            if (!f.is_open()) return "";
+            std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+            return str;
+        }
+
+        static inline bool write_text(const std::string& p, const std::string& content) {
+            std::ofstream f(p.c_str(), std::ios::out | std::ios::binary);
+            if (!f.is_open()) return false;
+            f.write(content.data(), content.size());
+            return f.good();
+        }
+    };
+
+    // ============================================================================
+    // High-Throughput Deterministic Pseudo-Random Generator (XorShift128+)
+    // ============================================================================
+    struct Rng {
+        u64 s[2];
+
+        Rng(u64 seed = 88172645463325252ULL) {
+            if (seed == 0) seed = 88172645463325252ULL;
+            s[0] = seed ^ 0x5555555555555555ULL;
+            s[1] = (seed * 6364136223846793005ULL) + 1442695040888963407ULL;
+            if (s[0] == 0 && s[1] == 0) s[0] = 1;
+        }
+
+        inline u64 next_u64() {
+            u64 s1 = s[0];
+            const u64 s0 = s[1];
+            s[0] = s0;
+            s1 ^= s1 << 23;
+            s[1] = s1 ^ s0 ^ (s1 >> 17) ^ (s0 >> 26);
+            return s[1] + s0;
+        }
+
+        inline u32 next_u32() {
+            return (u32)(next_u64() & 0xFFFFFFFFULL);
+        }
+
+        inline f64 next_f64() {
+            return (next_u64() >> 11) * (1.0 / 9007199254740992.0);
+        }
+
+        inline i32 range_i32(i32 min_val, i32 max_val) {
+            if (min_val >= max_val) return min_val;
+            u32 range = (u32)(max_val - min_val + 1);
+            return min_val + (i32)(next_u32() % range);
+        }
+
+        inline f64 range_f64(f64 min_val, f64 max_val) {
+            return min_val + (max_val - min_val) * next_f64();
+        }
+    };
+}
+
 using veloc::Channel;
+using veloc::Stopwatch;
+using veloc::Time;
+using veloc::Path;
+using veloc::Rng;
+
 using Arena = VeloC_Arena;
 template <typename T> using Span = Slice<T>;
 

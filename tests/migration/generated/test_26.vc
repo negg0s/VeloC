@@ -1,2 +1,2 @@
 #include <algorithm>
-pub fn main() -> i32 { int sum = 0; for (int i = 0; i < 5; i++) for (int j = 0; j < 5; j++) sum++; println(f"{sum}"); return 0; }
+pub fn main() -> i32 { int sum = 0; for (int i = 0; i < 5; i++) for (int j = 0; j < 5; j++) sum++; println(sum); return 0; }

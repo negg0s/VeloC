@@ -1,2 +1,2 @@
 #include <algorithm>
-pub fn main() -> i32 { int x = 0; do { x++; } while (x < 3); println(f"{x}"); return 0; }
+pub fn main() -> i32 { int x = 0; while (true) {  x++; ; if (!(x < 3)) break; } println(x); return 0; }

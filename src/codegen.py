@@ -80,7 +80,7 @@ class CppCodegen:
                         return f'printf("{esc}\\n")'
                     else:
                         arg_str = self.emit_expr(arg_expr)
-                        return f'printf("%s\\n", {arg_str})'
+                        return f'printf("%s\\n", (::veloc::to_str({arg_str})).c_str())'
                 elif len(expr.args) >= 2:
                     fmt = self.emit_expr(expr.args[0])
                     rest = ", ".join(self.emit_expr(a) for a in expr.args[1:])
@@ -90,7 +90,7 @@ class CppCodegen:
             elif callee_str == "print":
                 if len(expr.args) == 1:
                     arg_str = self.emit_expr(expr.args[0])
-                    return f'printf("%s", {arg_str})'
+                    return f'printf("%s", (::veloc::to_str({arg_str})).c_str())'
                 elif len(expr.args) >= 2:
                     fmt = self.emit_expr(expr.args[0])
                     rest = ", ".join(self.emit_expr(a) for a in expr.args[1:])
@@ -369,8 +369,14 @@ class CppCodegen:
         return "\n".join(lines)
 
     def emit_decl(self, decl: Decl) -> str:
-        if isinstance(decl, ModuleDecl) or isinstance(decl, ImportDecl):
+        if isinstance(decl, ModuleDecl):
             return ""
+        elif isinstance(decl, ImportDecl):
+            mod = decl.path.strip()
+            if mod.startswith("veloc_"):
+                subpkg = mod[len("veloc_"):]
+                return f'#include <{mod}.h>\nusing namespace veloc::{subpkg};\n\n'
+            return f'#include <{mod}.h>\n\n'
         elif isinstance(decl, SoAStructDecl):
             return self.emit_soa_struct(decl)
         elif isinstance(decl, FnDecl):

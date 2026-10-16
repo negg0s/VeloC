@@ -513,10 +513,10 @@ class VeloCTranspiler:
                 if first_part.endswith('"'):
                     first_part = first_part[:-1] + '\\n"'
                     return f'printf({first_part}, {rest.strip()});'
-            return f'printf("%s\\n", {inner});'
+            return f'printf("%s\\n", (::veloc::to_str({inner})).c_str());'
 
         code = re.sub(r'\bprintln\s*\((.*?)\);', replace_println, code)
-        code = re.sub(r'\bprint\s*\((.*?)\);', r'printf("%s", \1);', code)
+        code = re.sub(r'\bprint\s*\((.*?)\);', r'printf("%s", (::veloc::to_str(\1)).c_str());', code)
 
         # 12. Strip `module ...;` and `import ...;`
         code = re.sub(r'^\s*module\s+[^;]+;', '// [VeloC module declaration]', code, flags=re.MULTILINE)

@@ -1,0 +1,12 @@
+module Main;
+
+import veloc_net;
+
+fn main() -> i32 {
+    let mut req = HttpRequest();
+    HttpRequest::parse("GET /api/v1/health HTTP/1.1\r\nHost: localhost\r\n\r\n", req);
+    let resp = HttpResponse(200, "application/json", "{\"status\": \"healthy\"}");
+    println("=== test_web_app High-Speed Web Server ===");
+    println(f"Routed request path: {req.path} -> HTTP {resp.status_code}");
+    return 0;
+}
