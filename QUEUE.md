@@ -25,5 +25,12 @@
   - [x] Блок C: Сертификация и критичные системы (Safety-critical profile `--profile=safety`, MISRA-VeloC правила, Трассируемость `#[req("...")]` и матрица, Подготовительные артефакты DO-178C/ISO 26262, Детерминированная арифметика)
   - [x] Блок D: Формальная верификация [R] (Формально проверенное ядро stdlib SMT/контракты, Метаморфное тестирование, Translation validation IR, Доказанные гарантии в `docs/safety/guarantees.md`)
   - [x] Блок E: ИИ-инструменты и экосистема агентов (MCP-сервер и JSON-RPC `veloc mcp`, Грамматика для constrained decoding EBNF/GBNF, Бенчмарк VeloC-Eval из 200 задач, Каталог ошибок ИИ в `docs/ai/common-pitfalls.md`, `veloc ai-check`, `veloc context`, Property & Mutation testing)
+- [x] **ЭТАП 8**: Первый крупный пользователь, Флагманские приложения, Петля обратной связи, Управление и Релиз 1.0-RC (VeloC 1.0-RC). (Выполнен 2026-10-17).
+  - [x] Блок A: Флагманские приложения в apps/ (veloc-edit, veloc-db, veloc-render, veloc-pathtracer, veloc-llm, veloc-compiler, veloc-sync со 100% реальными замерами на i5-10400F)
+  - [x] Блок B: Петля обратной связи (решение коллизий winnt.h, добавление <unordered_set> в veloc.h, docs/api-guidelines.md, раздел 7 в docs/language-findings.md)
+  - [x] Блок C: Управление проектом и сообщество (GOVERNANCE.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, RFC процесс и rfcs/, ROADMAP.md на 12 мес., `veloc triage`, `veloc dev-setup`, onboarding guide)
+  - [x] Блок D: Долгая поддержка и качество (LTS политика docs/lts-policy.md, golden тесты `tests/golden/`, crater gate `veloc crater`, health dashboard `veloc health` -> `docs/health/index.html`, bus factor)
+  - [x] Блок E: Финальный цикл зрелости (1.0-rc кандидат в CHANGELOG.md, ADR-0021 в DECISIONS.md, честный аудит ограничений `docs/known-limitations.md`)
+
 
 

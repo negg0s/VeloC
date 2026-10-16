@@ -1,0 +1,9 @@
+#include <veloc.h>
+
+fn main() -> i32 {
+    let v1: Vec3 = Vec3(1.0f, 2.0f, 3.0f);
+    let v2: Vec3 = Vec3(4.0f, 5.0f, 6.0f);
+    let v3: Vec3 = v1 + v2;
+    printf("VEC_ADD: %.1f, %.1f, %.1f\n", v3.x, v3.y, v3.z);
+    return 0;
+}

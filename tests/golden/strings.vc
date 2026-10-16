@@ -1,0 +1,9 @@
+#include <veloc.h>
+#include <string>
+
+fn main() -> i32 {
+    std::string s = "Hello, VeloC 1.0!";
+    printf("LEN: %zu\n", s.length());
+    printf("MSG: %s\n", s.c_str());
+    return 0;
+}

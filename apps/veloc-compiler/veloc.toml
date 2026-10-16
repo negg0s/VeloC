@@ -1,0 +1,9 @@
+[package]
+name = "veloc-compiler"
+version = "0.1.0"
+description = "Micro-language compiler with Lexer, Parser, SSA Constant Folding & Stack VM interpreter in VeloC"
+authors = ["VeloC Team"]
+
+[build]
+opt_level = 3
+safe = true

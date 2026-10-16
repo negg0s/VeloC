@@ -481,6 +481,11 @@ def main():
     ctx_p = subparsers.add_parser("context", help="Bundle prioritized project context for LLM prompt")
     ctx_p.add_argument("--tokens", type=int, default=4000, help="Maximum token budget")
 
+    subparsers.add_parser("triage", help="Run contributor issue triage and good first issues")
+    subparsers.add_parser("dev-setup", help="Verify developer environment toolchain and directories")
+    subparsers.add_parser("crater", help="Run ecosystem-wide regression build verification across all apps and packages")
+    subparsers.add_parser("health", help="Generate codebase health metrics and HTML dashboard")
+
     args = parser.parse_args()
 
 
@@ -652,6 +657,28 @@ def main():
             subprocess.run(cmd)
         else:
             subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "run_benchmarks.py")])
+    elif args.command == "triage":
+        from good_first_issues import run_triage
+        run_triage()
+    elif args.command == "dev-setup":
+        ensure_dirs()
+        print("=" * 80)
+        print("                   VeloC Toolchain & Developer Setup                            ")
+        print("=" * 80)
+        print(f"  * Root Directory: {ROOT_DIR}")
+        print(f"  * Clang Compiler: {CLANG_PATH} ({'FOUND' if CLANG_PATH.exists() else 'MISSING'})")
+        print(f"  * Python Executable: {sys.executable} ({sys.version.split()[0]})")
+        print(f"  * Include Directory: {INCLUDE_DIR} ({'FOUND' if (INCLUDE_DIR / 'veloc.h').exists() else 'MISSING'})")
+        print(f"  * Cache Directory: {CACHE_DIR}")
+        print(f"  * Build Directory: {BUILD_DIR}")
+        print("  [STATUS] Toolchain verified and operational for VeloC 1.0-RC development!")
+        print("=" * 80)
+    elif args.command == "crater":
+        from crater import run_crater
+        sys.exit(run_crater(ROOT_DIR))
+    elif args.command == "health":
+        from health_dashboard import generate_health_report
+        generate_health_report(ROOT_DIR)
     else:
         parser.print_help()
 

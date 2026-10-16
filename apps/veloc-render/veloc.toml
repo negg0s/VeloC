@@ -1,0 +1,9 @@
+[package]
+name = "veloc-render"
+version = "0.1.0"
+description = "High-performance ECS and 3D software rendering/culling engine"
+authors = ["VeloC Team"]
+
+[build]
+opt_level = 3
+safe = true

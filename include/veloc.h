@@ -18,6 +18,8 @@
 #include <utility>
 #include <memory>
 #include <functional>
+#include <unordered_set>
+#include <unordered_map>
 
 namespace veloc {
     template <typename T>

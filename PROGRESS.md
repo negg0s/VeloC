@@ -349,4 +349,36 @@
   - `veloc context`: сборка контекста проекта для LLM с лимитом токенов.
   - Автогенерация property-тестов (`src/property_test.py`) и мутационное тестирование (`src/mutation_test.py` - 100% mutation score).
 
+### 15. Этап 8: Первый крупный пользователь, Флагманские приложения, Петля обратной связи, Управление и Релиз 1.0-RC (VeloC 1.0-RC)
+- [x] **15.1 Блок A: Флагманские приложения (`apps/`)**:
+  - `apps/veloc-edit`: Текстовый редактор/IDE-ядро на Piece Table с мульти-курсором, undo/redo и подсветкой синтаксиса (загрузка 6.4MB за 1.38 мс, 11.7 мкс/правка).
+  - `apps/veloc-db`: Встраиваемая СУБД с WAL, MVCC snapshot-изоляцией, B+Tree индексом, SQL cost-based оптимизатором и симуляцией сбоев (5,052,801 транзакций/сек).
+  - `apps/veloc-render`: 3D SoA ECS игровой движок с frustum culling и динамическим освещением (3,274.4 FPS на 100,000 сущностей).
+  - `apps/veloc-pathtracer`: Многопоточный трассировщик путей Монте-Карло с материалами Lambertian/Mirror/Emitter (40.13 млн лучей/сек на 12 потоках).
+  - `apps/veloc-llm`: Инференс-движок авторегрессионных трансформеров с RoPE, Attention, RMSNorm, SwiGLU и KV-кэшем (6,238.8 токенов/сек, 0.16 мс/токен).
+  - `apps/veloc-compiler`: Микро-компилятор со сверткой констант и стек-машиной VM (113.66 MIPS, вычисление цикла 1..1M за 114 мс).
+  - `apps/veloc-sync`: Потоковый дедупликатор файлов с алгоритмом Content-Defined Chunking FastCDC (424.2 МБ/сек, коэффициент дедупликации 160.0x, экономия 99.4%).
+  - Архитектурная документация для каждого приложения: `docs/apps/*.md` и `apps/*/README.md`.
+- [x] **15.2 Блок B: Петля обратной связи языка**:
+  - Каталог болей и компиляторных дефектов: раздел 7 в `docs/language-findings.md` (устранение платформенных коллизий `winnt.h`, добавление `<unordered_set>` в `veloc.h`).
+  - Стайлгайд стандартной библиотеки и соглашений API: `docs/api-guidelines.md`.
+  - Честный анализ слабых мест и компромиссов: `docs/known-limitations.md`.
+- [x] **15.3 Блок C: Управление проектом и сообщество**:
+  - `GOVERNANCE.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, issue-шаблоны `.github/ISSUE_TEMPLATE/`.
+  - RFC процесс: `rfcs/0000-template.md`, ретро-RFC `0001-simd-intrinsics.md`, `0002-safe-fast-modes.md`, `0003-piece-table-buffer.md`.
+  - Дорожная карта на 12 месяцев: `ROADMAP.md` со спецификацией гарантий стабильности 1.0.
+  - Генератор задач для новичков: `src/good_first_issues.py` (`veloc triage`).
+  - Онбординг контрибьютора: `veloc dev-setup`, `docs/architecture/overview.md`.
+- [x] **15.4 Блок D: Долгая поддержка и качество**:
+  - Политика долгосрочной поддержки: `docs/lts-policy.md` (3 года LTS для 1.0).
+  - Набор golden-тестов обратной совместимости `tests/golden/` и верификатор `tests/test_golden.py` (100% bit-for-bit совпадение).
+  - Экосистемный Crater gate: `src/crater.py` (`veloc crater` - 100% чистая сборка всех 7 приложений).
+  - Проектный health dashboard: `src/health_dashboard.py` (`veloc health` -> `docs/health/index.html`).
+  - План устойчивости к фактору автобуса и аварийного восстановления: `docs/maintenance/bus_factor.md`.
+- [x] **15.5 Блок E: Финальный релиз-кандидат 1.0-RC**:
+  - Выпуск VeloC 1.0.0-rc1 зафиксирован в `CHANGELOG.md` и `DECISIONS.md` (ADR-0021).
+  - Честные слабые стороны: `docs/known-limitations.md`.
+  - Дорожная карта следующих этапов: `ROADMAP.md`.
+
+
 

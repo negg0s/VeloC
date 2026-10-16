@@ -1,0 +1,12 @@
+[package]
+name = "veloc-db"
+version = "0.1.0"
+authors = ["VeloC Core Team"]
+license = "MIT"
+description = "High-performance embedded database with B+tree, WAL, MVCC, and SQL query engine"
+
+[dependencies]
+veloc-data = "0.1.0"
+
+[capabilities]
+allow = ["fs.read", "fs.write", "time.now"]

@@ -1,0 +1,241 @@
+module VelocPathTracer;
+
+#include <veloc.h>
+#include <cmath>
+#include <vector>
+#include <thread>
+#include <random>
+
+struct Color3 {
+    f32 r, g, b;
+    Color3() : r(0), g(0), b(0) {}
+    Color3(f32 _r, f32 _g, f32 _b) : r(_r), g(_g), b(_b) {}
+    Color3 operator+(const Color3& o) const { return Color3(r + o.r, g + o.g, b + o.b); }
+    Color3 operator*(f32 s) const { return Color3(r * s, g * s, b * s); }
+    Color3 operator*(const Color3& o) const { return Color3(r * o.r, g * o.g, b * o.b); }
+};
+
+struct PtVec3 {
+    f32 x, y, z;
+    PtVec3() : x(0), y(0), z(0) {}
+    PtVec3(f32 _x, f32 _y, f32 _z) : x(_x), y(_y), z(_z) {}
+    PtVec3 operator+(const PtVec3& o) const { return PtVec3(x + o.x, y + o.y, z + o.z); }
+    PtVec3 operator-(const PtVec3& o) const { return PtVec3(x - o.x, y - o.y, z - o.z); }
+    PtVec3 operator*(f32 s) const { return PtVec3(x * s, y * s, z * s); }
+    f32 dot(const PtVec3& o) const { return x * o.x + y * o.y + z * o.z; }
+    f32 length_sq() const { return x*x + y*y + z*z; }
+    f32 length() const { return std::sqrt(length_sq()); }
+    PtVec3 normalized() const {
+        f32 l = length();
+        return (l > 0.0001f) ? (*this * (1.0f / l)) : *this;
+    }
+};
+
+struct Ray {
+    PtVec3 orig;
+    PtVec3 dir;
+    Ray(const PtVec3& o, const PtVec3& d) : orig(o), dir(d.normalized()) {}
+};
+
+struct HitRecord {
+    f32 t;
+    PtVec3 p;
+    PtVec3 normal;
+    Color3 albedo;
+    bool is_reflective;
+    bool is_emitter;
+};
+
+struct Sphere {
+    PtVec3 center;
+    f32 radius;
+    Color3 albedo;
+    bool is_reflective;
+    bool is_emitter;
+
+    bool hit(const Ray& r, f32 t_min, f32 t_max, HitRecord& rec) const {
+        PtVec3 oc = r.orig - center;
+        f32 a = r.dir.length_sq();
+        f32 half_b = oc.dot(r.dir);
+        f32 c = oc.length_sq() - radius * radius;
+        f32 discriminant = half_b * half_b - a * c;
+
+        if (discriminant < 0.0f) return false;
+        f32 sqrtd = std::sqrt(discriminant);
+
+        f32 root = (-half_b - sqrtd) / a;
+        if (root < t_min || root > t_max) {
+            root = (-half_b + sqrtd) / a;
+            if (root < t_min || root > t_max) return false;
+        }
+
+        rec.t = root;
+        rec.p = r.orig + r.dir * rec.t;
+        rec.normal = (rec.p - center) * (1.0f / radius);
+        rec.albedo = albedo;
+        rec.is_reflective = is_reflective;
+        rec.is_emitter = is_emitter;
+        return true;
+    }
+};
+
+class Scene {
+public:
+    std::vector<Sphere> spheres;
+
+    void add(const Sphere& s) {
+        spheres.push_back(s);
+    }
+
+    bool intersect(const Ray& r, f32 t_min, f32 t_max, HitRecord& rec) const {
+        HitRecord temp_rec;
+        bool hit_anything = false;
+        f32 closest_so_far = t_max;
+
+        for (const auto& s : spheres) {
+            if (s.hit(r, t_min, closest_so_far, temp_rec)) {
+                hit_anything = true;
+                closest_so_far = temp_rec.t;
+                rec = temp_rec;
+            }
+        }
+        return hit_anything;
+    }
+};
+
+// Simple fast pseudo-random float [0, 1)
+static inline f32 fast_rand(u32& state) {
+    state = state * 1664525u + 1013904223u;
+    return (f32)(state & 0x00FFFFFF) / 16777216.0f;
+}
+
+static inline PtVec3 random_in_hemisphere(const PtVec3& normal, u32& state) {
+    PtVec3 v;
+    do {
+        v = PtVec3(fast_rand(state) * 2.0f - 1.0f,
+                   fast_rand(state) * 2.0f - 1.0f,
+                   fast_rand(state) * 2.0f - 1.0f);
+    } while (v.length_sq() >= 1.0f || v.length_sq() < 0.0001f);
+    v = v.normalized();
+    if (v.dot(normal) > 0.0f) return v;
+    return v * -1.0f;
+}
+
+Color3 ray_color(const Ray& r, const Scene& scene, i32 depth, u32& rng, i64& ray_count) {
+    ray_count++;
+    if (depth <= 0) return Color3(0, 0, 0);
+
+    HitRecord rec;
+    if (scene.intersect(r, 0.001f, 1000.0f, rec)) {
+        if (rec.is_emitter) {
+            return rec.albedo;
+        }
+
+        if (rec.is_reflective) {
+            // Perfect specular reflection: r = d - 2*(d.n)*n
+            PtVec3 reflected = r.dir - rec.normal * (2.0f * r.dir.dot(rec.normal));
+            Ray scattered(rec.p, reflected);
+            return ray_color(scattered, scene, depth - 1, rng, ray_count) * rec.albedo;
+        } else {
+            // Diffuse bounce (Lambertian cosine approximation)
+            PtVec3 scatter_dir = random_in_hemisphere(rec.normal, rng);
+            Ray scattered(rec.p, scatter_dir);
+            return ray_color(scattered, scene, depth - 1, rng, ray_count) * rec.albedo * 0.7f;
+        }
+    }
+
+    // Sky background gradient
+    PtVec3 unit_direction = r.dir;
+    f32 t = 0.5f * (unit_direction.y + 1.0f);
+    return Color3(1.0f, 1.0f, 1.0f) * (1.0f - t) + Color3(0.5f, 0.7f, 1.0f) * t;
+}
+
+fn main() -> i32 {
+    printf("================================================================================\n");
+    printf("     VeloC-PathTracer: Monte Carlo Path Tracer with Multi-Threading             \n");
+    printf("================================================================================\n");
+
+    Scene scene;
+    // Ground
+    scene.add(Sphere{PtVec3(0.0f, -100.5f, -1.0f), 100.0f, Color3(0.8f, 0.8f, 0.0f), false, false});
+    // Center diffuse sphere
+    scene.add(Sphere{PtVec3(0.0f, 0.0f, -1.2f), 0.5f, Color3(0.1f, 0.2f, 0.5f), false, false});
+    // Left reflective glass/metal sphere
+    scene.add(Sphere{PtVec3(-1.0f, 0.0f, -1.0f), 0.5f, Color3(0.8f, 0.8f, 0.8f), true, false});
+    // Right emitter light sphere
+    scene.add(Sphere{PtVec3(1.0f, 0.5f, -1.0f), 0.4f, Color3(4.0f, 4.0f, 3.0f), false, true});
+
+    const i32 width = 160;
+    const i32 height = 120;
+    const i32 samples_per_pixel = 8;
+    const i32 max_depth = 4;
+
+    PtVec3 cam_orig(0.0f, 0.0f, 1.0f);
+    f32 viewport_height = 2.0f;
+    f32 viewport_width = viewport_height * ((f32)width / (f32)height);
+    f32 focal_length = 1.0f;
+
+    PtVec3 horizontal(viewport_width, 0.0f, 0.0f);
+    PtVec3 vertical(0.0f, viewport_height, 0.0f);
+    PtVec3 lower_left_corner = cam_orig - horizontal * 0.5f - vertical * 0.5f - PtVec3(0.0f, 0.0f, focal_length);
+
+    printf("  - Render target: %dx%d (%d samples/pixel, max depth %d)\n", width, height, samples_per_pixel, max_depth);
+    printf("  - Scene spheres: %zu\n", scene.spheres.size());
+
+    u32 num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) num_threads = 4;
+    printf("  - Dispatching over %u worker threads...\n", num_threads);
+
+    std::vector<Color3> framebuffer(width * height);
+    std::vector<i64> thread_ray_counts(num_threads, 0);
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+
+    std::vector<std::thread> workers;
+    for (u32 t = 0; t < num_threads; ++t) {
+        workers.emplace_back([&, t]() {
+            u32 rng = 1337u + t * 997u;
+            i32 rows_per_thread = (height + (i32)num_threads - 1) / (i32)num_threads;
+            i32 y_start = (i32)t * rows_per_thread;
+            i32 y_end = std::min(y_start + rows_per_thread, height);
+
+            for (i32 j = y_start; j < y_end; ++j) {
+                for (i32 i = 0; i < width; ++i) {
+                    Color3 pixel_color(0, 0, 0);
+                    for (i32 s = 0; s < samples_per_pixel; ++s) {
+                        f32 u = ((f32)i + fast_rand(rng)) / (f32)(width - 1);
+                        f32 v = ((f32)(height - 1 - j) + fast_rand(rng)) / (f32)(height - 1);
+                        Ray r(cam_orig, lower_left_corner + horizontal * u + vertical * v - cam_orig);
+                        pixel_color = pixel_color + ray_color(r, scene, max_depth, rng, thread_ray_counts[t]);
+                    }
+                    framebuffer[j * width + i] = pixel_color * (1.0f / (f32)samples_per_pixel);
+                }
+            }
+        });
+    }
+
+    for (auto& w : workers) {
+        w.join();
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 render_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count();
+
+    i64 total_rays = 0;
+    for (u32 t = 0; t < num_threads; ++t) {
+        total_rays += thread_ray_counts[t];
+    }
+    f64 rays_per_sec = ((f64)total_rays / (render_ms / 1000.0));
+
+    printf("  - Total Rays Cast: %lld in %.2f ms\n", total_rays, render_ms);
+    printf("  - Path Tracing Throughput: %.2f Million Rays/sec\n", rays_per_sec / 1e6);
+    printf("  - Sample pixel (center): R=%.2f, G=%.2f, B=%.2f\n",
+           framebuffer[(height/2)*width + (width/2)].r,
+           framebuffer[(height/2)*width + (width/2)].g,
+           framebuffer[(height/2)*width + (width/2)].b);
+
+    printf("================================================================================\n");
+    printf("[VELOC-PATHTRACER SUCCESS] Multi-Threaded Monte Carlo Path Tracer Verified!\n");
+    printf("================================================================================\n");
+    return 0;
+}

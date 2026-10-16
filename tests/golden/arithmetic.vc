@@ -1,0 +1,12 @@
+#include <veloc.h>
+
+fn main() -> i32 {
+    let a: i32 = 42;
+    let b: i32 = 13;
+    printf("ADD: %d\n", a + b);
+    printf("SUB: %d\n", a - b);
+    printf("MUL: %d\n", a * b);
+    printf("DIV: %d\n", a / b);
+    printf("MOD: %d\n", a % b);
+    return 0;
+}
