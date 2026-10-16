@@ -1,0 +1,7 @@
+pub fn calculate_hash(x: i64) -> i64 {
+    return x * 31;
+}
+
+pub fn new_feature(count: usize) -> bool {
+    return count > 0;
+}

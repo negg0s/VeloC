@@ -1,0 +1,9 @@
+pub fn calculate_hash(x: i64) -> i64 {
+    return x * 31;
+}
+
+pub fn old_feature() -> void {}
+
+pub fn extra_feature() -> i32 {
+    return 42;
+}

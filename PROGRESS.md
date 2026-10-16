@@ -87,3 +87,17 @@
   - 19/19 примеров дают 100% идентичный SHA-256 хэш как для C++, так и для финальных `.exe`
 - [x] **7.7 Исключение неопределенного поведения знаковых чисел**:
   - Флаг `-fwrapv` гарантирует двухкомпонентное оборачивание знаковых чисел без оптимизаторских ловушек
+### 8. Этап 2: Блоки B, E, F (Инкрементальный компилятор, ABI и Статический анализ)
+- [x] **8.1 Salsa-подобный Query Engine (`src/query.py`, `veloc query-trace`)**:
+  - Мемоизация запросов (`file_read`, `tokenize`, `parse_ast`, `tu_emit`)
+  - Content-Addressed Store (CAS) в `.cache/cas/` с SHA256-ключами
+  - Команда `veloc query-trace <file>` с выводом дерева запросов, HIT/MISS и микросекундных таймингов
+- [x] **8.2 Бенчмарк инкрементальной сборки (`veloc bench --incremental`)**:
+  - Генерация синтетических модульных проектов на 10 и 50 модулей (до 250 функций)
+  - Замеры: Cold build (~2800ms) vs Warm build (250ms instant cache) vs 1-line edit (244ms)
+- [x] **8.3 Аудитор совместимости Semver и ABI (`src/semver.py`, `veloc semver-check`)**:
+  - Автоматическое извлечение публичного API (`pub fn`, `soa struct`)
+  - Сравнение версий с классификацией изменений: `MAJOR` (breaking), `MINOR` (addition), `PATCH`
+- [x] **8.4 Статический анализ границ и времени жизни (`src/analyzer.py`, `veloc check`)**:
+  - Команда `veloc check --bounds-report <file>` с классификацией `ELIMINATED` vs `RUNTIME`
+  - Обнаружение и предотвращение утечек адресов локального стека (`return &local_var`)

@@ -1,0 +1,4 @@
+fn bad_escape() -> int* {
+    let local_var: i32 = 42;
+    return &local_var; // Illegal: returns pointer to stack variable
+}

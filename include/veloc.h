@@ -39,6 +39,7 @@ namespace veloc {
 #endif
 
 #define noalias VELOC_RESTRICT
+#define pub
 
 // Fast fixed-size integer types
 typedef uint8_t  u8;

@@ -126,6 +126,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         "-fno-rtti",
         "-fomit-frame-pointer",
         f"-I{INCLUDE_DIR}",
+        f"-I{source_path.parent}",
         "-lws2_32"
     ]
 
@@ -231,6 +232,60 @@ def show_info():
     print(f"Cache Hierarchy: 32 KB L1 Data, 256 KB L2, 12 MB L3")
     print("==================================================")
 
+def run_static_check(source_path: Path, bounds_report: bool = False):
+    from analyzer import StaticAnalyzer
+    source_str = source_path.read_text(encoding="utf-8")
+    tokens = Lexer(source_str, str(source_path)).tokenize()
+    program = Parser(tokens, source_str, str(source_path)).parse_program()
+    analyzer = StaticAnalyzer(str(source_path))
+    analyzer.analyze_program(program)
+
+    if analyzer.lifetime_errors:
+        print(f"\n[VeloC Static Analysis Errors]:")
+        for line, col, msg in analyzer.lifetime_errors:
+            print(f"  {source_path}:{line}:{col}: {msg}")
+        sys.exit(1)
+
+    if bounds_report:
+        analyzer.print_bounds_report()
+    else:
+        print(f"[VeloC Check Success] {source_path.name} passed all static invariants and lifetime checks cleanly.")
+
+def run_semver_check(old_file: Path, new_file: Path):
+    from semver import SemverChecker
+    old_code = old_file.read_text(encoding="utf-8")
+    new_code = new_file.read_text(encoding="utf-8")
+    old_api = SemverChecker.extract_api(old_code, str(old_file))
+    new_api = SemverChecker.extract_api(new_code, str(new_file))
+    bump, details = SemverChecker.compare(old_api, new_api)
+
+    print("==================================================")
+    print("         VeloC Semver Public ABI Report           ")
+    print("==================================================")
+    print(f"Recommended Semantic Version Bump: [{bump}]\n")
+    print("API Differences:")
+    for d in details:
+        print(f"  * {d}")
+    print("==================================================")
+
+def run_query_trace(source_path: Path):
+    from query import QueryEngine
+    engine = QueryEngine(ROOT_DIR / ".cache" / "cas")
+    
+    content = engine.query("file_read", str(source_path), lambda: source_path.read_text(encoding="utf-8"))
+    
+    tokens = engine.query("tokenize", f"{source_path}:{hashlib.sha256(content.encode()).hexdigest()[:12]}",
+                          lambda: Lexer(content, str(source_path)).tokenize())
+    
+    program = engine.query("parse_ast", f"{source_path}:{len(tokens)}",
+                           lambda: Parser(tokens, content, str(source_path)).parse_program())
+    
+    codegen = CppCodegen(str(INCLUDE_DIR))
+    cpp_code = engine.query("tu_emit", f"{source_path.stem}:{len(program.declarations)}",
+                            lambda: codegen.generate_cpp(program))
+    
+    engine.print_trace()
+
 def main():
     parser = argparse.ArgumentParser(description="VeloC: The High-Performance Faster C++ Dialect & Toolchain")
     subparsers = parser.add_subparsers(dest="command")
@@ -273,6 +328,7 @@ def main():
     bench_p = subparsers.add_parser("bench", help="Run comparative benchmark vs standard C++")
     bench_p.add_argument("--all", action="store_true", help="Run all scientific benchmarks")
     bench_p.add_argument("--update-readme", action="store_true", help="Update README.md with honest benchmark results")
+    bench_p.add_argument("--incremental", action="store_true", help="Run incremental compilation benchmark")
 
     explain_p = subparsers.add_parser("explain", help="Explain an error code (e.g. veloc explain E0001)")
     explain_p.add_argument("code", help="Error code (E0001, E0002, etc.)")
@@ -283,6 +339,15 @@ def main():
     diff_p.add_argument("--count", type=int, default=10, help="Number of random programs to test (default 10)")
     fuzz_p = subparsers.add_parser("fuzz", help="Run compiler mutation fuzzing engine")
     fuzz_p.add_argument("--iterations", type=int, default=500, help="Number of fuzzing iterations (default 500)")
+    qt_p = subparsers.add_parser("query-trace", help="Display query execution graph and timings for a file")
+    qt_p.add_argument("file", help="Path to .vc file to analyze")
+    check_p = subparsers.add_parser("check", help="Run static analysis and bounds check inspection")
+    check_p.add_argument("file", help="Path to .vc file")
+    check_p.add_argument("--bounds-report", action="store_true", help="Print detailed bounds check elimination report")
+
+    semver_p = subparsers.add_parser("semver-check", help="Audit public API signatures for breaking changes")
+    semver_p.add_argument("old_file", help="Path to baseline .vc file")
+    semver_p.add_argument("new_file", help="Path to new/updated .vc file")
 
     args = parser.parse_args()
 
@@ -325,8 +390,16 @@ def main():
         subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "differential" / "run_diff.py"), str(args.count)])
     elif args.command == "fuzz":
         subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "fuzz" / "fuzz_compiler.py"), str(args.iterations)])
+    elif args.command == "query-trace":
+        run_query_trace(Path(args.file))
+    elif args.command == "check":
+        run_static_check(Path(args.file), bounds_report=args.bounds_report)
+    elif args.command == "semver-check":
+        run_semver_check(Path(args.old_file), Path(args.new_file))
     elif args.command == "bench":
-        if hasattr(args, "all") and args.all:
+        if hasattr(args, "incremental") and args.incremental:
+            subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "bench_incremental.py")])
+        elif hasattr(args, "all") and args.all:
             bench_script = ROOT_DIR / "benchmarks" / "rigorous_bench.py"
             cmd = [sys.executable, str(bench_script)]
             if hasattr(args, "update_readme") and args.update_readme:
