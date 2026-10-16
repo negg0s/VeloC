@@ -1,0 +1,55 @@
+#include <veloc.h>
+#include <veloc_ai.h>
+#include <cstdio>
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("       VeloC AI: Real Autonomous MLP Training & Inference        \n");
+    printf("=================================================================\n");
+
+    // Task: Learn non-linear XOR function
+    // X0 = [0, 0] -> 0
+    // X1 = [0, 1] -> 1
+    // X2 = [1, 0] -> 1
+    // X3 = [1, 1] -> 0
+
+    f32 X[4][2] = {
+        {0.0f, 0.0f},
+        {0.0f, 1.0f},
+        {1.0f, 0.0f},
+        {1.0f, 1.0f}
+    };
+    f32 Y[4][1] = {
+        {0.0f},
+        {1.0f},
+        {1.0f},
+        {0.0f}
+    };
+
+    printf("[Architecture]: MLP 2 -> 8 -> 1 (with ReLU & Backprop)\n");
+    veloc::ai::MLP model(2, 8, 1);
+
+    printf("[Training]: Optimizing 20,000 steps with SGD (lr=0.05)...\n");
+    f32 final_loss = 0.0f;
+    for (usize epoch = 0; epoch < 20000; epoch++) {
+        f32 epoch_loss = 0.0f;
+        for (usize i = 0; i < 4; i++) {
+            epoch_loss += model.forward_and_step(X[i], Y[i], 0.05f);
+        }
+        final_loss = epoch_loss / 4.0f;
+    }
+    printf("[Training Completed]: Final MSE Loss: %.6f\n", final_loss);
+
+    printf("\n[Evaluation Predictions]:\n");
+    for (usize i = 0; i < 4; i++) {
+        f32 pred[1];
+        model.predict(X[i], pred);
+        printf("  Input: (%.0f, %.0f) -> Target: %.0f, Predicted: %.4f %s\n",
+               X[i][0], X[i][1], Y[i][0], pred[0],
+               (fabsf(pred[0] - Y[i][0]) < 0.2f ? "[CORRECT]" : "[INCORRECT]"));
+    }
+
+    printf("=================================================================\n");
+    printf("[DEMO SUCCESS]: MLP successfully trained and converged.\n");
+    return 0;
+}

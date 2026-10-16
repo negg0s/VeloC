@@ -1,0 +1,12 @@
+[package]
+name = "veloc-ai"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "High-performance AI/ML engine with N-dim tensors, AVX2 FMA kernels, BPE tokenizer, and autograd MLP"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "avx2"

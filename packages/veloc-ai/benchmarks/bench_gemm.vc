@@ -1,0 +1,68 @@
+#include <veloc.h>
+#include <veloc_ai.h>
+#include <cstdio>
+#include <chrono>
+
+const usize M = 256;
+const usize K = 256;
+const usize N = 256;
+
+static f32 A[M * K];
+static f32 B[K * N];
+static f32 C_gemm[M * N];
+static f32 C_naive[M * N];
+
+// Naive scalar reference implementation for baseline comparison
+void naive_gemm(const f32* a, const f32* b, f32* c, usize m, usize k, usize n) {
+    std::memset(c, 0, m * n * sizeof(f32));
+    for (usize i = 0; i < m; i++) {
+        for (usize p = 0; p < k; p++) {
+            for (usize j = 0; j < n; j++) {
+                c[i * n + j] += a[i * k + p] * b[p * n + j];
+            }
+        }
+    }
+}
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("        VeloC AI GEMM Benchmark: AVX2+FMA vs Naive (256x256)     \n");
+    printf("=================================================================\n");
+
+    for (usize i = 0; i < M * K; i++) { A[i] = ((f32)(i % 100)) * 0.01f; }
+    for (usize i = 0; i < K * N; i++) { B[i] = ((f32)((i + 7) % 100)) * 0.01f; }
+
+    // 1. Benchmark Naive Scalar GEMM
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (usize iter = 0; iter < 10; iter++) {
+        naive_gemm(A, B, C_naive, M, K, N);
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 naive_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count() / 10.0;
+    f64 gflops_naive = (2.0 * (f64)M * (f64)K * (f64)N) / (naive_ms * 1e6);
+    printf("  [Naive Scalar GEMM] 256x256: %.2f ms (Throughput: %.2f GFLOPS)\n", naive_ms, gflops_naive);
+
+    // 2. Benchmark AVX2+FMA Optimized GEMM
+    auto t2 = std::chrono::high_resolution_clock::now();
+    for (usize iter = 0; iter < 50; iter++) {
+        veloc::ai::gemm_avx2(A, B, C_gemm, M, K, N);
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+    f64 avx2_ms = std::chrono::duration<f64, std::milli>(t3 - t2).count() / 50.0;
+    f64 gflops_avx2 = (2.0 * (f64)M * (f64)K * (f64)N) / (avx2_ms * 1e6);
+    f64 speedup = naive_ms / avx2_ms;
+    printf("  [AVX2+FMA VeloC GEMM] 256x256: %.2f ms (Throughput: %.2f GFLOPS, Speedup: %.1fx)\n",
+           avx2_ms, gflops_avx2, speedup);
+
+    // Verify correctness
+    f32 max_diff = 0.0f;
+    for (usize i = 0; i < M * N; i++) {
+        f32 diff = fabsf(C_gemm[i] - C_naive[i]);
+        if (diff > max_diff) max_diff = diff;
+    }
+    printf("  [Verification Checksum] Max absolute diff vs scalar reference: %.6f\n", max_diff);
+
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY]\n");
+    return 0;
+}

@@ -433,6 +433,18 @@ class Parser:
             full_name = "::".join(name_parts)
             return Identifier(tok.line, tok.col, self.filename, name=full_name)
 
+        if tok.type == TokenType.LBRACE:
+            start_tok = self.advance() # {
+            items = []
+            if not self.check(TokenType.RBRACE):
+                while True:
+                    items.append(self.parse_expr(0))
+                    if not self.match(TokenType.COMMA):
+                        break
+            self.expect(TokenType.RBRACE, "Expected '}' closing initializer list")
+            item_strs = [CppCodegen("<include>").emit_expr(it) for it in items]
+            return Identifier(start_tok.line, start_tok.col, self.filename, name=f"{{{', '.join(item_strs)}}}")
+
         if tok.type == TokenType.MATCH:
             start_tok = self.advance()
             has_paren = self.match(TokenType.LPAREN)

@@ -1,0 +1,51 @@
+#include <veloc.h>
+#include <veloc_ai.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-ai Tensor, AVX2 Kernels, Softmax, Attention, BPE, MLP...\n");
+
+    // 1. N-dim Tensor shape & indexing
+    std::vector<usize> shape = {4, 8};
+    veloc::ai::Tensor<f32> t(shape);
+    assert(t.total_size == 32);
+    t.at2D(1, 2) = 42.0f;
+    assert(t.at2D(1, 2) == 42.0f);
+
+    // 2. Softmax test
+    f32 raw_logits[4] = {1.0f, 2.0f, 3.0f, 4.0f};
+    f32 sm_probs[4];
+    veloc::ai::softmax_avx2(raw_logits, sm_probs, 4);
+    f32 sum = sm_probs[0] + sm_probs[1] + sm_probs[2] + sm_probs[3];
+    assert(fabsf(sum - 1.0f) < 1e-5f);
+    assert(sm_probs[3] > sm_probs[2] && sm_probs[2] > sm_probs[1]);
+
+    // 3. RMSNorm test
+    f32 x_norm[4] = {2.0f, 2.0f, 2.0f, 2.0f};
+    f32 gamma[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    f32 out_norm[4];
+    veloc::ai::rmsnorm_avx2(x_norm, gamma, out_norm, 4);
+    assert(fabsf(out_norm[0] - 1.0f) < 1e-3f);
+
+    // 4. BPE Tokenizer test
+    veloc::ai::BPETokenizer tok;
+    std::string text = "Hello VeloC AI!";
+    std::vector<i32> encoded = tok.encode(text);
+    assert(encoded.size() == text.size());
+    std::string decoded = tok.decode(encoded);
+    assert(decoded == text);
+
+    // 5. Scaled Dot-Product Attention test (2 tokens, dim 4)
+    f32 Q[8] = {1, 0, 1, 0,  0, 1, 0, 1};
+    f32 K[8] = {1, 0, 1, 0,  0, 1, 0, 1};
+    f32 V[8] = {2, 2, 2, 2,  4, 4, 4, 4};
+    f32 AttnOut[8];
+    veloc::ai::scaled_dot_product_attention(Q, K, V, AttnOut, 2, 4);
+    // Output must be valid numbers (not NaN)
+    assert(!std::isnan(AttnOut[0]) && !std::isnan(AttnOut[4]));
+
+    printf("[TEST PASS]: veloc-ai components verified successfully!\n");
+    return 0;
+}
