@@ -14,6 +14,10 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
+#include <tuple>
+#include <utility>
+#include <memory>
+#include <functional>
 
 namespace veloc {
     template <typename T>
@@ -877,6 +881,10 @@ static inline int veloc_exec(const char* command) {
         exit(1); \
     } \
 } while(0)
+
+#ifndef assert
+#define assert(cond) assert_true(cond)
+#endif
 
 // ============================================================================
 // ANSI Color Terminal Helpers
@@ -2903,6 +2911,722 @@ namespace veloc {
             return min_val + (max_val - min_val) * next_f64();
         }
     };
+
+    // ========================================================================
+    // BLOCK A: Advanced Type System (Const Generics, Tuples, Linear, Contracts)
+    // ========================================================================
+
+    // 1. Const Generics: Fixed-Size Matrix with Compile-Time Dimensional Verification
+    template <typename T, usize M, usize N>
+    struct Mat {
+        static_assert(M > 0 && N > 0, "Matrix dimensions must be positive non-zero integers");
+        static constexpr usize ROWS = M;
+        static constexpr usize COLS = N;
+        T data[M * N];
+
+        constexpr Mat() : data{} {}
+
+        static constexpr Mat zeros() {
+            return Mat();
+        }
+
+        static constexpr Mat identity() {
+            static_assert(M == N, "Identity matrix must be square (ROWS == COLS)");
+            Mat res;
+            for (usize i = 0; i < M; ++i) res.at(i, i) = (T)1;
+            return res;
+        }
+
+        constexpr const T& at(usize r, usize c) const {
+            return data[r * N + c];
+        }
+        constexpr T& at(usize r, usize c) {
+            return data[r * N + c];
+        }
+
+        constexpr Mat<T, M, N> operator+(const Mat<T, M, N>& rhs) const {
+            Mat<T, M, N> res;
+            for (usize i = 0; i < M * N; ++i) res.data[i] = data[i] + rhs.data[i];
+            return res;
+        }
+
+        constexpr Mat<T, M, N> operator-(const Mat<T, M, N>& rhs) const {
+            Mat<T, M, N> res;
+            for (usize i = 0; i < M * N; ++i) res.data[i] = data[i] - rhs.data[i];
+            return res;
+        }
+
+        // Compile-time dimension matching: (M x K) * (K x P) -> (M x P)
+        template <usize P>
+        constexpr Mat<T, M, P> operator*(const Mat<T, N, P>& rhs) const {
+            Mat<T, M, P> res;
+            for (usize i = 0; i < M; ++i) {
+                for (usize j = 0; j < P; ++j) {
+                    T sum = 0;
+                    for (usize k = 0; k < N; ++k) {
+                        sum += at(i, k) * rhs.at(k, j);
+                    }
+                    res.at(i, j) = sum;
+                }
+            }
+            return res;
+        }
+
+        constexpr Mat<T, N, M> transpose() const {
+            Mat<T, N, M> res;
+            for (usize i = 0; i < M; ++i) {
+                for (usize j = 0; j < N; ++j) {
+                    res.at(j, i) = at(i, j);
+                }
+            }
+            return res;
+        }
+
+        constexpr bool operator==(const Mat<T, M, N>& rhs) const {
+            for (usize i = 0; i < M * N; ++i) {
+                if (data[i] != rhs.data[i]) return false;
+            }
+            return true;
+        }
+        constexpr bool operator!=(const Mat<T, M, N>& rhs) const {
+            return !(*this == rhs);
+        }
+    };
+
+    // 2. Variadic Generics: Tuple and Helpers
+    template <typename... Ts>
+    using Tuple = std::tuple<Ts...>;
+
+    template <typename... Ts>
+    constexpr auto make_tuple(Ts&&... args) {
+        return std::make_tuple(std::forward<Ts>(args)...);
+    }
+
+    template <usize I, typename... Ts>
+    constexpr decltype(auto) get(Tuple<Ts...>& t) {
+        return std::get<I>(t);
+    }
+
+    template <usize I, typename... Ts>
+    constexpr decltype(auto) get(const Tuple<Ts...>& t) {
+        return std::get<I>(t);
+    }
+
+    // 3. Linear / Affine Types [R]: Single-use Resources
+    template <typename T>
+    struct Linear {
+        T value;
+        bool consumed;
+
+        explicit Linear(T val) : value(std::move(val)), consumed(false) {}
+
+        Linear(Linear&& other) noexcept : value(std::move(other.value)), consumed(other.consumed) {
+            other.consumed = true;
+        }
+
+        Linear& operator=(Linear&& other) noexcept {
+            if (this != &other) {
+                value = std::move(other.value);
+                consumed = other.consumed;
+                other.consumed = true;
+            }
+            return *this;
+        }
+
+        Linear(const Linear&) = delete;
+        Linear& operator=(const Linear&) = delete;
+
+        ~Linear() {
+            #ifndef VELOC_FAST
+            if (!consumed) {
+                fprintf(stderr, "[VeloC Linear Type Panic]: Resource leaked without being consumed!\n");
+            }
+            #endif
+        }
+
+        T consume() {
+            #ifndef VELOC_FAST
+            if (consumed) {
+                fprintf(stderr, "[VeloC Linear Type Panic]: Double consumption of linear resource!\n");
+                abort();
+            }
+            #endif
+            consumed = true;
+            return std::move(value);
+        }
+
+        const T& peek() const {
+            return value;
+        }
+    };
+
+    // 4. Refinement Types [R]: Interval / Condition Verified Values
+    template <typename T, auto Predicate>
+    struct Refined {
+        T value;
+
+        constexpr explicit Refined(T val) : value(val) {
+            #ifndef VELOC_FAST
+            if (!Predicate(val)) {
+                fprintf(stderr, "[VeloC Refinement Type Panic]: Invariant violation in refined type!\n");
+                abort();
+            }
+            #else
+            __builtin_assume(Predicate(val));
+            #endif
+        }
+
+        constexpr operator T() const { return value; }
+        constexpr T get() const { return value; }
+    };
+
+    // 5. Contract Programming Counters & Verifiers
+    inline u64 contracts_proven_count = 0;
+    inline u64 contracts_checked_count = 0;
+
+    static inline void contract_requires(bool cond, const char* desc, const char* file, int line) {
+        contracts_checked_count++;
+        if (!cond) {
+            fprintf(stderr, "[VeloC Contract Violation: REQUIRES] '%s' failed at %s:%d\n", desc, file, line);
+            abort();
+        }
+    }
+
+    static inline void contract_ensures(bool cond, const char* desc, const char* file, int line) {
+        contracts_checked_count++;
+        if (!cond) {
+            fprintf(stderr, "[VeloC Contract Violation: ENSURES] '%s' failed at %s:%d\n", desc, file, line);
+            abort();
+        }
+    }
+
+    static inline void contract_invariant(bool cond, const char* desc, const char* file, int line) {
+        contracts_checked_count++;
+        if (!cond) {
+            fprintf(stderr, "[VeloC Contract Violation: INVARIANT] '%s' failed at %s:%d\n", desc, file, line);
+            abort();
+        }
+    }
+
+    // 6. Distinct Newtypes & Units of Measure
+    template <typename T, typename Tag>
+    struct Distinct {
+        T raw;
+        explicit constexpr Distinct(T val = T{}) : raw(val) {}
+        constexpr T get() const { return raw; }
+        constexpr bool operator==(const Distinct& other) const { return raw == other.raw; }
+        constexpr bool operator!=(const Distinct& other) const { return raw != other.raw; }
+        constexpr Distinct operator+(const Distinct& other) const { return Distinct(raw + other.raw); }
+        constexpr Distinct operator-(const Distinct& other) const { return Distinct(raw - other.raw); }
+    };
+
+    // 7. Typestate Pattern
+    struct ClosedState {};
+    struct OpenState {};
+
+    template <typename State>
+    struct TypestateHandle {
+        std::string name;
+        explicit TypestateHandle(std::string n) : name(std::move(n)) {}
+    };
+
+    static inline TypestateHandle<OpenState> typestate_open(TypestateHandle<ClosedState> h) {
+        return TypestateHandle<OpenState>(h.name);
+    }
+    static inline TypestateHandle<ClosedState> typestate_close(TypestateHandle<OpenState> h) {
+        return TypestateHandle<ClosedState>(h.name);
+    }
+
+    inline usize next_type_id() {
+        static usize counter = 0;
+        return ++counter;
+    }
+    template <typename T>
+    inline usize get_type_id() {
+        static usize id = next_type_id();
+        return id;
+    }
+
+    // 8. Dynamic Dispatch On Demand: Any with Checked Downcast (No-RTTI compliant)
+    struct Any {
+        struct BaseHolder {
+            virtual ~BaseHolder() = default;
+            virtual usize type_id() const = 0;
+            virtual BaseHolder* clone() const = 0;
+        };
+
+        template <typename T>
+        struct Holder : BaseHolder {
+            T value;
+            Holder(const T& v) : value(v) {}
+            usize type_id() const override { return get_type_id<T>(); }
+            BaseHolder* clone() const override { return new Holder<T>(value); }
+        };
+
+        BaseHolder* ptr;
+
+        Any() : ptr(nullptr) {}
+
+        template <typename T>
+        Any(const T& val) : ptr(new Holder<T>(val)) {}
+
+        Any(const Any& other) : ptr(other.ptr ? other.ptr->clone() : nullptr) {}
+        Any(Any&& other) noexcept : ptr(other.ptr) { other.ptr = nullptr; }
+
+        Any& operator=(const Any& other) {
+            if (this != &other) {
+                delete ptr;
+                ptr = other.ptr ? other.ptr->clone() : nullptr;
+            }
+            return *this;
+        }
+
+        Any& operator=(Any&& other) noexcept {
+            if (this != &other) {
+                delete ptr;
+                ptr = other.ptr;
+                other.ptr = nullptr;
+            }
+            return *this;
+        }
+
+        ~Any() { delete ptr; }
+
+        bool has_value() const { return ptr != nullptr; }
+
+        template <typename T>
+        bool is() const {
+            return ptr && (ptr->type_id() == get_type_id<T>());
+        }
+
+        template <typename T>
+        T* cast() {
+            if (ptr && ptr->type_id() == get_type_id<T>()) {
+                return &static_cast<Holder<T>*>(ptr)->value;
+            }
+            return nullptr;
+        }
+
+        template <typename T>
+        const T* cast() const {
+            if (ptr && ptr->type_id() == get_type_id<T>()) {
+                return &static_cast<const Holder<T>*>(ptr)->value;
+            }
+            return nullptr;
+        }
+
+        template <typename T>
+        T unwrap() const {
+            auto p = cast<T>();
+            if (!p) {
+                fprintf(stderr, "[VeloC Any Panic]: Failed downcast to requested type!\n");
+                abort();
+            }
+            return *p;
+        }
+    };
+
+    // ========================================================================
+    // BLOCK B: Embedded DSLs & Comptime Verification
+    // ========================================================================
+    namespace regex {
+        template <usize N>
+        struct ComptimeRegex {
+            char pattern[N];
+            constexpr ComptimeRegex(const char (&p)[N]) {
+                for (usize i = 0; i < N; ++i) pattern[i] = p[i];
+            }
+
+            constexpr bool match_exact(const char* s) const {
+                usize p_idx = 0;
+                usize s_idx = 0;
+                while (p_idx < N - 1 && pattern[p_idx] != '\0') {
+                    if (s[s_idx] == '\0') return false;
+                    if (pattern[p_idx] == '.' || pattern[p_idx] == s[s_idx]) {
+                        p_idx++;
+                        s_idx++;
+                    } else {
+                        return false;
+                    }
+                }
+                return s[s_idx] == '\0';
+            }
+        };
+
+        template <usize N>
+        constexpr auto compile(const char (&p)[N]) {
+            return ComptimeRegex<N>(p);
+        }
+    }
+
+    namespace sql {
+        constexpr bool validate_query(const char* sql) {
+            if (!sql) return false;
+            bool is_select = (sql[0] == 'S' || sql[0] == 's') && (sql[1] == 'E' || sql[1] == 'e') && (sql[2] == 'L' || sql[2] == 'l');
+            bool is_insert = (sql[0] == 'I' || sql[0] == 'i') && (sql[1] == 'N' || sql[1] == 'n') && (sql[2] == 'S' || sql[2] == 's');
+            bool is_create = (sql[0] == 'C' || sql[0] == 'c') && (sql[1] == 'R' || sql[1] == 'r') && (sql[2] == 'E' || sql[2] == 'e');
+            if (!is_select && !is_insert && !is_create) return false;
+
+            if (is_select) {
+                bool has_from = false;
+                usize i = 0;
+                while (sql[i] != '\0') {
+                    if ((sql[i] == 'F' || sql[i] == 'f') &&
+                        (sql[i+1] == 'R' || sql[i+1] == 'r') &&
+                        (sql[i+2] == 'O' || sql[i+2] == 'o') &&
+                        (sql[i+3] == 'M' || sql[i+3] == 'm')) {
+                        has_from = true;
+                        break;
+                    }
+                    i++;
+                }
+                return has_from;
+            }
+            return true;
+        }
+    }
+
+    // ========================================================================
+    // BLOCK C: Concurrency, Coroutines, Actors, STM & Deterministic Parallelism
+    // ========================================================================
+
+    // 1. Stackless Generator Coroutine
+    template <typename T>
+    struct Generator {
+        int state;
+        T current_value;
+        T limit;
+        T step;
+
+        Generator(T start, T lim, T stp = 1) : state(0), current_value(start), limit(lim), step(stp) {}
+
+        bool next(T& out) {
+            switch (state) {
+                case 0:
+                    if (current_value < limit) {
+                        out = current_value;
+                        current_value += step;
+                        state = 1;
+                        return true;
+                    }
+                    state = 2;
+                    return false;
+                case 1:
+                    if (current_value < limit) {
+                        out = current_value;
+                        current_value += step;
+                        return true;
+                    }
+                    state = 2;
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        void reset(T start) {
+            current_value = start;
+            state = 0;
+        }
+
+        static constexpr usize frame_size() {
+            return sizeof(Generator);
+        }
+    };
+
+    // 2. Selectable Multi-Channel
+    template <typename T, usize Cap = 64>
+    struct SelectableChannel {
+        T buffer[Cap];
+        usize head;
+        usize tail;
+        usize count;
+
+        SelectableChannel() : head(0), tail(0), count(0) {}
+
+        bool try_send(const T& val) {
+            if (count >= Cap) return false;
+            buffer[tail] = val;
+            tail = (tail + 1) % Cap;
+            count++;
+            return true;
+        }
+
+        bool try_recv(T& out) {
+            if (count == 0) return false;
+            out = buffer[head];
+            head = (head + 1) % Cap;
+            count--;
+            return true;
+        }
+
+        bool is_ready() const {
+            return count > 0;
+        }
+    };
+
+    // 3. Software Transactional Memory (STM) [R]
+    template <typename T>
+    struct TVar {
+        T value;
+        u64 version;
+
+        TVar(T val = T{}) : value(val), version(1) {}
+
+        T read(u64& read_ver) const {
+            read_ver = version;
+            return value;
+        }
+
+        bool commit(const T& new_val, u64 expected_ver) {
+            if (version != expected_ver) return false;
+            value = new_val;
+            version++;
+            return true;
+        }
+    };
+
+    // 4. Deterministic Parallel Reduction (Fixed Associative Tree)
+    template <typename T, typename Op>
+    static inline T deterministic_parallel_reduce(const T* data, usize n, T init, Op op) {
+        if (n == 0) return init;
+        const usize CHUNK_SIZE = 256;
+        if (n <= CHUNK_SIZE) {
+            T acc = init;
+            for (usize i = 0; i < n; ++i) acc = op(acc, data[i]);
+            return acc;
+        }
+        usize num_chunks = (n + CHUNK_SIZE - 1) / CHUNK_SIZE;
+        std::vector<T> chunk_res(num_chunks);
+        for (usize c = 0; c < num_chunks; ++c) {
+            usize start = c * CHUNK_SIZE;
+            usize end = (start + CHUNK_SIZE < n) ? start + CHUNK_SIZE : n;
+            T acc = (start == 0) ? init : T{};
+            for (usize i = start; i < end; ++i) acc = op(acc, data[i]);
+            chunk_res[c] = acc;
+        }
+        T total = chunk_res[0];
+        for (usize c = 1; c < num_chunks; ++c) {
+            total = op(total, chunk_res[c]);
+        }
+        return total;
+    }
+
+    // 5. Reactive Dataflow Pipeline with Bounded Backpressure
+    template <typename T, usize MaxBuffer = 128>
+    struct DataflowStage {
+        T queue[MaxBuffer];
+        usize head;
+        usize tail;
+        usize size;
+        u64 dropped_items;
+
+        DataflowStage() : head(0), tail(0), size(0), dropped_items(0) {}
+
+        bool push(const T& item) {
+            if (size >= MaxBuffer) {
+                dropped_items++;
+                return false;
+            }
+            queue[tail] = item;
+            tail = (tail + 1) % MaxBuffer;
+            size++;
+            return true;
+        }
+
+        bool pull(T& out) {
+            if (size == 0) return false;
+            out = queue[head];
+            head = (head + 1) % MaxBuffer;
+            size--;
+            return true;
+        }
+    };
+
+    // ========================================================================
+    // BLOCK E: Ergonomics & Quality of Life (Error v2, Iterators v2, Strings v2)
+    // ========================================================================
+
+    // 1. Error handling v2 with context chain and source tracking
+    struct Error {
+        std::string message;
+        std::vector<std::string> context_chain;
+        const char* file;
+        int line;
+
+        Error() : message(""), file(""), line(0) {}
+        Error(const std::string& msg, const char* f = "", int l = 0)
+            : message(msg), file(f), line(l) {}
+
+        Error& context(const std::string& ctx) {
+            context_chain.push_back(ctx);
+            return *this;
+        }
+
+        std::string to_string() const {
+            std::string out = "Error: " + message;
+            if (file && file[0] != '\0') {
+                out += " (at " + std::string(file) + ":" + std::to_string(line) + ")";
+            }
+            for (int i = (int)context_chain.size() - 1; i >= 0; --i) {
+                out += "\n  caused by: " + context_chain[i];
+            }
+            return out;
+        }
+    };
+
+    #define VELOC_ERROR(msg) veloc::Error((msg), __FILE__, __LINE__)
+
+    // 2. Iterators v2: Adapters (peekable, step_by, rev) & Zero-Cost Terminals (sum, product, min, max, collect)
+    template <typename T>
+    struct PeekableIter {
+        const T* data;
+        usize len;
+        usize index;
+
+        PeekableIter(const T* d, usize l) : data(d), len(l), index(0) {}
+
+        bool has_next() const { return index < len; }
+        bool peek(T& out) const {
+            if (index >= len) return false;
+            out = data[index];
+            return true;
+        }
+        bool next(T& out) {
+            if (index >= len) return false;
+            out = data[index++];
+            return true;
+        }
+    };
+
+    template <typename T>
+    struct StepByIter {
+        const T* data;
+        usize len;
+        usize step;
+        usize index;
+
+        StepByIter(const T* d, usize l, usize s) : data(d), len(l), step(s ? s : 1), index(0) {}
+
+        bool next(T& out) {
+            if (index >= len) return false;
+            out = data[index];
+            index += step;
+            return true;
+        }
+    };
+
+    template <typename T>
+    struct RevIter {
+        const T* data;
+        usize len;
+        usize current;
+
+        RevIter(const T* d, usize l) : data(d), len(l), current(l) {}
+
+        bool next(T& out) {
+            if (current == 0) return false;
+            current--;
+            out = data[current];
+            return true;
+        }
+    };
+
+    template <typename T>
+    struct ExtendedSliceIter {
+        const T* data;
+        usize len;
+
+        ExtendedSliceIter(const T* d, usize l) : data(d), len(l) {}
+
+        PeekableIter<T> peekable() const { return PeekableIter<T>(data, len); }
+        StepByIter<T> step_by(usize step) const { return StepByIter<T>(data, len, step); }
+        RevIter<T> rev() const { return RevIter<T>(data, len); }
+
+        T sum() const {
+            T total{};
+            for (usize i = 0; i < len; ++i) total += data[i];
+            return total;
+        }
+
+        T product() const {
+            if (len == 0) return T{};
+            T total = data[0];
+            for (usize i = 1; i < len; ++i) total *= data[i];
+            return total;
+        }
+
+        T min() const {
+            if (len == 0) return T{};
+            T m = data[0];
+            for (usize i = 1; i < len; ++i) if (data[i] < m) m = data[i];
+            return m;
+        }
+
+        T max() const {
+            if (len == 0) return T{};
+            T m = data[0];
+            for (usize i = 1; i < len; ++i) if (data[i] > m) m = data[i];
+            return m;
+        }
+
+        usize collect_into(T* out_buf, usize max_items) const {
+            usize count = (len < max_items) ? len : max_items;
+            for (usize i = 0; i < count; ++i) out_buf[i] = data[i];
+            return count;
+        }
+    };
+
+    template <typename T>
+    static inline ExtendedSliceIter<T> make_iter(const T* arr, usize n) {
+        return ExtendedSliceIter<T>(arr, n);
+    }
+
+    // 3. Strings v2: ByteSpan and Multiline Strip Margin
+    struct ByteSpan {
+        const u8* data;
+        usize len;
+        ByteSpan() : data(nullptr), len(0) {}
+        ByteSpan(const u8* d, usize l) : data(d), len(l) {}
+        ByteSpan(const char* s) : data((const u8*)s), len(s ? strlen(s) : 0) {}
+    };
+
+    static inline std::string strip_margin(const std::string& input, char delimiter = '|') {
+        std::string result;
+        std::istringstream stream(input);
+        std::string line;
+        bool first = true;
+        while (std::getline(stream, line)) {
+            size_t pos = line.find(delimiter);
+            std::string clean = (pos != std::string::npos) ? line.substr(pos + 1) : line;
+            if (!first) result += "\n";
+            result += clean;
+            first = false;
+        }
+        return result;
+    }
+
+    // 4. Slice Pattern Matching Helper ([first, .., last], [x], [])
+    template <typename T>
+    struct SlicePattern {
+        const T* data;
+        usize len;
+        SlicePattern(const T* d, usize l) : data(d), len(l) {}
+
+        bool is_empty() const { return len == 0; }
+        bool is_single(T& single) const {
+            if (len == 1) { single = data[0]; return true; }
+            return false;
+        }
+        bool head_tail(T& first, T& last) const {
+            if (len >= 2) {
+                first = data[0];
+                last = data[len - 1];
+                return true;
+            }
+            return false;
+        }
+    };
 }
 
 using veloc::Channel;
@@ -2910,6 +3634,39 @@ using veloc::Stopwatch;
 using veloc::Time;
 using veloc::Path;
 using veloc::Rng;
+
+using veloc::Mat;
+using veloc::Tuple;
+using veloc::make_tuple;
+using std::get;
+using veloc::Linear;
+using veloc::Refined;
+using veloc::Distinct;
+using veloc::TypestateHandle;
+using veloc::ClosedState;
+using veloc::OpenState;
+using veloc::typestate_open;
+using veloc::typestate_close;
+using veloc::contract_requires;
+using veloc::contract_ensures;
+using veloc::contract_invariant;
+using veloc::contracts_checked_count;
+using veloc::Any;
+
+// Block C: Concurrency & Models exports
+using veloc::Generator;
+using veloc::SelectableChannel;
+using veloc::TVar;
+using veloc::deterministic_parallel_reduce;
+using veloc::DataflowStage;
+
+// Block E: Ergonomics & Quality of Life exports
+using veloc::Error;
+using veloc::ExtendedSliceIter;
+using veloc::make_iter;
+using veloc::ByteSpan;
+using veloc::strip_margin;
+using veloc::SlicePattern;
 
 using Arena = VeloC_Arena;
 template <typename T> using Span = Slice<T>;

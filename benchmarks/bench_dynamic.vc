@@ -1,0 +1,95 @@
+module BenchDispatch;
+
+#include <veloc.h>
+#include <vector>
+
+// 1. Static dispatch (monomorphization)
+template <typename T>
+VELOC_INLINE int static_eval(T& obj, int val) {
+    return obj.compute(val);
+}
+
+struct StaticWorkerA {
+    VELOC_INLINE int compute(int x) { return x * 3 + 1; }
+};
+struct StaticWorkerB {
+    VELOC_INLINE int compute(int x) { return x ^ 0x5A5A; }
+};
+
+// 2. Enum / tagged union dispatch
+enum WorkerKind { KindA, KindB };
+struct EnumWorker {
+    WorkerKind kind;
+    VELOC_INLINE int compute(int x) {
+        switch (kind) {
+            case KindA: return x * 3 + 1;
+            case KindB: return x ^ 0x5A5A;
+            default: return 0;
+        }
+    }
+};
+
+// 3. Dynamic vtable dispatch (dyn Trait)
+struct IDynWorker {
+    virtual int compute(int x) = 0;
+    virtual ~IDynWorker() = default;
+};
+
+struct DynWorkerA : public IDynWorker {
+    int compute(int x) override { return x * 3 + 1; }
+};
+struct DynWorkerB : public IDynWorker {
+    int compute(int x) override { return x ^ 0x5A5A; }
+};
+
+fn main() -> i32 {
+    println("==================================================");
+    println("      VeloC Dispatch Cost Leaderboard Benchmark   ");
+    println("==================================================");
+
+    const int ITERS = 10000000;
+    
+    // 1. Static Monomorphized Benchmark
+    StaticWorkerA worker_a;
+    let mut sw = Stopwatch();
+    let mut sum_static = 0;
+    for (int i = 0; i < ITERS; i++) {
+        sum_static += static_eval(worker_a, i);
+    }
+    let t_static_ms = sw.elapsed_ms();
+    let ns_static_per_call = (t_static_ms * 1000000.0) / (double)ITERS;
+    println(f"1. Static Dispatch (Inlined) : {t_static_ms} ms ({ns_static_per_call} ns/call)");
+
+    // 2. Tagged Enum Dispatch Benchmark
+    EnumWorker enum_worker;
+    enum_worker.kind = KindA;
+    sw.restart();
+    let mut sum_enum = 0;
+    for (int i = 0; i < ITERS; i++) {
+        sum_enum += enum_worker.compute(i);
+    }
+    let t_enum_ms = sw.elapsed_ms();
+    let ns_enum_per_call = (t_enum_ms * 1000000.0) / (double)ITERS;
+    println(f"2. Tagged Enum (Switch)      : {t_enum_ms} ms ({ns_enum_per_call} ns/call)");
+
+    // 3. Dynamic Vtable Dispatch Benchmark
+    DynWorkerA dyn_worker;
+    IDynWorker* dyn_ptr = &dyn_worker;
+    sw.restart();
+    let mut sum_dyn = 0;
+    for (int i = 0; i < ITERS; i++) {
+        sum_dyn += dyn_ptr->compute(i);
+    }
+    let t_dyn_ms = sw.elapsed_ms();
+    let ns_dyn_per_call = (t_dyn_ms * 1000000.0) / (double)ITERS;
+    println(f"3. Dynamic Dispatch (Vtable) : {t_dyn_ms} ms ({ns_dyn_per_call} ns/call)");
+
+    assert_eq(sum_static, sum_enum);
+    assert_eq(sum_static, sum_dyn);
+
+    println("==================================================");
+    let overhead = t_dyn_ms / t_static_ms;
+    println(f"Vtable Overhead Factor: {overhead}x vs static inline");
+    println("==================================================");
+    return 0;
+}

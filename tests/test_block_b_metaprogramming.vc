@@ -1,0 +1,34 @@
+module TestBlockBMetaprogramming;
+
+#include <veloc.h>
+
+fn test_comptime_regex() {
+    println("--- Testing Comptime Regex DFA ---");
+    constexpr auto re = veloc::regex::compile("v.l.c");
+    assert_true(re.match_exact("veloc"));
+    assert_true(re.match_exact("valac"));
+    assert_true(!re.match_exact("velocit"));
+    assert_true(!re.match_exact("velo"));
+    println("[Comptime Regex Passed]");
+}
+
+fn test_comptime_sql_dsl() {
+    println("--- Testing Comptime SQL Validator [R] ---");
+    static_assert(veloc::sql::validate_query("SELECT id, name FROM users"), "Query must be valid");
+    static_assert(veloc::sql::validate_query("INSERT INTO table VALUES (1)"), "Insert must be valid");
+    static_assert(!veloc::sql::validate_query("SELECT id, name WHERE id = 1"), "Invalid query missing FROM");
+    static_assert(!veloc::sql::validate_query("FOOBAR id FROM users"), "Invalid query bad command");
+    println("[Comptime SQL DSL Passed]");
+}
+
+fn main() -> i32 {
+    println("==================================================");
+    println("   VeloC Block B Metaprogramming & Comptime Tests ");
+    println("==================================================");
+    test_comptime_regex();
+    test_comptime_sql_dsl();
+    println("==================================================");
+    println("[ALL BLOCK B METAPROGRAMMING TESTS PASSED 100%]");
+    println("==================================================");
+    return 0;
+}

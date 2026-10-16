@@ -1,0 +1,108 @@
+module TestBlockEErgonomics;
+
+#include <veloc.h>
+
+fn test_error_handling_v2() {
+    println("--- Testing Error Handling v2 ---");
+    let mut err = VELOC_ERROR("configuration parameter 'threads' missing");
+    err.context("failed to initialize worker pool");
+    err.context("failed to bootstrap server");
+    
+    assert_eq(err.context_chain.size(), (usize)2);
+    let str_rep = err.to_string();
+    assert_true(str_rep.find("caused by: failed to initialize worker pool") != std::string::npos);
+    assert_true(str_rep.find("configuration parameter") != std::string::npos);
+    println("[Error Handling v2 Passed]");
+}
+
+fn test_iterators_v2() {
+    println("--- Testing Extended Iterator Adapters v2 ---");
+    i32 numbers[5] = {10, 20, 30, 40, 50};
+    let iter = make_iter(numbers, 5);
+
+    // Sum & Product & Min & Max
+    assert_eq(iter.sum(), 150);
+    assert_eq(iter.product(), 12000000);
+    assert_eq(iter.min(), 10);
+    assert_eq(iter.max(), 50);
+
+    // Peekable
+    let mut p_iter = iter.peekable();
+    assert_true(p_iter.has_next());
+    let mut peek_val: i32 = 0;
+    assert_true(p_iter.peek(peek_val));
+    assert_eq(peek_val, 10);
+    let mut next_val: i32 = 0;
+    assert_true(p_iter.next(next_val));
+    assert_eq(next_val, 10);
+    assert_true(p_iter.peek(peek_val));
+    assert_eq(peek_val, 20);
+
+    // Rev
+    let mut r_iter = iter.rev();
+    let mut r_val: i32 = 0;
+    assert_true(r_iter.next(r_val));
+    assert_eq(r_val, 50);
+    assert_true(r_iter.next(r_val));
+    assert_eq(r_val, 40);
+
+    // Step_by(2)
+    let mut s_iter = iter.step_by(2);
+    let mut s_val: i32 = 0;
+    assert_true(s_iter.next(s_val));
+    assert_eq(s_val, 10);
+    assert_true(s_iter.next(s_val));
+    assert_eq(s_val, 30);
+    assert_true(s_iter.next(s_val));
+    assert_eq(s_val, 50);
+
+    // Collect into buffer
+    i32 collected[3] = {0, 0, 0};
+    let count = iter.collect_into(collected, 3);
+    assert_eq((int)count, 3);
+    assert_eq(collected[0], 10);
+    assert_eq(collected[1], 20);
+    assert_eq(collected[2], 30);
+
+    println("[Extended Iterator Adapters v2 Passed]");
+}
+
+fn test_strings_and_patterns() {
+    println("--- Testing Strings v2 & Slice Pattern Matching ---");
+    // Multiline string with strip_margin
+    let multiline_raw = "  |SELECT id, name\n  |FROM users\n  |WHERE active = 1;";
+    let clean = strip_margin(multiline_raw, '|');
+    assert_true(clean == "SELECT id, name\nFROM users\nWHERE active = 1;");
+
+    // ByteSpan
+    let bytes = ByteSpan("VeloC\0ByteStream");
+    assert_true(bytes.len >= 5);
+    assert_eq((char)bytes.data[0], 'V');
+
+    // Slice Patterns
+    i32 arr[4] = {100, 200, 300, 400};
+    let pattern = SlicePattern<i32>(arr, 4);
+    assert_true(!pattern.is_empty());
+    let mut first: i32 = 0;
+    let mut last: i32 = 0;
+    assert_true(pattern.head_tail(first, last));
+    assert_eq(first, 100);
+    assert_eq(last, 400);
+
+    i32 single_elem[1] = {777};
+    let single_pat = SlicePattern<i32>(single_elem, 1);
+    let mut single_val: i32 = 0;
+    assert_true(single_pat.is_single(single_val));
+    assert_eq(single_val, 777);
+
+    println("[Strings v2 & Slice Patterns Passed]");
+}
+
+fn main() -> i32 {
+    println("[Block E] Testing Ergonomics & Quality of Life...");
+    test_error_handling_v2();
+    test_iterators_v2();
+    test_strings_and_patterns();
+    println("[Block E] All tests PASSED!");
+    return 0;
+}

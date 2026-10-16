@@ -4,6 +4,8 @@
 from typing import List, Tuple, Optional
 from ast_nodes import *
 
+import re
+
 class BoundsReportEntry:
     def __init__(self, line: int, col: int, expr_str: str, status: str, reason: str):
         self.line = line
@@ -13,12 +15,62 @@ class BoundsReportEntry:
         self.reason = reason
 
 class StaticAnalyzer:
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, source_text: str = ""):
         self.filename = filename
+        self.source_text = source_text
         self.bounds_reports: List[BoundsReportEntry] = []
         self.lifetime_errors: List[Tuple[int, int, str]] = []
+        self.doc_lint_errors: List[Tuple[int, int, str]] = []
+
+    def check_doc_invariants(self):
+        if not self.source_text:
+            return
+        lines = self.source_text.splitlines()
+        doc_lines = []
+        doc_start_line = 1
+        for idx, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith("///"):
+                if not doc_lines:
+                    doc_start_line = idx + 1
+                doc_lines.append(stripped[3:].strip())
+            elif stripped.startswith("fn ") and doc_lines:
+                fn_match = re.search(r"fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)\s*(?:->\s*([A-Za-z0-9_<>:&* ]+))?", stripped)
+                if fn_match:
+                    fn_name = fn_match.group(1)
+                    raw_params = fn_match.group(2).strip()
+                    ret_type = (fn_match.group(3) or "void").strip()
+                    actual_param_names = set()
+                    if raw_params:
+                        for p in raw_params.split(","):
+                            parts = p.strip().split(":")
+                            if len(parts) >= 1:
+                                p_name = parts[0].replace("&", "").replace("mut", "").strip()
+                                actual_param_names.add(p_name)
+                    
+                    for doc_line in doc_lines:
+                        param_m = re.search(r"@?param\s+([A-Za-z0-9_]+)", doc_line)
+                        if param_m:
+                            doc_p = param_m.group(1)
+                            if doc_p not in actual_param_names:
+                                self.doc_lint_errors.append((
+                                    doc_start_line, 1,
+                                    f"Lint [doc_mismatch]: Documented parameter '{doc_p}' does not exist in function '{fn_name}'"
+                                ))
+                        ret_m = re.search(r"@?returns?\s+([A-Za-z0-9_<>:&* ]+)", doc_line)
+                        if ret_m:
+                            doc_ret = ret_m.group(1).strip()
+                            if doc_ret != ret_type and ret_type != "void":
+                                self.doc_lint_errors.append((
+                                    doc_start_line, 1,
+                                    f"Lint [doc_mismatch]: Documented return type '{doc_ret}' does not match signature '{ret_type}' in function '{fn_name}'"
+                                ))
+                doc_lines = []
+            elif stripped:
+                doc_lines = []
 
     def analyze_program(self, program: Program):
+        self.check_doc_invariants()
         for decl in program.declarations:
             if isinstance(decl, FnDecl):
                 self._analyze_fn(decl)

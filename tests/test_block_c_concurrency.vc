@@ -1,0 +1,85 @@
+module TestBlockCConcurrency;
+
+#include <veloc.h>
+
+fn add_op(a: f32, b: f32) -> f32 {
+    return a + b;
+}
+
+fn main() -> i32 {
+    println("[Block C] Testing Concurrency & Models...");
+
+    // 1. Stackless Generator Coroutine
+    let mut gen = Generator<i32>(0, 50, 10);
+    let mut val: i32 = 0;
+    let mut sum: i32 = 0;
+    while gen.next(val) {
+        sum = sum + val;
+    }
+    // 0 + 10 + 20 + 30 + 40 = 100
+    assert_eq(sum, 100);
+    assert_true(gen.frame_size() > 0);
+    println("  - Generator passed (sum: 100, frame_size ok)");
+
+    // 2. SelectableChannel
+    let mut ch = SelectableChannel<i32, 4>();
+    assert_true(!ch.is_ready());
+    assert_true(ch.try_send(42));
+    assert_true(ch.try_send(84));
+    assert_true(ch.is_ready());
+    
+    let mut recv_val: i32 = 0;
+    assert_true(ch.try_recv(recv_val));
+    assert_eq(recv_val, 42);
+    assert_true(ch.try_recv(recv_val));
+    assert_eq(recv_val, 84);
+    assert_true(!ch.try_recv(recv_val)); // empty
+    println("  - SelectableChannel passed (buffered FIFO + nonblocking select ready)");
+
+    // 3. Software Transactional Memory (STM) TVar
+    let mut shared_var = TVar<i32>(100);
+    let mut ver: u64 = 0;
+    let tx1_val = shared_var.read(ver);
+    assert_eq(tx1_val, 100);
+    assert_true(ver == 1);
+    
+    // Simulate transaction commit
+    let committed = shared_var.commit(250, ver);
+    assert_true(committed);
+    let mut ver2: u64 = 0;
+    assert_eq(shared_var.read(ver2), 250);
+    assert_true(ver2 == 2);
+
+    // Simulate conflict: stale transaction trying to commit with old ver (1)
+    let conflict = shared_var.commit(999, ver);
+    assert_true(!conflict); // rejected!
+    let mut ver3: u64 = 0;
+    assert_eq(shared_var.read(ver3), 250); // unchanged
+    println("  - STM TVar passed (optimistic read + conflict rollback)");
+
+    // 4. Deterministic Parallel Reduce
+    f32 data[8] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f};
+    let total = deterministic_parallel_reduce(data, 8, 0.0f, add_op);
+    assert_eq((int)total, 36);
+    println("  - Deterministic Parallel Reduce passed (sum: 36.0)");
+
+    // 5. Reactive Dataflow Pipeline with Bounded Backpressure
+    let mut stage = DataflowStage<f32, 4>();
+    assert_true(stage.push(1.5f));
+    assert_true(stage.push(2.5f));
+    assert_true(stage.push(3.5f));
+    assert_true(stage.push(4.5f));
+    // Buffer is full (capacity 4), next push must drop
+    assert_true(!stage.push(5.5f));
+    assert_true(stage.dropped_items == 1);
+
+    let mut item: f32 = 0.0f;
+    assert_true(stage.pull(item));
+    assert_eq((int)item, 1);
+    // Now there's space for 1 item
+    assert_true(stage.push(6.5f));
+    println("  - Reactive Dataflow Stage passed (backpressure dropping + bounded queue)");
+
+    println("[Block C] All tests PASSED!");
+    return 0;
+}

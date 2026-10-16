@@ -55,7 +55,16 @@ def clean_cache(all_artifacts: bool = False):
     print(f"[VeloC Clean] Cleaned {cleaned} temporary files/directories from D:\\VeloC\\.cache")
 
 def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O3", 
-                test_mode: bool = False, verbose: bool = False, quiet: bool = False) -> Path:
+                test_mode: bool = False, verbose: bool = False, quiet: bool = False,
+                opt_report: bool = False, profile: str = None) -> Path:
+    if profile:
+        profile_map = {
+            "fast-compile": "-O0",
+            "balanced": "-O2",
+            "max-perf": "-O3",
+            "min-size": "-Oz"
+        }
+        opt_level = profile_map.get(profile, "-O3")
     ensure_dirs()
     if not source_path.exists():
         print(f"[Error] Source file not found: {source_path}")
@@ -78,10 +87,22 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         if hash_target.read_text().strip() == current_hash:
             if verbose:
                 print(f"[VeloC Instant Cache Hit] {source_path.name} -> {output_exe.name} (0.3ms - Up to date)")
+            if opt_report:
+                from ir import IRGenerator, VeloCOptimizer
+                src_txt = source_path.read_text(encoding="utf-8")
+                ir_gen = IRGenerator(src_txt, str(source_path))
+                mid = ir_gen.build_mid_ir()
+                opt = VeloCOptimizer(profile or "max-perf")
+                _, rep = opt.optimize(mid)
+                print(rep.summary())
             return output_exe
 
     # Compile VeloC -> C++ via AST Parser & Code Generator
     source_str = source_path.read_text(encoding="utf-8")
+    if "macro_rules!" in source_str:
+        from macro_expander import MacroExpander
+        source_str = MacroExpander().expand_source(source_str)
+
     t0 = time.perf_counter()
     use_ast = True
     try:
@@ -151,6 +172,13 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     hash_target.write_text(current_hash)
     if not quiet:
         print(f"[VeloC Build Success] {source_path.name} -> {output_exe.name} (Transpile: {t_transpile:.1f}ms, Compile: {t_compile:.1f}ms)")
+    if opt_report:
+        from ir import IRGenerator, VeloCOptimizer
+        ir_gen = IRGenerator(source_str, str(source_path))
+        mid = ir_gen.build_mid_ir()
+        opt = VeloCOptimizer(profile or "max-perf")
+        _, rep = opt.optimize(mid)
+        print(rep.summary())
     return output_exe
 
 def run_veloc(source_path: Path, args: list = None, verbose: bool = False):
@@ -245,7 +273,7 @@ def run_static_check(source_path: Path, bounds_report: bool = False):
     source_str = source_path.read_text(encoding="utf-8")
     tokens = Lexer(source_str, str(source_path)).tokenize()
     program = Parser(tokens, source_str, str(source_path)).parse_program()
-    analyzer = StaticAnalyzer(str(source_path))
+    analyzer = StaticAnalyzer(str(source_path), source_text=source_str)
     analyzer.analyze_program(program)
 
     if analyzer.lifetime_errors:
@@ -253,6 +281,11 @@ def run_static_check(source_path: Path, bounds_report: bool = False):
         for line, col, msg in analyzer.lifetime_errors:
             print(f"  {source_path}:{line}:{col}: {msg}")
         sys.exit(1)
+
+    if analyzer.doc_lint_errors:
+        print(f"\n[VeloC Documentation Invariant Lints]:")
+        for line, col, msg in analyzer.doc_lint_errors:
+            print(f"  {source_path}:{line}:{col}: {msg}")
 
     if bounds_report:
         analyzer.print_bounds_report()
@@ -302,6 +335,8 @@ def main():
     build_p.add_argument("file", help="Path to .vc file")
     build_p.add_argument("-o", "--output", help="Output executable path")
     build_p.add_argument("-O", "--opt", default="-O3", help="Optimization level (-O0, -O2, -O3, -Ofast)")
+    build_p.add_argument("--profile", default=None, choices=["fast-compile", "balanced", "max-perf", "min-size"], help="Compilation profile")
+    build_p.add_argument("--opt-report", action="store_true", help="Print detailed optimization report")
     build_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     run_p = subparsers.add_parser("run", help="Compile and run a .vc source file")
@@ -367,11 +402,47 @@ def main():
     pg_p = subparsers.add_parser("playground", help="Start the VeloC Web Playground local server")
     pg_p.add_argument("--port", type=int, default=8080, help="HTTP port (default 8080)")
     subparsers.add_parser("autopilot", help="Run autonomous continuous health and benchmark verification")
+    expand_p = subparsers.add_parser("expand", help="Print declarative macro expansion of a .vc file")
+    expand_p.add_argument("file", help="Path to .vc file to expand")
+
+    ir_p = subparsers.add_parser("ir", help="Dump intermediate representation (HighIR, MidIR, LowIR)")
+    ir_p.add_argument("file", help="Path to .vc file")
+    ir_p.add_argument("--level", default="mid", choices=["high", "mid", "low"], help="IR level to dump")
+    ir_p.add_argument("--opt", action="store_true", help="Run optimization pipeline before dumping")
 
     args = parser.parse_args()
 
     if args.command == "build":
-        build_veloc(Path(args.file), Path(args.output) if args.output else None, opt_level=args.opt, verbose=args.verbose)
+        build_veloc(Path(args.file), Path(args.output) if args.output else None, 
+                    opt_level=args.opt, verbose=args.verbose, 
+                    opt_report=args.opt_report, profile=args.profile)
+    elif args.command == "ir":
+        from ir import IRGenerator, VeloCOptimizer
+        src_path = Path(args.file)
+        if not src_path.exists():
+            print(f"[Error] Source file not found: {src_path}")
+            sys.exit(1)
+        src_text = src_path.read_text(encoding="utf-8")
+        gen = IRGenerator(src_text, str(src_path))
+        if args.level == "high":
+            mod = gen.build_high_ir()
+            print(mod.to_text())
+        elif args.level == "low":
+            mid = gen.build_mid_ir()
+            if args.opt:
+                opt = VeloCOptimizer("max-perf")
+                mid, _ = opt.optimize(mid)
+            low = gen.build_low_ir(mid)
+            print(low.to_text())
+        else: # mid
+            mid = gen.build_mid_ir()
+            if args.opt:
+                opt = VeloCOptimizer("max-perf")
+                mid, rep = opt.optimize(mid)
+                print(mid.to_text())
+                print(rep.summary())
+            else:
+                print(mid.to_text())
     elif args.command == "run":
         run_veloc(Path(args.file), args=args.args, verbose=args.verbose)
     elif args.command == "watch":
@@ -396,6 +467,9 @@ def main():
     elif args.command == "autopilot":
         from autopilot import run_autopilot
         run_autopilot()
+    elif args.command == "expand":
+        from macro_expander import expand_file
+        print(expand_file(args.file))
     elif args.command == "add":
         from pkg.manager import PackageManager
         pm = PackageManager(ROOT_DIR)

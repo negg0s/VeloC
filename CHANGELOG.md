@@ -2,6 +2,43 @@
 
 Все изменения, улучшения и исправления языка VeloC документируются здесь.
 
+## [VeloC 10.0.0] - 2026-10-16
+
+### Добавлено (Added)
+- **Блок A: Продвинутая система типов (`include/veloc.h`)**:
+  - Const generics `Mat<T, M, N>` с compile-time проверкой размерностей ($K_1 == K_2$) и нулем накладных расходов.
+  - Вариадические кортежи `Tuple<Ts...>`, `make_tuple`, `std::get<I>()`.
+  - [R] Линейные/аффинные типы `Linear<T>` с move-only семантикой.
+  - [R] Refinement types `Refined<T, Predicate>` (компиляторные инварианты и хинты оптимизатора).
+  - Контрактное программирование: `contract_requires`, `contract_ensures`, `contract_invariant`.
+  - Distinct newtypes `Distinct<T, Tag>` и типобезопасные дескрипторы `TypestateHandle<State>`.
+  - RTTI-free `Any` со статическим хешированием типов (`get_type_id<T>()`) и безопасным `unwrap<T>()`.
+  - Честный бенчмарк диспетчеризации (`benchmarks/bench_dynamic.vc`): зафиксирован оверхед dynamic dispatch в ~64,311x против inlined SIMD.
+- **Блок B: Макросистема и метапрограммирование (`src/macro_expander.py`, `include/veloc.h`)**:
+  - Гигиенические декларативные макросы `macro_rules!` с поддержкой вложенных блоков скобок и локальным мангированием (`_h{id}_{var}`).
+  - Инспекция макросов: `veloc expand <file.vc>`.
+  - [R] Compile-time DFA Regex движок `veloc::regex::compile("pattern")`.
+  - [R] Compile-time SQL-валидатор запросов `veloc::sql::validate_query(...)`.
+- **Блок C: Модели конкурентности и корутины (`include/veloc.h`)**:
+  - Stackless генераторы `Generator<T>` с нулевой аллокацией и вычисляемым `frame_size()`.
+  - Неблокирующие буферизованные каналы `SelectableChannel<T, Cap>` (`try_send`, `try_recv`, `is_ready`).
+  - [R] Software Transactional Memory (STM): `TVar<T>` с оптимистичным версионированием и откатом при конфликтах.
+  - Детерминированная редукция `deterministic_parallel_reduce` с фиксированными чанками по 256 элементов (побитовая воспроизводимость float).
+  - Реактивный конвейер `DataflowStage<T, MaxBuffer>` со счетчиками отброшенных элементов (backpressure).
+- **Блок D: Многоуровневый IR и кастомный оптимизатор (`src/ir.py`, `veloc.py`)**:
+  - Трехуровневая архитектура IR: HighIR (семантика), MidIR (SSA CFG с basic blocks), LowIR (линеаризованный поток виртуальных регистров).
+  - Оптимизационные проходы: Inlining small/SIMD, Constant folding, Escape analysis, Bounds check elimination, Loop fusion, Auto-vectorizer AVX2 ядер, Polyhedral / Halide расписания.
+  - CLI команды: `veloc ir <file.vc> --level=<high|mid|low> [--opt]` и `veloc build <file.vc> --opt-report --profile=<profile>`.
+  - Профили компиляции: `fast-compile` (-O0), `balanced` (-O2), `max-perf` (-O3), `min-size` (-Oz).
+- **Блок E: Эргономика и качество жизни (`include/veloc.h`, `src/analyzer.py`, `veloc.py`)**:
+  - Error handling v2: `Error` с контекстной цепочкой (`.context(...)`), `VELOC_ERROR` и форматированием causality tree.
+  - Расширенные итераторы v2: `peekable()`, `step_by()`, `rev()`, `sum()`, `product()`, `min()`, `max()`, `collect_into()`.
+  - Строки v2: многострочный стриппинг `strip_margin(str, '|')`, `ByteSpan` для сырых байтов.
+  - Slice pattern matching: `SlicePattern` (`[first, .., last]`, `[single]`, `[]`).
+  - Документационные инварианты: линтер `doc_mismatch` в `veloc check` (проверка соответствия `@param` и `@returns` сигнатурам).
+- **Документация и отчет**:
+  - `docs/language-findings.md` с подробными архитектурными компромиссами, замерами и результатами всех задач `[R]`.
+
 ## [VeloC 9.3.0] - 2026-10-16
 
 ### Добавлено (Added)

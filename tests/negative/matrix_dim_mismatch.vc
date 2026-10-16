@@ -1,0 +1,11 @@
+module NegativeMatrixDim;
+
+#include <veloc.h>
+
+pub fn main() -> i32 {
+    let m1 = Mat<f32, 2, 3>::zeros();
+    let m2 = Mat<f32, 4, 2>::zeros();
+    // 3 != 4, dimension mismatch must fail compilation
+    let m3 = m1 * m2;
+    return 0;
+}

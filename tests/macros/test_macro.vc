@@ -1,0 +1,26 @@
+module TestMacro;
+
+macro_rules! repeat {
+    ($action:expr, $n:expr) => {
+        for (int _tmp_i = 0; _tmp_i < $n; _tmp_i++) {
+            $action;
+        }
+    };
+};
+
+macro_rules! square {
+    ($x:expr) => {
+        (($x) * ($x))
+    };
+};
+
+fn main() -> i32 {
+    let mut count = 0;
+    repeat!(count++, 5);
+    assert_eq(count, 5);
+    
+    let sq = square!(4);
+    assert_eq(sq, 16);
+    println("[Macro Expansion Test Passed]");
+    return 0;
+}

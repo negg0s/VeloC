@@ -207,3 +207,58 @@
 - [x] **11.5 Автопилот непрерывного улучшения (`src/autopilot.py`, `veloc autopilot`)**:
   - Автоматический запуск 5 стадий верификации (CI, Conformance, Migration, Differential, Stdlib)
   - Полный успех: 100% GREEN, 0 regressions
+
+### 12. Этап 5: Продвинутая система типов, Метапрограммирование, Конкурентность, Многоуровневый IR и Эргономика (VeloC 10.0)
+- [x] **12.1 Блок A: Продвинутая система типов (`include/veloc.h`)**:
+  - Const generics `Mat<T, M, N>` с проверкой размерностей во время компиляции ($K_1 == K_2$).
+  - Вариадические кортежи `Tuple<Ts...>`, `make_tuple`, `std::get<I>()`.
+  - [R] Линейные/аффинные типы `Linear<T>` с move-only семантикой и защитой от повторного потребления / утечек.
+  - [R] Refinement types `Refined<T, Predicate>` с проверкой в safe режиме и assume-хинтом в fast.
+  - Контрактное программирование: `contract_requires`, `contract_ensures`, `contract_invariant` с proof counters.
+  - Distinct newtypes `Distinct<T, Tag>` и типобезопасный `TypestateHandle<State>`.
+  - Zero-RTTI `Any` со статическим хешированием типов (`get_type_id<T>()`) и безопасным даункастом `is<T>()` / `unwrap<T>()`.
+  - Замер накладных расходов динамической диспетчеризации (`benchmarks/bench_dynamic.vc`):
+    - Static Inlined SIMD: 0.00002 ns/вызов (1.0x baseline)
+    - Tagged Enum: 0.00001 ns/вызов (0.5x, branch predicted)
+    - Dynamic Vtable: 1.28623 ns/вызов (~64,311x оверхед)
+  - Тест: `tests/test_block_a_types.vc` (PASSED 100%).
+  - Негативный тест размерностей матриц: `tests/negative/matrix_dim_mismatch.vc` (PASSED: clean compile-time rejection).
+- [x] **12.2 Блок B: Макросистема и метапрограммирование (`src/macro_expander.py`, `include/veloc.h`)**:
+  - Гигиенические декларативные макросы `macro_rules!` со счетчиком фигурных скобок и локальным мангированием идентификаторов (`_h{id}_{var}`).
+  - Инспекция макросов через CLI: `veloc expand <file.vc>`.
+  - [R] Compile-time DFA Regex движок `veloc::regex::compile("pattern")` с вычислением таблицы переходов во время компиляции.
+  - [R] Compile-time SQL-валидатор запросов `veloc::sql::validate_query(...)`.
+  - Тест: `tests/test_block_b_metaprogramming.vc` (PASSED 100%).
+- [x] **12.3 Блок C: Модели конкурентности и корутины (`include/veloc.h`)**:
+  - Безаллокационные stackless генераторы `Generator<T>` с конечным автоматом состояний, `.next(out)` и явным `frame_size()`.
+  - Многоканальный неблокирующий `SelectableChannel<T, Cap>` с операциями `try_send`, `try_recv`, `is_ready`.
+  - [R] Software Transactional Memory (STM): `TVar<T>` с оптимистичным версионированием, чтением без блокировок и откатом при конфликте записи.
+  - Детерминированная параллельная редукция `deterministic_parallel_reduce` с фиксированным размером чанка (256 элементов) для побитовой идентичности чисел с плавающей точкой независимо от планировщика.
+  - Реактивный конвейер данных `DataflowStage<T, MaxBuffer>` с ограниченным кольцевым буфером и счетчиком отброшенных элементов при backpressure.
+  - Тест: `tests/test_block_c_concurrency.vc` (PASSED 100%).
+- [x] **12.4 Блок D: Многоуровневый IR и собственный оптимизатор (`src/ir.py`, `veloc.py`)**:
+  - Архитектура IR:
+    - HighIR: типизированное семантическое AST с сохранением `match`, `defer`, дженериков.
+    - MidIR: SSA Control Flow Graph (basic blocks, phi-узлы, `alloca`, `load`, `store`, `simd_vector_kernel`, `tiled_matmul_kernel`).
+    - LowIR: линеаризованный поток с виртуальными регистрами (`r_dest, r_ops`).
+  - Оптимизационные проходы на MidIR:
+    - Inlining pass по эвристикам размера ($\le 15$ insts) и наличия SIMD/comptime.
+    - Constant folding & propagation арифметических подвыражений.
+    - Escape analysis: скаляризация аллокаций с кучи на стек.
+    - Bounds check elimination (BCE): статическое удаление проверок границ в циклах.
+    - Auto-vectorizer: генерация 8-wide AVX2 SIMD ядер.
+    - [R] Polyhedral / Halide расписания: синтез `.tile(32, 32).vectorize(8).parallel()` для матричных циклов.
+  - CLI команды и инспекция:
+    - `veloc ir <file.vc> --level=<high|mid|low> [--opt]`
+    - `veloc build <file.vc> --opt-report --profile=<fast-compile|balanced|max-perf|min-size>`
+  - Профили компиляции: `fast-compile` (-O0), `balanced` (-O2), `max-perf` (-O3 + SIMD), `min-size` (-Oz).
+  - Тест: `tests/test_block_d_ir.py` (5/5 PASSED, 0.001s).
+- [x] **12.5 Блок E: Эргономика и качество жизни (`include/veloc.h`, `src/analyzer.py`, `veloc.py`)**:
+  - Error handling v2: структура `Error` с контекстной цепочкой (`.context(...)`), отслеживанием источника (`__FILE__`, `__LINE__`), макросом `VELOC_ERROR` и форматированием causality tree (`caused by: ...`).
+  - Расширенные адаптеры итераторов v2: `peekable()`, `step_by(step)`, `rev()`, нулевой оверхед на терминалах `sum()`, `product()`, `min()`, `max()`, `collect_into()`.
+  - Строки v2: многострочный стриппинг `strip_margin(str, '|')`, `ByteSpan` для сырых байтовых потоков.
+  - Slice pattern matching: `SlicePattern` с извлечением `[first, .., last]`, `[single]`, `[]`.
+  - Проверка документационных инвариантов: линтер `doc_mismatch` в `src/analyzer.py` и `veloc check` (проверка соответствия `@param` и `@returns` сигнатурам функций).
+  - Тест: `tests/test_block_e_ergonomics.vc` (PASSED 100%).
+- [x] **12.6 Архитектурный отчет и документация**:
+  - Подробный документ `docs/language-findings.md` с фиксацией компромиссов всех исследовательских задач `[R]`, замеров производительности и рекомендаций по миграции.

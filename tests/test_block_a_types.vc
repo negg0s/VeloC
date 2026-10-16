@@ -1,0 +1,99 @@
+module TestBlockATypes;
+
+#include <veloc.h>
+
+struct PosPred {
+    static constexpr bool check(int v) { return v > 0; }
+};
+
+struct UserIdTag {};
+struct OrderIdTag {};
+typedef Distinct<u64, UserIdTag> UserId;
+typedef Distinct<u64, OrderIdTag> OrderId;
+
+fn test_const_generics_matrix() {
+    println("--- Testing Const Generics Mat<T, M, N> ---");
+    let mut m1 = Mat<f32, 2, 3>::zeros();
+    m1.at(0, 0) = 1.0f; m1.at(0, 1) = 2.0f; m1.at(0, 2) = 3.0f;
+    m1.at(1, 0) = 4.0f; m1.at(1, 1) = 5.0f; m1.at(1, 2) = 6.0f;
+
+    let mut m2 = Mat<f32, 3, 2>::zeros();
+    m2.at(0, 0) = 7.0f; m2.at(0, 1) = 8.0f;
+    m2.at(1, 0) = 9.0f; m2.at(1, 1) = 1.0f;
+    m2.at(2, 0) = 2.0f; m2.at(2, 1) = 3.0f;
+
+    let m3 = m1 * m2; // Mat<f32, 2, 2>
+    assert_eq((int)m3.at(0, 0), 31);
+    assert_eq((int)m3.at(0, 1), 19);
+    assert_eq((int)m3.at(1, 0), 85);
+    assert_eq((int)m3.at(1, 1), 55);
+
+    let id = Mat<f32, 2, 2>::identity();
+    let m4 = m3 * id;
+    assert_true(m4 == m3);
+    println("[Const Generics Matrix Passed]");
+}
+
+fn test_variadic_tuples() {
+    println("--- Testing Variadic Generics Tuple<Ts...> ---");
+    let t = make_tuple(42, 3.1415, "veloc");
+    assert_eq(std::get<0>(t), 42);
+    assert_true(std::get<1>(t) > 3.14);
+    println("[Variadic Generics Tuple Passed]");
+}
+
+fn test_linear_types() {
+    println("--- Testing Linear / Affine Types ---");
+    let mut lin = Linear<int>(100);
+    assert_eq(lin.peek(), 100);
+    let val = lin.consume();
+    assert_eq(val, 100);
+    println("[Linear Types Passed]");
+}
+
+fn test_contracts_and_distinct() {
+    println("--- Testing Contracts and Distinct Newtypes ---");
+    contract_requires(10 > 5, "10 must be greater than 5", __FILE__, __LINE__);
+    contract_ensures(2 + 2 == 4, "math must hold", __FILE__, __LINE__);
+    assert_true(contracts_checked_count >= 2);
+
+    let u1 = UserId(1001);
+    let u2 = UserId(1001);
+    let u3 = UserId(1002);
+    assert_true(u1 == u2);
+    assert_true(u1 != u3);
+    assert_eq(u1.get(), 1001);
+    println("[Contracts and Distinct Newtypes Passed]");
+}
+
+fn test_typestate_and_any() {
+    println("--- Testing Typestate and Any Dynamic Dispatch ---");
+    let closed = TypestateHandle<ClosedState>("session.db");
+    let opened = typestate_open(closed);
+    let closed_again = typestate_close(opened);
+    assert_eq(closed_again.name, "session.db");
+
+    let a = Any(1337);
+    assert_true(a.is<int>());
+    assert_eq(a.unwrap<int>(), 1337);
+
+    let s = Any(std::string("dynamic"));
+    assert_true(s.is<std::string>());
+    assert_eq(s.unwrap<std::string>(), "dynamic");
+    println("[Typestate and Any Dynamic Dispatch Passed]");
+}
+
+fn main() -> i32 {
+    println("==================================================");
+    println("       VeloC Block A Advanced Types Test Suite    ");
+    println("==================================================");
+    test_const_generics_matrix();
+    test_variadic_tuples();
+    test_linear_types();
+    test_contracts_and_distinct();
+    test_typestate_and_any();
+    println("==================================================");
+    println("[ALL BLOCK A ADVANCED TYPE TESTS PASSED 100%]");
+    println("==================================================");
+    return 0;
+}
