@@ -20,8 +20,8 @@ class CppCodegen:
         elif isinstance(expr, FloatLiteral):
             return expr.value
         elif isinstance(expr, StringLiteral):
-            # Escape newlines
-            escaped = expr.value.replace("\n", "\\n").replace("\t", "\\t").replace('"', '\\"')
+            # Escape newlines, carriage returns, tabs
+            escaped = expr.value.replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t").replace('"', '\\"')
             return f'"{escaped}"'
         elif isinstance(expr, CharLiteral):
             return f"'{expr.value}'"

@@ -11,7 +11,7 @@ def format_raw_tokens(tokens: List[Token]) -> str:
     parts = []
     for t in tokens:
         if t.type == TokenType.STRING_LIT:
-            esc = t.value.replace("\n", "\\n").replace('"', '\\"')
+            esc = t.value.replace("\r", "\\r").replace("\n", "\\n").replace('"', '\\"')
             parts.append(f'"{esc}"')
         elif t.type == TokenType.CHAR_LIT:
             parts.append(f"'{t.value}'")

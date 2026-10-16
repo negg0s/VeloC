@@ -1,0 +1,40 @@
+#include <veloc.h>
+#include <veloc_net.h>
+#include <cstdio>
+#include <string>
+#include <chrono>
+
+const usize NUM_REQUESTS = 100000;
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("          VeloC Net Benchmark: HTTP/1.1 Request Parsing          \n");
+    printf("=================================================================\n");
+
+    const char* raw_http = 
+        "POST /api/v2/orders/checkout HTTP/1.1\r\n"
+        "Host: api.veloc.io\r\n"
+        "User-Agent: VeloC-Bench/1.0\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Length: 42\r\n"
+        "\r\n"
+        "{\"item_id\": 9801, \"quantity\": 2, \"coupon\": \"SPEED\"}";
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+    usize valid_count = 0;
+    for (usize i = 0; i < NUM_REQUESTS; i++) {
+        veloc::net::HttpRequest req;
+        if (veloc::net::HttpRequest::parse(raw_http, req)) {
+            valid_count++;
+        }
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 elapsed_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count();
+    f64 rps = ((f64)NUM_REQUESTS) / (elapsed_ms / 1000.0);
+
+    printf("  [HTTP/1.1 Parse] 100,000 Requests: %.2f ms (Throughput: %.2f requests/sec)\n",
+           elapsed_ms, rps);
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY] Parsed %lld valid requests.\n", (long long)valid_count);
+    return 0;
+}

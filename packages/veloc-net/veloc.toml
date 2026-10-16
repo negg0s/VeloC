@@ -1,0 +1,12 @@
+[package]
+name = "veloc-net"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "High-performance network runtime for VeloC: Winsock/IOCP async event loop, HTTP/1.1 server, and rollback state sync"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "avx2"

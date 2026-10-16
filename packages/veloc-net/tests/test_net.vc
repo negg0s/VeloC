@@ -1,0 +1,49 @@
+#include <veloc.h>
+#include <veloc_net.h>
+#include <cassert>
+#include <cstdio>
+#include <string>
+
+struct PlayerState {
+    f32 x, y;
+    i32 health;
+};
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-net HTTP Parser & Game Rollback Netcode...\n");
+
+    // 1. Socket subsystem initialization
+    veloc::net::NetInit net;
+
+    // 2. HTTP Request Parsing test
+    const char* raw_get = "GET /api/v1/status HTTP/1.1\r\nHost: veloc.org\r\n\r\n";
+    veloc::net::HttpRequest req;
+    bool ok = veloc::net::HttpRequest::parse(raw_get, req);
+    assert(ok);
+    assert(req.method == "GET");
+    assert(req.path == "/api/v1/status");
+
+    // 3. HTTP Response Serialization test
+    veloc::net::HttpResponse resp(200, "application/json", "{\"status\":\"ok\"}");
+    std::string serialized = resp.serialize();
+    assert(serialized.find("HTTP/1.1 200 OK") != std::string::npos);
+    assert(serialized.find("Content-Length: 15") != std::string::npos);
+
+    // 4. Game Rollback Netcode test
+    veloc::net::RollbackEngine<PlayerState, 64> rollback;
+    rollback.save_frame(10, PlayerState{100.0f, 200.0f, 100});
+    rollback.save_frame(11, PlayerState{105.0f, 200.0f, 95});
+    rollback.save_frame(12, PlayerState{110.0f, 200.0f, 90});
+
+    const PlayerState* s11 = rollback.get_frame(11);
+    assert(s11 != nullptr && s11->x == 105.0f && s11->health == 95);
+
+    // Trigger rollback to frame 10 (e.g. mispredicted remote hit)
+    rollback.rollback_to(10);
+    assert(rollback.get_current_frame() == 10);
+    const PlayerState* s10 = rollback.get_frame(10);
+    assert(s10 != nullptr && s10->x == 100.0f);
+
+    printf("[TEST PASS]: veloc-net components verified successfully!\n");
+    return 0;
+}
