@@ -127,6 +127,13 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         "-fomit-frame-pointer",
         f"-I{INCLUDE_DIR}",
         f"-I{source_path.parent}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-game' / 'include'}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-ai' / 'include'}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-sci' / 'include'}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-data' / 'include'}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-net' / 'include'}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-embedded' / 'include'}",
+        f"-I{ROOT_DIR / 'packages' / 'veloc-cli' / 'include'}",
         "-lws2_32"
     ]
 

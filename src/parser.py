@@ -499,9 +499,9 @@ class Parser:
             is_const = True
             self.advance()
         
-        if self.check(TokenType.IDENT):
-            type_tokens = [self.advance()]
-            while self.check(TokenType.STAR) or self.check(TokenType.BIT_AND) or (self.check(TokenType.COLON_COLON) and self.pos + 1 < len(self.tokens) and self.tokens[self.pos + 1].type == TokenType.IDENT):
+        if self.check(TokenType.IDENT) or self.check(TokenType.COLON_COLON):
+            type_tokens = []
+            while self.check(TokenType.IDENT) or self.check(TokenType.COLON_COLON):
                 type_tokens.append(self.advance())
             if self.check(TokenType.LT):
                 type_tokens.append(self.advance())

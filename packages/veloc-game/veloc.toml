@@ -1,0 +1,12 @@
+[package]
+name = "veloc-game"
+version = "0.1.0"
+authors = ["VeloC Systems Team"]
+edition = "2026"
+description = "High-performance game engine with sparse-set ECS, fixed timestep, SIMD physics and audio mixer"
+
+[dependencies]
+
+[build]
+opt_level = "-O3"
+simd = "avx2"

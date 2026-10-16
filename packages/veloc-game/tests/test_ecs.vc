@@ -1,0 +1,73 @@
+#include <veloc.h>
+#include <veloc_game.h>
+#include <cassert>
+#include <cstdio>
+
+struct Position {
+    f32 x, y;
+};
+
+struct Velocity {
+    f32 vx, vy;
+};
+
+pub fn main() -> i32 {
+    printf("[TEST]: veloc-game ECS & System Components...\n");
+
+    // 1. World & entity creation / recycle
+    veloc::game::GameWorld<1000> world;
+    Entity e1 = world.spawn();
+    Entity e2 = world.spawn();
+    Entity e3 = world.spawn();
+
+    assert(world.is_alive(e1));
+    assert(world.is_alive(e2));
+    assert(world.is_alive(e3));
+    assert(world.alive_count() == 3);
+
+    // 2. SparseSet operations
+    veloc::game::SparseSet<Position, 1000> pos_pool;
+    veloc::game::SparseSet<Velocity, 1000> vel_pool;
+
+    pos_pool.emplace(e1, Position{10.0f, 20.0f});
+    pos_pool.emplace(e2, Position{30.0f, 40.0f});
+    vel_pool.emplace(e1, Velocity{1.0f, 2.0f});
+
+    assert(pos_pool.has(e1));
+    assert(pos_pool.has(e2));
+    assert(!pos_pool.has(e3));
+    assert(vel_pool.has(e1));
+    assert(!vel_pool.has(e2));
+
+    Position* p1 = pos_pool.get(e1);
+    assert(p1 != nullptr && p1->x == 10.0f && p1->y == 20.0f);
+
+    // 3. Entity recycling & handle invalidation
+    pos_pool.remove(e2);
+    world.destroy(e2);
+    assert(!world.is_alive(e2));
+    assert(world.alive_count() == 2);
+
+    Entity e4 = world.spawn(); // Should reuse index of e2 but with incremented generation
+    assert(world.is_alive(e4));
+    assert(veloc::game::entity_index(e4) == veloc::game::entity_index(e2));
+    assert(veloc::game::entity_gen(e4) != veloc::game::entity_gen(e2));
+
+    // Old handle e2 must not resolve
+    assert(!pos_pool.has(e2));
+    assert(!pos_pool.has(e4)); // e4 does not have component yet
+
+    // 4. Spatial grid test
+    veloc::game::SpatialGrid2D<16, 16, 128> grid(10.0f);
+    grid.insert(e1, 15.0f, 15.0f); // Cell (1, 1)
+    grid.insert(e3, 18.0f, 12.0f); // Cell (1, 1)
+
+    u32 found = 0;
+    grid.query_cell(11.0f, 14.0f, [&](Entity found_e) {
+        found++;
+    });
+    assert(found == 2);
+
+    printf("[TEST PASS]: veloc-game ECS verified successfully!\n");
+    return 0;
+}

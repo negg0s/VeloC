@@ -1,0 +1,64 @@
+#include <veloc.h>
+#include <veloc_game.h>
+#include <cstdio>
+#include <cmath>
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("     VeloC Game Engine: Interactive SIMD Particle & Physics Demo \n");
+    printf("=================================================================\n");
+
+    const usize NUM_PARTICLES = 131072; // 128k particles
+    printf("[Init]: Spawning %lld SIMD particles with AVX2 SoA layout...\n", (long long)NUM_PARTICLES);
+
+    veloc::game::SIMDParticles2D particles = veloc::game::SIMDParticles2D::create(NUM_PARTICLES);
+    for (usize i = 0; i < NUM_PARTICLES; i++) {
+        f32 angle = (f32)i * 0.01f;
+        f32 speed = 5.0f + (f32)(i % 100) * 0.1f;
+        particles.x[i] = 500.0f;
+        particles.y[i] = 500.0f;
+        particles.vx[i] = cosf(angle) * speed;
+        particles.vy[i] = sinf(angle) * speed;
+        particles.life[i] = 5.0f;
+    }
+
+    // Fixed timestep simulation clock: 60 FPS
+    veloc::game::FixedTimestep clock(1.0 / 60.0);
+    veloc::game::FrameProfiler profiler;
+
+    printf("[Simulate]: Running 120 fixed-timestep frames...\n");
+    f32 sim_dt = (f32)clock.fixed_dt();
+
+    for (usize frame = 0; frame < 120; frame++) {
+        u64 t_frame_start = profiler.now_us();
+
+        // 1. Particle update
+        u64 t_simd_start = profiler.now_us();
+        particles.update(sim_dt, -9.81f);
+        u64 t_simd_end = profiler.now_us();
+        profiler.record("SIMD_Particles_Update", t_simd_start, t_simd_end - t_simd_start);
+
+        // 2. Broadphase spatial grid insertion (sample 16k active particles)
+        u64 t_grid_start = profiler.now_us();
+        veloc::game::SpatialGrid2D<64, 64, 32768> grid(32.0f);
+        for (usize i = 0; i < 16384; i++) {
+            grid.insert((Entity)i, particles.x[i], particles.y[i]);
+        }
+        u64 t_grid_end = profiler.now_us();
+        profiler.record("SpatialGrid_Broadphase", t_grid_start, t_grid_end - t_grid_start);
+
+        u64 t_frame_end = profiler.now_us();
+        profiler.record("Full_Frame", t_frame_start, t_frame_end - t_frame_start);
+    }
+
+    const char* trace_path = "D:/VeloC/game_frame_trace.json";
+    bool exported = profiler.export_chrome_trace(trace_path);
+    if (exported) {
+        printf("[Profiler]: Chrome trace successfully exported to: %s\n", trace_path);
+        printf("            Load in chrome://tracing or speedscope.app to inspect frame timings!\n");
+    }
+
+    printf("=================================================================\n");
+    printf("[DEMO SUCCESS]: 128k particles simulated across 120 frames flawlessly.\n");
+    return 0;
+}

@@ -1,0 +1,72 @@
+#include <veloc.h>
+#include <veloc_game.h>
+#include <cstdio>
+#include <chrono>
+
+struct Transform {
+    f32 x, y, z;
+};
+
+struct RigidBody {
+    f32 vx, vy, vz;
+    f32 mass;
+};
+
+// 1,000,000 Entities Benchmark
+const usize ENTITY_COUNT = 1000000;
+
+static veloc::game::GameWorld<ENTITY_COUNT> world;
+static veloc::game::SparseSet<Transform, ENTITY_COUNT> transform_pool;
+static veloc::game::SparseSet<RigidBody, ENTITY_COUNT> rb_pool;
+
+pub fn main() -> i32 {
+    printf("=================================================================\n");
+    printf("         VeloC Game Engine ECS Benchmark (1,000,000 Entities)    \n");
+    printf("=================================================================\n");
+
+    // Phase 1: Entity Spawning & Component Emplacement
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (usize i = 0; i < ENTITY_COUNT; i++) {
+        Entity e = world.spawn();
+        transform_pool.emplace(e, Transform{(f32)i, (f32)(i * 2), 0.0f});
+        if ((i & 1) == 0) {
+            rb_pool.emplace(e, RigidBody{1.0f, -0.5f, 0.0f, 10.0f});
+        }
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    f64 spawn_ms = std::chrono::duration<f64, std::milli>(t1 - t0).count();
+    printf("  [Spawn & Emplace] 1,000,000 Entities (1M Transforms, 500k RigidBodies): %.2f ms\n", spawn_ms);
+
+    // Phase 2: Cache-Friendly Linear Component Iteration (Physics Update)
+    auto t2 = std::chrono::high_resolution_clock::now();
+    f32 dt = 1.0f / 60.0f;
+    f32 sum_x = 0.0f;
+    for (usize iter = 0; iter < 10; iter++) {
+        Transform* t_begin = transform_pool.begin();
+        usize count = transform_pool.size();
+        for (usize i = 0; i < count; i++) {
+            t_begin[i].x += 0.1f * dt;
+            sum_x += t_begin[i].x;
+        }
+    }
+    auto t3 = std::chrono::high_resolution_clock::now();
+    f64 iter_ms = std::chrono::duration<f64, std::milli>(t3 - t2).count() / 10.0;
+    printf("  [Linear Iteration] 1,000,000 Components per frame: %.2f ms (Throughput: %.2f M entities/sec)\n",
+           iter_ms, 1.0 / (iter_ms / 1000.0));
+
+    // Phase 3: Entity Removal (Swap-with-last)
+    auto t4 = std::chrono::high_resolution_clock::now();
+    for (usize i = 0; i < 100000; i++) {
+        Entity e = veloc::game::make_entity((u32)i, 0);
+        transform_pool.remove(e);
+        world.destroy(e);
+    }
+    auto t5 = std::chrono::high_resolution_clock::now();
+    f64 remove_ms = std::chrono::duration<f64, std::milli>(t5 - t4).count();
+    printf("  [Remove & Recycle] 100,000 Entities: %.2f ms (%.2f ns/entity)\n",
+           remove_ms, (remove_ms * 1e6) / 100000.0);
+
+    printf("=================================================================\n");
+    printf("[BENCHMARK COMPLETED SUCCESSFULLY] Checksum: %.2f\n", sum_x);
+    return 0;
+}
