@@ -3668,6 +3668,28 @@ using veloc::ByteSpan;
 using veloc::strip_margin;
 using veloc::SlicePattern;
 
+// Stage 6: Extreme Performance & Kernels Library
+#include <veloc_stage6.h>
+using veloc::gemm_microkernel_6x16_f32;
+using veloc::bitonic_sort_16_f32;
+using veloc::SwissTable;
+using veloc::simd_validate_utf8;
+using veloc::fast_parse_f64;
+using veloc::simd_lz4_compress;
+using veloc::simd_lz4_decompress;
+using veloc::crc32c_hw_u32;
+using veloc::xxh3_64_simd;
+using veloc::CSRGraph;
+using veloc::ThreadCachingAllocator;
+using veloc::MmapFile;
+using veloc::Task;
+using veloc::WorkStealingDeque;
+using veloc::KernelDim;
+using veloc::KernelContext;
+using veloc::launch_kernel;
+using veloc::SeqLock;
+using veloc::LoomSchedule;
+
 using Arena = VeloC_Arena;
 template <typename T> using Span = Slice<T>;
 

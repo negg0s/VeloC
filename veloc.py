@@ -410,6 +410,16 @@ def main():
     ir_p.add_argument("--level", default="mid", choices=["high", "mid", "low"], help="IR level to dump")
     ir_p.add_argument("--opt", action="store_true", help="Run optimization pipeline before dumping")
 
+    hw_p = subparsers.add_parser("hwinfo", help="Inspect CPU, cache topology, SIMD ISA, and GPU")
+    hw_p.add_argument("--json", action="store_true", help="Output raw JSON")
+
+    tune_p = subparsers.add_parser("tune", help="Auto-tune kernel parameters (cache tiles, unrolls, prefetch)")
+    tune_p.add_argument("--force", action="store_true", help="Force re-run parameter exploration")
+
+    pdiff_p = subparsers.add_parser("perf-diff", help="Compare performance between two benchmark JSON runs")
+    pdiff_p.add_argument("file_a", help="Baseline benchmark JSON file")
+    pdiff_p.add_argument("file_b", help="New benchmark JSON file")
+
     args = parser.parse_args()
 
     if args.command == "build":
@@ -480,6 +490,15 @@ def main():
         pm.remove_dependency(Path.cwd(), args.package)
     elif args.command == "info":
         show_info()
+    elif args.command == "hwinfo":
+        from hwinfo import run_hwinfo_cli
+        run_hwinfo_cli(as_json=args.json)
+    elif args.command == "tune":
+        from autotuner import run_tune_cli
+        run_tune_cli(force=args.force)
+    elif args.command == "perf-diff":
+        from observability import run_perf_diff
+        run_perf_diff(Path(args.file_a), Path(args.file_b))
     elif args.command == "clean":
         clean_cache(all_artifacts=args.all)
     elif args.command == "explain":

@@ -1,0 +1,191 @@
+module BenchRoofline;
+
+#include <veloc.h>
+#include <immintrin.h>
+
+// Measure actual physical hardware ceiling on this machine:
+// 1. Peak FMA Compute (GFLOPS)
+// 2. Memory Bandwidth Hierarchy (L1, L2, L3, RAM in GB/s)
+// 3. Cache and RAM Latency (Pointer Chasing in ns)
+
+fn measure_fma_peak() -> f64 {
+    // 16 unrolled independent AVX2 FMA accumulators to saturate Port 0 & Port 1
+    __m256 a0 = _mm256_set1_ps(1.0001f);
+    __m256 a1 = _mm256_set1_ps(1.0002f);
+    __m256 a2 = _mm256_set1_ps(1.0003f);
+    __m256 a3 = _mm256_set1_ps(1.0004f);
+    __m256 a4 = _mm256_set1_ps(1.0005f);
+    __m256 a5 = _mm256_set1_ps(1.0006f);
+    __m256 a6 = _mm256_set1_ps(1.0007f);
+    __m256 a7 = _mm256_set1_ps(1.0008f);
+    __m256 a8 = _mm256_set1_ps(1.0009f);
+    __m256 a9 = _mm256_set1_ps(1.0010f);
+    __m256 aa = _mm256_set1_ps(1.0011f);
+    __m256 ab = _mm256_set1_ps(1.0012f);
+    __m256 ac = _mm256_set1_ps(1.0013f);
+    __m256 ad = _mm256_set1_ps(1.0014f);
+    __m256 ae = _mm256_set1_ps(1.0015f);
+    __m256 af = _mm256_set1_ps(1.0016f);
+
+    __m256 mul = _mm256_set1_ps(1.000001f);
+    __m256 add = _mm256_set1_ps(0.000001f);
+
+    const u64 iters = 20000000ULL;
+    // 16 FMAs per inner loop * 8 floats * 2 ops = 256 FLOP per loop
+    const u64 total_flops = iters * 256ULL;
+
+    Stopwatch sw;
+    sw.start();
+    for (u64 i = 0; i < iters; ++i) {
+        a0 = _mm256_fmadd_ps(a0, mul, add);
+        a1 = _mm256_fmadd_ps(a1, mul, add);
+        a2 = _mm256_fmadd_ps(a2, mul, add);
+        a3 = _mm256_fmadd_ps(a3, mul, add);
+        a4 = _mm256_fmadd_ps(a4, mul, add);
+        a5 = _mm256_fmadd_ps(a5, mul, add);
+        a6 = _mm256_fmadd_ps(a6, mul, add);
+        a7 = _mm256_fmadd_ps(a7, mul, add);
+        a8 = _mm256_fmadd_ps(a8, mul, add);
+        a9 = _mm256_fmadd_ps(a9, mul, add);
+        aa = _mm256_fmadd_ps(aa, mul, add);
+        ab = _mm256_fmadd_ps(ab, mul, add);
+        ac = _mm256_fmadd_ps(ac, mul, add);
+        ad = _mm256_fmadd_ps(ad, mul, add);
+        ae = _mm256_fmadd_ps(ae, mul, add);
+        af = _mm256_fmadd_ps(af, mul, add);
+    }
+    sw.stop();
+    f64 secs = sw.elapsed_ms() / 1000.0;
+    f64 gflops = (total_flops / 1e9) / secs;
+
+    // Prevent optimizer from DCE
+    f32 res[8];
+    _mm256_storeu_ps(res, a0);
+    volatile f32 sink = res[0];
+    (void)sink;
+
+    return gflops;
+}
+
+fn measure_bandwidth(size_bytes: usize, iters: usize) -> f64 {
+    u8* buf = (u8*)malloc(size_bytes);
+    memset(buf, 0xAA, size_bytes);
+
+    __m256i sum = _mm256_setzero_si256();
+    Stopwatch sw;
+    sw.start();
+    for (usize it = 0; it < iters; ++it) {
+        usize chunks = size_bytes / 32;
+        __m256i* p = (__m256i*)buf;
+        for (usize i = 0; i < chunks; i += 4) {
+            __m256i v0 = _mm256_loadu_si256(p + i + 0);
+            __m256i v1 = _mm256_loadu_si256(p + i + 1);
+            __m256i v2 = _mm256_loadu_si256(p + i + 2);
+            __m256i v3 = _mm256_loadu_si256(p + i + 3);
+            sum = _mm256_xor_si256(sum, v0);
+            sum = _mm256_xor_si256(sum, v1);
+            sum = _mm256_xor_si256(sum, v2);
+            sum = _mm256_xor_si256(sum, v3);
+        }
+    }
+    sw.stop();
+    f64 secs = sw.elapsed_ms() / 1000.0;
+    f64 total_gb = (f64(size_bytes) * f64(iters)) / 1e9;
+    f64 gbps = total_gb / secs;
+
+    volatile int sink = _mm256_extract_epi32(sum, 0);
+    (void)sink;
+    free(buf);
+    return gbps;
+}
+
+fn measure_latency_pointer_chasing(size_bytes: usize) -> f64 {
+    usize num_nodes = size_bytes / sizeof(usize);
+    if (num_nodes < 4) num_nodes = 4;
+    usize* nodes = (usize*)malloc(num_nodes * sizeof(usize));
+
+    // Simple pseudo-random permutation cycle to avoid hardware prefetcher
+    for (usize i = 0; i < num_nodes; ++i) {
+        nodes[i] = (i + 131071ULL) % num_nodes;
+    }
+
+    const usize iters = 20000000;
+    usize idx = 0;
+
+    Stopwatch sw;
+    sw.start();
+    for (usize i = 0; i < iters; ++i) {
+        idx = nodes[idx];
+    }
+    sw.stop();
+
+    f64 total_ns = sw.elapsed_ns();
+    f64 ns_per_hop = total_ns / f64(iters);
+
+    volatile usize sink = idx;
+    (void)sink;
+    free(nodes);
+    return ns_per_hop;
+}
+
+fn main() -> i32 {
+    println("================================================================================");
+    println("              VeloC Physical Machine Roofline & Latency Probe                   ");
+    println("================================================================================");
+
+    // 1. Peak FMA GFLOPS (Single Core saturation)
+    let fma_single_core = measure_fma_peak();
+    let fma_6_core_est = fma_single_core * 6.0; // 6 physical cores
+    println("  [FMA Compute Ceiling]:");
+    printf("    - Single Core Peak FMA: %.2f GFLOPS\n", fma_single_core);
+    printf("    - 6-Core Physical Peak: %.2f GFLOPS\n", fma_6_core_est);
+
+    // 2. Memory Hierarchy Bandwidth
+    println("  [Memory Hierarchy Bandwidth (Read)]: ");
+    let bw_l1 = measure_bandwidth(16 * 1024, 200000); // 16 KB (Fits in 32 KB L1D)
+    printf("    - L1D Cache Bandwidth:  %.2f GB/s\n", bw_l1);
+
+    let bw_l2 = measure_bandwidth(128 * 1024, 30000); // 128 KB (Fits in 256 KB L2)
+    printf("    - L2 Cache Bandwidth:   %.2f GB/s\n", bw_l2);
+
+    let bw_l3 = measure_bandwidth(4 * 1024 * 1024, 1500); // 4 MB (Fits in 12 MB L3)
+    printf("    - L3 Cache Bandwidth:   %.2f GB/s\n", bw_l3);
+
+    let bw_ram = measure_bandwidth(64 * 1024 * 1024, 100); // 64 MB (Exceeds L3 -> RAM)
+    printf("    - Main RAM Bandwidth:   %.2f GB/s\n", bw_ram);
+
+    // 3. Cache & Memory Access Latency (Pointer Chasing)
+    println("  [Access Latency (Pointer Chasing)]: ");
+    let lat_l1 = measure_latency_pointer_chasing(16 * 1024);
+    printf("    - L1D Access Latency:   %.2f ns (~%.1f cycles @ 4.0 GHz)\n", lat_l1, lat_l1 * 4.0);
+
+    let lat_l2 = measure_latency_pointer_chasing(128 * 1024);
+    printf("    - L2 Access Latency:    %.2f ns (~%.1f cycles @ 4.0 GHz)\n", lat_l2, lat_l2 * 4.0);
+
+    let lat_l3 = measure_latency_pointer_chasing(4 * 1024 * 1024);
+    printf("    - L3 Access Latency:    %.2f ns (~%.1f cycles @ 4.0 GHz)\n", lat_l3, lat_l3 * 4.0);
+
+    let lat_ram = measure_latency_pointer_chasing(64 * 1024 * 1024);
+    printf("    - Main RAM Latency:     %.2f ns (~%.1f cycles @ 4.0 GHz)\n", lat_ram, lat_ram * 4.0);
+
+    // Output JSON for roofline generator
+    FILE* f = fopen(".veloc/roofline.json", "w");
+    if (f) {
+        fprintf(f, "{\n");
+        fprintf(f, "  \"fma_peak_single_gflops\": %.2f,\n", fma_single_core);
+        fprintf(f, "  \"fma_peak_multicore_gflops\": %.2f,\n", fma_6_core_est);
+        fprintf(f, "  \"bandwidth_l1_gbps\": %.2f,\n", bw_l1);
+        fprintf(f, "  \"bandwidth_l2_gbps\": %.2f,\n", bw_l2);
+        fprintf(f, "  \"bandwidth_l3_gbps\": %.2f,\n", bw_l3);
+        fprintf(f, "  \"bandwidth_ram_gbps\": %.2f,\n", bw_ram);
+        fprintf(f, "  \"latency_l1_ns\": %.2f,\n", lat_l1);
+        fprintf(f, "  \"latency_l2_ns\": %.2f,\n", lat_l2);
+        fprintf(f, "  \"latency_l3_ns\": %.2f,\n", lat_l3);
+        fprintf(f, "  \"latency_ram_ns\": %.2f\n", lat_ram);
+        fprintf(f, "}\n");
+        fclose(f);
+    }
+    println("================================================================================");
+    println("[Roofline Probe Success] Physical constants written to .veloc/roofline.json");
+    return 0;
+}

@@ -1,0 +1,72 @@
+{
+  "cpu_model": "Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz",
+  "physical_cores": 6,
+  "logical_cores": 12,
+  "base_mhz": 2900,
+  "max_mhz": 2904,
+  "arch": "x86_64",
+  "simd_extensions": {
+    "SSE": true,
+    "SSE2": true,
+    "SSE3": true,
+    "SSSE3": true,
+    "SSE4_1": true,
+    "SSE4_2": true,
+    "AVX": true,
+    "AVX2": true,
+    "FMA3": true,
+    "F16C": true,
+    "BMI1": true,
+    "BMI2": true,
+    "AES_NI": true,
+    "PCLMULQDQ": true,
+    "AVX512F": false,
+    "AVX512BW": false,
+    "AVX512CD": false,
+    "AVX512DQ": false,
+    "AVX512VL": false,
+    "AMX": false,
+    "ARM_NEON": false,
+    "ARM_SVE": false
+  },
+  "vector_width_bits": 256,
+  "caches": {
+    "L1D": {
+      "level": "L1D",
+      "size_kb": 32,
+      "line_size": 64,
+      "associativity": 8,
+      "shared_threads": 2
+    },
+    "L1I": {
+      "level": "L1I",
+      "size_kb": 32,
+      "line_size": 64,
+      "associativity": 8,
+      "shared_threads": 2
+    },
+    "L2": {
+      "level": "L2",
+      "size_kb": 256,
+      "line_size": 64,
+      "associativity": 4,
+      "shared_threads": 2
+    },
+    "L3": {
+      "level": "L3",
+      "size_kb": 12288,
+      "line_size": 64,
+      "associativity": 16,
+      "shared_threads": 12
+    }
+  },
+  "ram_total_gb": 15.87,
+  "gpu_info": {
+    "name": "NVIDIA GeForce RTX 3050",
+    "driver": "32.0.16.1714",
+    "vram_mb": 8192,
+    "vulkan_support": true,
+    "cuda_driver_support": true
+  },
+  "hw_hash": "dc7ac8a60a156634"
+}

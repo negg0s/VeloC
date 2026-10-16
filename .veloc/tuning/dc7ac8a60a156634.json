@@ -1,0 +1,12 @@
+{
+  "hw_hash": "dc7ac8a60a156634",
+  "cpu_model": "Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz",
+  "gemm_tile_m": 16,
+  "gemm_tile_n": 16,
+  "gemm_tile_k": 16,
+  "simd_unroll_factor": 8,
+  "prefetch_distance_bytes": 256,
+  "thread_spawn_threshold": 4096,
+  "non_temporal_store_threshold_bytes": 6291456,
+  "speedup_vs_default": 1.46
+}

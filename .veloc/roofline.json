@@ -1,0 +1,12 @@
+{
+  "fma_peak_single_gflops": 217.94,
+  "fma_peak_multicore_gflops": 1307.62,
+  "bandwidth_l1_gbps": 126.61,
+  "bandwidth_l2_gbps": 107.33,
+  "bandwidth_l3_gbps": 63.81,
+  "bandwidth_ram_gbps": 18.12,
+  "latency_l1_ns": 1.26,
+  "latency_l2_ns": 1.26,
+  "latency_l3_ns": 7.83,
+  "latency_ram_ns": 65.32
+}

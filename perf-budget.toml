@@ -1,0 +1,17 @@
+# VeloC Continuous Performance Budgets
+# CI builds verify that execution time, compile latency, and memory footprints stay within budget.
+
+[build_budgets]
+max_transpile_time_ms = 50.0
+max_compile_time_ms = 4000.0
+max_binary_size_kb = 3500.0
+
+[runtime_budgets]
+max_fma_saturation_diff_pct = 25.0
+max_gemm_execution_time_ms = 10.0
+max_sort_execution_time_ms = 5.0
+max_hash_lookup_latency_ns = 50.0
+
+[regression_policy]
+max_allowed_slowdown_pct = 3.0
+strict_mode = true

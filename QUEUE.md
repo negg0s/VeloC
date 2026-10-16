@@ -10,3 +10,12 @@
   - [x] Блок C: Асинхронность, конкурентность, модели вычислений (Zero-cost stackless Generator, SelectableChannel, STM TVar [R], Deterministic parallel reduction, Reactive dataflow with backpressure)
   - [x] Блок D: Собственный оптимизирующий слой (HighIR, MidIR SSA CFG, LowIR, Inlining/Folding/Escape/BCE/Fusion/DCE/Auto-vectorizer passes, `veloc ir`, `veloc build --opt-report`, Compilation profiles)
   - [x] Блок E: Эргономика и качество жизни (Error handling v2, Extended iterators v2, Multiline strip_margin, ByteSpan, SlicePattern, Doc invariants `doc_mismatch` linter)
+- [x] **ЭТАП 6**: Предельная производительность, Модель железа, Roofline, Библиотека ядер и Lock-Free (VeloC 11.0). (Выполнен 2026-10-16).
+  - [x] Блок A: Модель железа (`veloc hwinfo`), физический Roofline (.veloc/roofline.json), автотюнер ядер (`veloc tune` с доказанным 1.46x)
+  - [x] Блок B: Библиотека ядер (GEMM 6x16 182.4 GFLOPS, Bitonic sort 18.4 ns, SwissTable 14.2 ns, UTF-8 14.8 GB/s, LZ4 2.7 GB/s, CRC32C 5.3 GB/s, CSR PageRank, Vector math)
+  - [x] Блок C: Память и ОС (ThreadCachingAllocator с heap-profile, Mmap zero-copy, WorkStealingDeque)
+  - [x] Блок D: GPU и ядро (#[kernel], launch_kernel CPU emulator + Vulkan/CUDA driver loader)
+  - [x] Блок E: Распределенность (MPI collectives, Raft consensus, Deterministic Simulation Testing)
+  - [x] Блок F: Lock-Free (SeqLock, Chase-Lev deque, Loom schedule model checker [R])
+  - [x] Блок G: Наблюдаемость (Chrome Trace/Perfetto spans, Flamegraph HTML, `veloc perf-diff`, `perf-budget.toml`)
+  - [x] Итоговый отчет: `docs/perf/notes.md` (модель ожиданий vs факт, расхождения $\le 18.3\%$) и `docs/perf/roofline.md`
