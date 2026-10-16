@@ -1,0 +1,44 @@
+// Conformance Test: RULE-TYPE-001, RULE-TYPE-005, RULE-TYPE-007
+// Tests primitives, Option/Result algebraic types, and explicit 'as' cast
+
+fn test_try_helper(success: bool) -> Result<i32, const char*> {
+    if (success) {
+        return Result<i32, const char*>::Ok(100);
+    }
+    return Result<i32, const char*>::Err("failure");
+}
+
+fn try_caller(success: bool) -> Result<i32, const char*> {
+    let val = test_try_helper(success)?;
+    return Result<i32, const char*>::Ok(val + 50);
+}
+
+fn main() -> i32 {
+    // 1. RULE-TYPE-001: Integer widths
+    assert_eq(sizeof(i8), 1);
+    assert_eq(sizeof(i16), 2);
+    assert_eq(sizeof(i32), 4);
+    assert_eq(sizeof(i64), 8);
+    assert_eq(sizeof(f32), 4);
+    assert_eq(sizeof(f64), 8);
+
+    // 2. RULE-TYPE-007: Explicit 'as' cast
+    let a: i32 = 1234;
+    let b: f32 = a as f32;
+    assert_true(b == 1234.0f);
+
+    // 3. RULE-TYPE-005: Option & Result
+    let opt_some = Option<i32>::Some(99);
+    assert_true(opt_some.is_some());
+    assert_eq(opt_some.unwrap(), 99);
+
+    let res_ok = try_caller(true);
+    assert_true(res_ok.is_ok());
+    assert_eq(res_ok.unwrap(), 150);
+
+    let res_err = try_caller(false);
+    assert_true(res_err.is_err());
+
+    println("[CONFORMANCE PASS] RULE-TYPE-001, RULE-TYPE-005, RULE-TYPE-007 verified");
+    return 0;
+}

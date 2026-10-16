@@ -273,6 +273,7 @@ def main():
     explain_p.add_argument("code", help="Error code (E0001, E0002, etc.)")
 
     subparsers.add_parser("ci", help="Run full VeloC CI verification test suite")
+    subparsers.add_parser("spec-coverage", help="Run specification conformance suite and coverage report")
 
     args = parser.parse_args()
 
@@ -309,6 +310,8 @@ def main():
         print(explain_error_code(args.code))
     elif args.command == "ci":
         subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "run_tests.py")])
+    elif args.command == "spec-coverage":
+        subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "conformance" / "run_conformance.py")])
     elif args.command == "bench":
         if hasattr(args, "all") and args.all:
             bench_script = ROOT_DIR / "benchmarks" / "rigorous_bench.py"

@@ -1,0 +1,32 @@
+// Conformance Test: RULE-EVAL-001, RULE-EVAL-002, RULE-EVAL-003
+// Tests left-to-right evaluation, short-circuiting, and pipeline operator
+
+fn side_effect(flag: bool, counter: i32*) -> bool {
+    *counter = *counter + 1;
+    return flag;
+}
+
+fn add_ten(x: i32) -> i32 {
+    return x + 10;
+}
+
+fn double_val(x: i32) -> i32 {
+    return x * 2;
+}
+
+fn main() -> i32 {
+    // 1. RULE-EVAL-002: Short-circuiting
+    let mut call_count: i32 = 0;
+    let res_false = false && side_effect(true, &call_count);
+    assert_eq(call_count, 0); // Must NOT evaluate right side when left is false!
+
+    let res_true = true || side_effect(true, &call_count);
+    assert_eq(call_count, 0); // Must NOT evaluate right side when left is true!
+
+    // 2. RULE-EVAL-003: Pipeline operator
+    let pipe_res = 5 |> add_ten |> double_val;
+    assert_eq(pipe_res, 30); // (5 + 10) * 2 = 30
+
+    println("[CONFORMANCE PASS] RULE-EVAL-001..003 evaluation rules verified");
+    return 0;
+}

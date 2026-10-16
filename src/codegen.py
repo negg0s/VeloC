@@ -40,7 +40,7 @@ class CppCodegen:
             return f"({expr.op}{operand_str})"
         elif isinstance(expr, CastExpr):
             sub_expr = self.emit_expr(expr.expr)
-            if "*" in expr.target_type:
+            if "*" in expr.target_type or expr.target_type in ("uintptr_t", "intptr_t", "usize"):
                 return f"(({expr.target_type})({sub_expr}))"
             return f"static_cast<{expr.target_type}>({sub_expr})"
         elif isinstance(expr, AssertNonNullExpr):
@@ -48,7 +48,7 @@ class CppCodegen:
             return f"({sub_expr}).unwrap()"
         elif isinstance(expr, TryExpr):
             sub_expr = self.emit_expr(expr.expr)
-            return f"({sub_expr}).unwrap()"
+            return f"({{ auto _v_try = ({sub_expr}); if (::veloc::try_is_err(_v_try)) return ::veloc::try_forward_err(_v_try); ::veloc::try_unwrap(_v_try); }})"
         elif isinstance(expr, CallExpr):
             callee_str = self.emit_expr(expr.callee)
             if callee_str == "println":

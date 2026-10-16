@@ -1,0 +1,25 @@
+// Conformance Test: RULE-UB-001, RULE-UB-002, RULE-UB-003
+// Tests safety mechanisms, non-null assertions, and SIMD alignment guarantees
+
+fn main() -> i32 {
+    // 1. RULE-UB-002: Non-null assertion and Option unwrapping
+    let opt_val = Option<i32>::Some(42);
+    assert_true(opt_val.is_some());
+    let unwrapped = opt_val!;
+    assert_eq(unwrapped, 42);
+
+    // 2. RULE-UB-001: Slice bounds access
+    i32 arr[4] = {10, 20, 30, 40};
+    let slice = Slice<i32>::from_array(arr, 4);
+    assert_eq(slice.len, 4);
+    assert_eq(slice[0], 10);
+    assert_eq(slice[3], 40);
+
+    // 3. RULE-UB-003: Aligned SIMD allocation alignment check
+    let aligned_mem = (f32*)veloc_aligned_alloc(32, sizeof(f32) * 8);
+    assert_true(((uintptr_t)aligned_mem) % 32 == 0);
+    veloc_aligned_free(aligned_mem);
+
+    println("[CONFORMANCE PASS] RULE-UB-001, RULE-UB-002, RULE-UB-003 verified");
+    return 0;
+}

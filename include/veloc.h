@@ -747,6 +747,46 @@ struct Option {
 };
 
 namespace veloc {
+    template <typename E>
+    struct ErrCarrier {
+        E err;
+        template <typename OtherT, typename OtherE>
+        operator Result<OtherT, OtherE>() const {
+            return Result<OtherT, OtherE>::Err((OtherE)err);
+        }
+    };
+
+    struct NoneCarrier {
+        template <typename OtherT>
+        operator Option<OtherT>() const {
+            return Option<OtherT>::None();
+        }
+    };
+
+    template <typename T, typename E>
+    static VELOC_INLINE bool try_is_err(const Result<T, E>& r) { return r.is_err(); }
+
+    template <typename T>
+    static VELOC_INLINE bool try_is_err(const Option<T>& o) { return o.is_none(); }
+
+    template <typename T, typename E>
+    static VELOC_INLINE ErrCarrier<E> try_forward_err(const Result<T, E>& r) { return ErrCarrier<E>{r.err}; }
+
+    template <typename T>
+    static VELOC_INLINE NoneCarrier try_forward_err(const Option<T>& o) { return NoneCarrier{}; }
+
+    template <typename T, typename E>
+    static VELOC_INLINE auto& try_unwrap(Result<T, E>& r) { return r.val; }
+
+    template <typename T, typename E>
+    static VELOC_INLINE const auto& try_unwrap(const Result<T, E>& r) { return r.val; }
+
+    template <typename T>
+    static VELOC_INLINE auto& try_unwrap(Option<T>& o) { return o.val; }
+
+    template <typename T>
+    static VELOC_INLINE const auto& try_unwrap(const Option<T>& o) { return o.val; }
+
     template <typename T>
     static VELOC_INLINE T coalesce(Option<T> opt, const T& fallback) {
         return opt.unwrap_or(fallback);

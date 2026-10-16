@@ -795,6 +795,24 @@ class Parser:
                 decls.append(decl)
         return Program(1, 1, self.filename, declarations=decls)
 
+    def _parse_fn_param(self, tokens: List[Token]) -> FnParam:
+        if not tokens:
+            return FnParam(0, 0, self.filename, name="arg", type_name="auto")
+        colon_indices = [idx for idx, t in enumerate(tokens) if t.type == TokenType.COLON]
+        if colon_indices:
+            c_idx = colon_indices[0]
+            name_tokens = tokens[:c_idx]
+            t_tokens = tokens[c_idx + 1:]
+            p_name = name_tokens[-1].value if name_tokens else "arg"
+            p_type = format_type_tokens(t_tokens) if t_tokens else "auto"
+            return FnParam(tokens[0].line, tokens[0].col, self.filename, name=p_name, type_name=p_type)
+        elif len(tokens) == 1:
+            return FnParam(tokens[0].line, tokens[0].col, self.filename, name=tokens[0].value, type_name="auto")
+        else:
+            name_p = tokens[-1]
+            type_str = format_type_tokens(tokens[:-1])
+            return FnParam(name_p.line, name_p.col, self.filename, name=name_p.value, type_name=type_str)
+
     def parse_decl(self) -> Optional[Decl]:
         tok = self.current()
 
@@ -861,18 +879,10 @@ class Parser:
             params = []
             if not self.check(TokenType.RPAREN):
                 while True:
-                    # param: [type] name
                     type_part = []
                     while not self.check(TokenType.COMMA) and not self.check(TokenType.RPAREN) and not self.check(TokenType.EOF):
                         type_part.append(self.advance())
-                    if len(type_part) == 1:
-                        params.append(FnParam(type_part[0].line, type_part[0].col, self.filename,
-                                              name=type_part[0].value, type_name="auto"))
-                    elif len(type_part) >= 2:
-                        name_p = type_part[-1]
-                        type_str = " ".join(t.value for t in type_part[:-1])
-                        params.append(FnParam(name_p.line, name_p.col, self.filename,
-                                              name=name_p.value, type_name=type_str))
+                    params.append(self._parse_fn_param(type_part))
                     if not self.match(TokenType.COMMA):
                         break
 
@@ -907,14 +917,7 @@ class Parser:
                         param_tokens = []
                         while not self.check(TokenType.COMMA) and not self.check(TokenType.RPAREN) and not self.check(TokenType.EOF):
                             param_tokens.append(self.advance())
-                        if len(param_tokens) == 1:
-                            params.append(FnParam(param_tokens[0].line, param_tokens[0].col, self.filename,
-                                                  name=param_tokens[0].value, type_name="auto"))
-                        elif len(param_tokens) >= 2:
-                            name_p = param_tokens[-1]
-                            t_str = format_type_tokens(param_tokens[:-1])
-                            params.append(FnParam(name_p.line, name_p.col, self.filename,
-                                                  name=name_p.value, type_name=t_str))
+                        params.append(self._parse_fn_param(param_tokens))
                         if not self.match(TokenType.COMMA):
                             break
                 if self.check(TokenType.RPAREN):

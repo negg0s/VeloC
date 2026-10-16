@@ -1,0 +1,20 @@
+// Conformance Test: RULE-LEX-001, RULE-LEX-002, RULE-LEX-003
+// Tests comments, identifiers, and integer/float literal parsing
+
+fn main() -> i32 {
+    // Single-line comment test
+    /* Multi-line
+       comment test */
+    let dec_val: i32 = 42;
+    let hex_val: u32 = 0x2A;
+    let bin_val: u32 = 0b101010;
+    let flt_val: f32 = 3.14159f;
+
+    assert_eq(dec_val, 42);
+    assert_eq(hex_val, 42);
+    assert_eq(bin_val, 42);
+    assert_true(flt_val > 3.14f && flt_val < 3.15f);
+
+    println("[CONFORMANCE PASS] RULE-LEX-001..003 literals and tokens verified");
+    return 0;
+}

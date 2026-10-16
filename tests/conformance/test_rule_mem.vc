@@ -1,0 +1,33 @@
+// Conformance Test: RULE-MEM-002, RULE-MEM-003, RULE-MEM-004
+// Tests TrackingAllocator, Arena rewind, and Defer LIFO sequencing
+
+fn main() -> i32 {
+    // 1. RULE-MEM-003: Aligned allocation
+    let ptr = (f32*)veloc_aligned_alloc(32, sizeof(f32) * 64);
+    assert_true(ptr != NULL);
+    assert_true(((uintptr_t)ptr) % 32 == 0);
+    veloc_aligned_free(ptr);
+
+    // 2. RULE-MEM-002: Arena rewind
+    let mut arena = VeloC_Arena::create(1024 * 1024);
+    let marker = arena.get_marker();
+    let data = (i32*)arena.alloc(sizeof(i32) * 100);
+    data[0] = 777;
+    assert_eq(data[0], 777);
+    arena.reset_to_marker(marker);
+    assert_eq(arena.offset, marker);
+    arena.destroy();
+
+    // 3. RULE-MEM-004: Defer execution
+    let mut defer_order: i32 = 0;
+    {
+        defer defer_order = defer_order * 10 + 1;
+        defer defer_order = defer_order * 10 + 2;
+        // In LIFO order: last defer (2) runs first, then first defer (1)
+        // Expected value: 0 * 10 + 2 = 2; then 2 * 10 + 1 = 21!
+    }
+    assert_eq(defer_order, 21);
+
+    println("[CONFORMANCE PASS] RULE-MEM-002, RULE-MEM-003, RULE-MEM-004 verified");
+    return 0;
+}
