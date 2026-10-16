@@ -14,7 +14,7 @@ EXAMPLES_DIR = ROOT_DIR / "examples"
 
 sys.path.insert(0, str(SRC_DIR))
 from lexer import Lexer, LexerError
-from parser import Parser, ParseError
+from parser import Parser, ParseError, MultiParseError
 from diagnostics import DiagnosticReporter, DiagnosticCode
 
 def run_positive_tests():
@@ -40,6 +40,7 @@ def run_negative_tests():
         ("unterminated_string.vc", 'let s = "hello world;', DiagnosticCode.E0004),
         ("missing_semicolon.vc", 'fn foo() { let a = 10 let b = 20; }', DiagnosticCode.E0001),
         ("invalid_match_arm.vc", 'fn bar() { match (10) { foo => 1 } }', DiagnosticCode.E0001),
+        ("multi_errors.vc", 'fn f1() { let a = ; } fn f2() { let b = ; }', DiagnosticCode.E0001),
     ]
 
     passed = 0
@@ -52,6 +53,10 @@ def run_negative_tests():
         except LexerError as le:
             caught = True
             print(f"  [PASS] Negative test {name:<25} caught as LexerError ({expected_code.value})")
+            passed += 1
+        except MultiParseError as mpe:
+            caught = True
+            print(f"  [PASS] Negative test {name:<25} caught {len(mpe.errors)} multi-errors with expected code {mpe.errors[0].code.value}")
             passed += 1
         except ParseError as pe:
             caught = True

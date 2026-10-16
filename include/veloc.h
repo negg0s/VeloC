@@ -805,6 +805,10 @@ struct Slice {
     T* ptr;
     usize len;
 
+    Slice() : ptr(nullptr), len(0) {}
+    Slice(T* data, usize size) : ptr(data), len(size) {}
+    usize size() const { return len; }
+
     static Slice from_array(T* data, usize size) {
         Slice s;
         s.ptr = data;
@@ -2713,5 +2717,9 @@ using veloc::simd_argmax;
 using veloc::simd_gemv_f32;
 using veloc::simd_gemm_f32;
 using veloc::simd_quantize_f32_to_i8;
+using veloc::LockFreeRingBuffer;
+using veloc::Channel;
+using Arena = VeloC_Arena;
+template <typename T> using Span = Slice<T>;
 
 #endif // VELOC_H

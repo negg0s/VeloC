@@ -1,0 +1,7 @@
+fn test1() -> void {
+    let a = ; // Error 1: missing expression
+}
+
+fn test2() -> void {
+    let b = ; // Error 2: missing expression
+}

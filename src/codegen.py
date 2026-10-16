@@ -49,6 +49,27 @@ class CppCodegen:
         elif isinstance(expr, TryExpr):
             sub_expr = self.emit_expr(expr.expr)
             return f"({{ auto _v_try = ({sub_expr}); if (::veloc::try_is_err(_v_try)) return ::veloc::try_forward_err(_v_try); ::veloc::try_unwrap(_v_try); }})"
+        elif isinstance(expr, MatchExpr):
+            expr_str = self.emit_expr(expr.expr)
+            has_str = any(arm.pattern_val and arm.pattern_val.startswith('"') for arm in expr.arms)
+            switch_header = f"switch (::veloc::str_hash({expr_str})) {{" if has_str else f"switch ({expr_str}) {{"
+            body_parts = [f"([&]() {{\n    {switch_header}\n"]
+            for arm in expr.arms:
+                if arm.pattern_val is None or arm.pattern_val == "_":
+                    body_parts.append("        default:\n")
+                elif arm.pattern_val.startswith('"'):
+                    unquoted = arm.pattern_val.strip('"')
+                    body_parts.append(f'        case "{unquoted}"_hash:\n')
+                else:
+                    body_parts.append(f"        case {arm.pattern_val}:\n")
+                if isinstance(arm.body, Expr):
+                    arm_val = self.emit_expr(arm.body)
+                    body_parts.append(f"            return ({arm_val});\n")
+                elif isinstance(arm.body, Stmt):
+                    body_parts.append(self.emit_stmt(arm.body, 3))
+            body_parts.append("    }\n})()")
+            return "".join(body_parts)
+
         elif isinstance(expr, CallExpr):
             callee_str = self.emit_expr(expr.callee)
             if callee_str == "println":

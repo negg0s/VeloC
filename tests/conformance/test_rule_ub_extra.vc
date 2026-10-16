@@ -1,0 +1,45 @@
+// Rule Conformance Test: UB Prevention (RULE-UB-004, RULE-UB-005, RULE-UB-006)
+#include <veloc.h>
+#include <cassert>
+#include <cstdio>
+#include <atomic>
+#include <thread>
+#include <vector>
+
+fn main() -> i32 {
+    // RULE-UB-004: Arena-based allocation lifetime safety (all items valid until arena reset)
+    let mut arena = Arena::create(1024 * 1024);
+    int* p1 = (int*)arena.alloc(sizeof(int));
+    int* p2 = (int*)arena.alloc(sizeof(int));
+    *p1 = 111;
+    *p2 = 222;
+    assert(*p1 == 111);
+    assert(*p2 == 222);
+    arena.reset(); // Safely reclaims all allocations at once
+
+    // RULE-UB-005: Non-null assert checking
+    let real_val: i32 = 555;
+    let safe_ptr: const int* = &real_val;
+    assert(safe_ptr != nullptr);
+    let unwrapped: i32 = *safe_ptr;
+    assert(unwrapped == 555);
+
+    // RULE-UB-006: Data race avoidance with atomic operations
+    let mut counter: std::atomic<int>;
+    counter.store(0);
+    let mut workers: std::vector<std::thread>;
+    for (int t = 0; t < 4; ++t) {
+        workers.emplace_back([&counter]() {
+            for (int i = 0; i < 1000; ++i) {
+                counter.fetch_add(1, std::memory_order_relaxed);
+            }
+        });
+    }
+    for (auto& th : workers) {
+        th.join();
+    }
+    assert(counter.load() == 4000);
+
+    printf("PASS: RULE-UB-004, RULE-UB-005, RULE-UB-006\n");
+    return 0;
+}

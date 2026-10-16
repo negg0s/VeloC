@@ -74,6 +74,11 @@ class ParseError(Exception):
         self.code = code
         self.help_text = help_text
 
+class MultiParseError(Exception):
+    def __init__(self, errors: List[ParseError]):
+        super().__init__(f"Encountered {len(errors)} parse error(s)")
+        self.errors = errors
+
 class Parser:
     def __init__(self, tokens: List[Token], source_code: str = "", filename: str = "<stdin>"):
         self.tokens = tokens
@@ -81,6 +86,32 @@ class Parser:
         self.filename = filename
         self.pos = 0
         self.diagnostics = DiagnosticReporter(source_code, filename)
+        self.errors: List[ParseError] = []
+        self.max_errors: int = 10
+
+    def record_error(self, err: ParseError):
+        self.errors.append(err)
+        if len(self.errors) >= self.max_errors:
+            raise MultiParseError(self.errors)
+
+    def synchronize_stmt(self):
+        while not self.check(TokenType.EOF):
+            tok = self.current()
+            if tok.type in (TokenType.SEMICOLON, TokenType.RBRACE):
+                self.advance()
+                return
+            if tok.type in (TokenType.LET, TokenType.IF, TokenType.WHILE, TokenType.FOR,
+                            TokenType.RETURN, TokenType.MATCH, TokenType.DEFER, TokenType.BENCH):
+                return
+            self.advance()
+
+    def synchronize_decl(self):
+        while not self.check(TokenType.EOF):
+            tok = self.current()
+            if tok.type in (TokenType.FN, TokenType.SOA, TokenType.STRUCT,
+                            TokenType.MODULE, TokenType.IMPORT, TokenType.TEST, TokenType.PUB):
+                return
+            self.advance()
 
     def current(self) -> Token:
         if self.pos < len(self.tokens):
@@ -402,6 +433,29 @@ class Parser:
             full_name = "::".join(name_parts)
             return Identifier(tok.line, tok.col, self.filename, name=full_name)
 
+        if tok.type == TokenType.MATCH:
+            start_tok = self.advance()
+            has_paren = self.match(TokenType.LPAREN)
+            cond_expr = self.parse_expr(0)
+            if has_paren:
+                self.expect(TokenType.RPAREN, "Expected ')' after match expression")
+            self.expect(TokenType.LBRACE, "Expected '{' to start match body")
+            arms = []
+            while not self.check(TokenType.RBRACE) and not self.check(TokenType.EOF):
+                arm_tok = self.advance()
+                if arm_tok.value == "_":
+                    pat_val = "_"
+                elif arm_tok.type in (TokenType.STRING_LIT, TokenType.INT_LIT, TokenType.FLOAT_LIT, TokenType.IDENT):
+                    pat_val = f'"{arm_tok.value}"' if arm_tok.type == TokenType.STRING_LIT else arm_tok.value
+                else:
+                    raise ParseError(f"Expected match pattern (string, integer or '_'), got '{arm_tok.value}'", arm_tok, DiagnosticCode.E0001)
+                self.expect(TokenType.ARROW, "Expected '=>' after match pattern")
+                arm_body = self.parse_expr(0)
+                arms.append(MatchArm(arm_tok.line, arm_tok.col, self.filename, pattern_val=pat_val, body=arm_body))
+                self.match(TokenType.COMMA)
+            self.expect(TokenType.RBRACE, "Expected '}' closing match body")
+            return MatchExpr(start_tok.line, start_tok.col, self.filename, expr=cond_expr, arms=arms)
+
         raise ParseError(f"Unexpected token in expression: '{tok.value}'", tok, DiagnosticCode.E0001)
 
     # ==========================================
@@ -569,8 +623,18 @@ class Parser:
         name_tok = self.expect(TokenType.IDENT, "Expected variable name after 'let'")
         type_annot = None
         if self.match(TokenType.COLON):
-            type_tok = self.expect(TokenType.IDENT, "Expected type name after ':' in let declaration")
-            type_annot = type_tok.value
+            type_tokens = []
+            depth = 0
+            while not self.check(TokenType.EOF) and not self.check(TokenType.SEMICOLON):
+                if depth == 0 and self.check(TokenType.EQ):
+                    break
+                t = self.advance()
+                if t.type == TokenType.LT:
+                    depth += 1
+                elif t.type == TokenType.GT:
+                    depth -= 1
+                type_tokens.append(t)
+            type_annot = format_type_tokens(type_tokens)
         elif self.check(TokenType.IDENT) and self.peek().type == TokenType.EQ:
             # Syntax: let type name = ...
             type_annot = name_tok.value
@@ -596,14 +660,20 @@ class Parser:
                 self.expect(TokenType.LPAREN, "Expected '(' after pattern")
                 var_tok = self.expect(TokenType.IDENT, "Expected variable name in pattern")
                 self.expect(TokenType.RPAREN, "Expected ')' after variable name")
-                self.expect(TokenType.EQ, "Expected '=' in if let statement")
-                expr = self.parse_expr(0)
-                then_b = self.parse_block()
-                else_b = None
-                if self.match(TokenType.ELSE):
-                    else_b = self.parse_block() if self.check(TokenType.LBRACE) else self.parse_if_stmt()
-                return IfLetStmt(start_tok.line, start_tok.col, self.filename, pattern_type=pat_type,
-                                 var_name=var_tok.value, expr=expr, then_branch=then_b, else_branch=else_b)
+            elif pat_tok.type == TokenType.IDENT:
+                pat_type = "Some"
+                var_tok = self.advance()
+            else:
+                pat_type = "Some"
+                var_tok = self.expect(TokenType.IDENT, "Expected variable name in pattern")
+            self.expect(TokenType.EQ, "Expected '=' in if let statement")
+            expr = self.parse_expr(0)
+            then_b = self.parse_block()
+            else_b = None
+            if self.match(TokenType.ELSE):
+                else_b = self.parse_block() if self.check(TokenType.LBRACE) else self.parse_if_stmt()
+            return IfLetStmt(start_tok.line, start_tok.col, self.filename, pattern_type=pat_type,
+                             var_name=var_tok.value, expr=expr, then_branch=then_b, else_branch=else_b)
 
         # Standard if
         has_paren = self.match(TokenType.LPAREN)
@@ -640,11 +710,17 @@ class Parser:
                 self.expect(TokenType.LPAREN, "Expected '(' after pattern")
                 var_tok = self.expect(TokenType.IDENT, "Expected variable name in pattern")
                 self.expect(TokenType.RPAREN, "Expected ')' after variable name")
-                self.expect(TokenType.EQ, "Expected '=' in while let statement")
-                expr = self.parse_expr(0)
-                body = self.parse_block()
-                return WhileLetStmt(start_tok.line, start_tok.col, self.filename, pattern_type=pat_type,
-                                    var_name=var_tok.value, expr=expr, body=body)
+            elif pat_tok.type == TokenType.IDENT:
+                pat_type = "Some"
+                var_tok = self.advance()
+            else:
+                pat_type = "Some"
+                var_tok = self.expect(TokenType.IDENT, "Expected variable name in pattern")
+            self.expect(TokenType.EQ, "Expected '=' in while let statement")
+            expr = self.parse_expr(0)
+            body = self.parse_block()
+            return WhileLetStmt(start_tok.line, start_tok.col, self.filename, pattern_type=pat_type,
+                                var_name=var_tok.value, expr=expr, body=body)
 
         has_paren = self.match(TokenType.LPAREN)
         cond = self.parse_expr(0)
@@ -750,7 +826,11 @@ class Parser:
         start_tok = self.expect(TokenType.LBRACE, "Expected '{'")
         stmts = []
         while not self.check(TokenType.RBRACE) and not self.check(TokenType.EOF):
-            stmts.append(self.parse_stmt())
+            try:
+                stmts.append(self.parse_stmt())
+            except ParseError as err:
+                self.record_error(err)
+                self.synchronize_stmt()
         self.expect(TokenType.RBRACE, "Expected '}'")
         return BlockStmt(start_tok.line, start_tok.col, self.filename, statements=stmts)
 
@@ -790,9 +870,17 @@ class Parser:
     def parse_program(self) -> Program:
         decls = []
         while not self.check(TokenType.EOF):
-            decl = self.parse_decl()
-            if decl:
-                decls.append(decl)
+            try:
+                decl = self.parse_decl()
+                if decl:
+                    decls.append(decl)
+            except ParseError as err:
+                self.record_error(err)
+                self.synchronize_decl()
+        if self.errors:
+            if len(self.errors) == 1:
+                raise self.errors[0]
+            raise MultiParseError(self.errors)
         return Program(1, 1, self.filename, declarations=decls)
 
     def _parse_fn_param(self, tokens: List[Token]) -> FnParam:

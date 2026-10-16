@@ -1,0 +1,70 @@
+// Rule Conformance Test: Statements and Short-Circuit (RULE-STMT-001, RULE-STMT-002, RULE-STMT-003, RULE-EVAL-004)
+#include <veloc.h>
+#include <cassert>
+#include <cstdio>
+
+i32 global_defer_flag = 0;
+
+fn test_defer_scope() {
+    global_defer_flag = 1;
+    defer global_defer_flag = 42;
+    assert(global_defer_flag == 1);
+}
+
+fn side_effect(counter: int*) -> bool {
+    *counter += 1;
+    return true;
+}
+
+fn main() -> i32 {
+    // RULE-STMT-001: If-let pattern binding unwraps Option or Result
+    let opt_some = Option<i32>::Some(777);
+    let mut executed_some: bool = false;
+    if let val = opt_some {
+        assert(val == 777);
+        executed_some = true;
+    }
+    assert(executed_some == true);
+
+    let opt_none = Option<i32>::None();
+    let mut executed_none: bool = false;
+    if let val2 = opt_none {
+        executed_none = true;
+    }
+    assert(executed_none == false);
+
+    // RULE-STMT-002: Defer runs at scope exit in LIFO order
+    test_defer_scope();
+    assert(global_defer_flag == 42);
+
+    // RULE-STMT-003: Loop control (break / continue)
+    let mut loop_sum: i32 = 0;
+    for (int i = 0; i < 10; ++i) {
+        if (i % 2 != 0) {
+            continue;
+        }
+        if (i > 6) {
+            break;
+        }
+        loop_sum += i;
+    }
+    // i: 0, 2, 4, 6 -> sum = 12
+    assert(loop_sum == 12);
+
+    // RULE-EVAL-004: Short-circuit evaluation
+    int se_calls = 0;
+    bool false_cond = false;
+    if (false_cond && side_effect(&se_calls)) {
+        // unreachable
+    }
+    assert(se_calls == 0); // side_effect must NOT have been called
+
+    bool true_cond = true;
+    if (true_cond || side_effect(&se_calls)) {
+        // evaluated
+    }
+    assert(se_calls == 0); // side_effect must NOT have been called due to short-circuit
+
+    printf("PASS: RULE-STMT-001, RULE-STMT-002, RULE-STMT-003, RULE-EVAL-004\n");
+    return 0;
+}

@@ -1,0 +1,5 @@
+fn broken((( {
+    let x = "unclosed string;
+    let y = 10 + + * ;
+    match { => }
+}

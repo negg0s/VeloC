@@ -1,0 +1,11 @@
+fn test_match(x: i32) -> i32 {
+    let r = match (x) {
+        0 => 10,
+        1 => 20,
+        _ => 30
+    };
+    if let Some(v) = Option<i32>::Some(r) {
+        return v * 2;
+    }
+    return 0;
+}

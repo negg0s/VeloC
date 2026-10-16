@@ -1,0 +1,47 @@
+// Rule Conformance Test: Declarations, Memory Alignment, RingBuffer (RULE-DECL-001, RULE-MEM-001, RULE-MEM-005)
+#include <veloc.h>
+#include <cassert>
+#include <cstdio>
+#include <thread>
+#include <cstdint>
+
+soa struct Particle {
+    f32 x;
+    f32 y;
+    f32 vx;
+    f32 vy;
+};
+
+fn main() -> i32 {
+    // RULE-DECL-001: SoA declaration generates columnar arrays
+    let mut particles = Particle_SoA::create(1024);
+    particles.x[0] = 10.0f;
+    particles.y[0] = 20.0f;
+    particles.vx[0] = 1.0f;
+    particles.vy[0] = 2.0f;
+    assert(particles.x[0] == 10.0f);
+    assert(particles.y[0] == 20.0f);
+
+    // RULE-MEM-001: SIMD vectors guaranteed 32-byte alignment
+    let v: f32x8 = f32x8_set1(3.14159f);
+    let addr: uintptr_t = (uintptr_t)(&v);
+    assert((addr % 32) == 0);
+
+    // RULE-MEM-005: LockFreeRingBuffer provides lock-free queueing
+    let mut ring: LockFreeRingBuffer<i32, 128>;
+    let pushed1: bool = ring.push(100);
+    let pushed2: bool = ring.push(200);
+    assert(pushed1 == true);
+    assert(pushed2 == true);
+
+    let pop1: Option<i32> = ring.pop();
+    let pop2: Option<i32> = ring.pop();
+    let pop3: Option<i32> = ring.pop();
+
+    assert(pop1.is_some() && pop1.unwrap() == 100);
+    assert(pop2.is_some() && pop2.unwrap() == 200);
+    assert(pop3.is_none());
+
+    printf("PASS: RULE-DECL-001, RULE-MEM-001, RULE-MEM-005\n");
+    return 0;
+}

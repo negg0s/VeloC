@@ -1,0 +1,47 @@
+// Rule Conformance Test: Types, Slices, Option/Result, f-strings (RULE-TYPE-002, RULE-TYPE-003, RULE-TYPE-004, RULE-TYPE-006, RULE-LEX-004)
+#include <veloc.h>
+#include <cassert>
+#include <cstdio>
+#include <string>
+
+fn take_ownership(v: std::string) -> usize {
+    return v.size();
+}
+
+fn main() -> i32 {
+    // RULE-TYPE-002: Fixed-size arrays and slice views
+    int raw_arr[5] = {10, 20, 30, 40, 50};
+    Span<int> slice(raw_arr, 5);
+    assert(slice.size() == 5);
+    assert(slice[2] == 30);
+
+    // RULE-TYPE-003: Option<T> semantics
+    let none_val = Option<i32>::None();
+    assert(none_val.is_none());
+    assert(none_val.unwrap_or(42) == 42);
+
+    let some_val = Option<i32>::Some(999);
+    assert(some_val.is_some());
+    assert(some_val.unwrap() == 999);
+
+    // RULE-TYPE-004: Result<T, E> semantics
+    let ok_res = Result<i32, const char*>::Ok(123);
+    assert(ok_res.is_ok());
+    assert(ok_res.unwrap() == 123);
+
+    let err_res = Result<i32, const char*>::Err("failed");
+    assert(err_res.is_err());
+    assert(err_res.unwrap_or(0) == 0);
+
+    // RULE-TYPE-006: Move semantics / linear pointer transfer
+    std::string s = "linear_move";
+    usize len = take_ownership(std::move(s));
+    assert(len == 11);
+
+    // RULE-LEX-004: f-strings formatting
+    let count: i32 = 42;
+    println(f"Item count is {count}");
+
+    printf("PASS: RULE-TYPE-002, RULE-TYPE-003, RULE-TYPE-004, RULE-TYPE-006, RULE-LEX-004\n");
+    return 0;
+}

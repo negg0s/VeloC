@@ -18,7 +18,7 @@ BENCH_DIR = ROOT_DIR / "benchmarks"
 # Import VeloC Compiler Subsystems
 sys.path.insert(0, str(SRC_DIR))
 from lexer import Lexer, LexerError
-from parser import Parser, ParseError
+from parser import Parser, ParseError, MultiParseError
 from codegen import CppCodegen
 from diagnostics import DiagnosticReporter, DiagnosticCode, explain_error_code
 from transpiler import VeloCTranspiler
@@ -90,9 +90,12 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         codegen = CppCodegen(str(INCLUDE_DIR), test_mode=test_mode)
         cpp_code = codegen.generate_cpp(program)
         cpp_target.write_text(cpp_code, encoding="utf-8")
-    except (LexerError, ParseError) as err:
+    except (LexerError, ParseError, MultiParseError) as err:
         reporter = DiagnosticReporter(source_str, str(source_path))
-        if isinstance(err, ParseError):
+        if isinstance(err, MultiParseError):
+            for e in err.errors:
+                reporter.error(e.code, e.message, e.token.line, e.token.col, e.token.span_len, e.help_text)
+        elif isinstance(err, ParseError):
             reporter.error(err.code, err.message, err.token.line, err.token.col, err.token.span_len, err.help_text)
         else:
             reporter.error(DiagnosticCode.E0004, err.message, err.line, err.col)
@@ -116,6 +119,8 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         opt_level,
         "-march=native",
         "-static",
+        "-fwrapv",
+        "-Wl,--no-insert-timestamp",
         "-ffast-math",
         "-fno-exceptions",
         "-fno-rtti",
@@ -274,6 +279,10 @@ def main():
 
     subparsers.add_parser("ci", help="Run full VeloC CI verification test suite")
     subparsers.add_parser("spec-coverage", help="Run specification conformance suite and coverage report")
+    diff_p = subparsers.add_parser("diff-test", help="Run differential testing suite against reference C++")
+    diff_p.add_argument("--count", type=int, default=10, help="Number of random programs to test (default 10)")
+    fuzz_p = subparsers.add_parser("fuzz", help="Run compiler mutation fuzzing engine")
+    fuzz_p.add_argument("--iterations", type=int, default=500, help="Number of fuzzing iterations (default 500)")
 
     args = parser.parse_args()
 
@@ -312,6 +321,10 @@ def main():
         subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "run_tests.py")])
     elif args.command == "spec-coverage":
         subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "conformance" / "run_conformance.py")])
+    elif args.command == "diff-test":
+        subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "differential" / "run_diff.py"), str(args.count)])
+    elif args.command == "fuzz":
+        subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "fuzz" / "fuzz_compiler.py"), str(args.iterations)])
     elif args.command == "bench":
         if hasattr(args, "all") and args.all:
             bench_script = ROOT_DIR / "benchmarks" / "rigorous_bench.py"

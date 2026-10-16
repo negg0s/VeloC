@@ -105,6 +105,11 @@ class CoalesceExpr(Expr): # a ?? b
 class TupleExpr(Expr):
     elements: List[Expr] = field(default_factory=list)
 
+@dataclass
+class MatchExpr(Expr):
+    expr: Expr = field(default_factory=Expr)
+    arms: List['MatchArm'] = field(default_factory=list)
+
 # ==========================================
 # Statements
 # ==========================================
@@ -181,7 +186,7 @@ class ForEnumerateStmt(Stmt):
 @dataclass
 class MatchArm(ASTNode):
     pattern_val: Optional[str] = None # None means wildcard '_'
-    body: Stmt = field(default_factory=Stmt)
+    body: Any = None
 
 @dataclass
 class MatchStmt(Stmt):

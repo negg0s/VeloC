@@ -1,0 +1,63 @@
+// Rule Conformance Test: Expressions (RULE-EXPR-001, RULE-EXPR-002, RULE-EXPR-003, RULE-EXPR-004)
+#include <veloc.h>
+#include <cassert>
+#include <cstdio>
+
+fn add_one(x: i32) -> i32 {
+    return x + 1;
+}
+
+fn double_it(x: i32) -> i32 {
+    return x * 2;
+}
+
+fn compute_result(flag: bool) -> Result<i32, i32> {
+    if (flag) {
+        return Result<i32, i32>::Ok(42);
+    }
+    return Result<i32, i32>::Err(99);
+}
+
+fn call_try_ok() -> Result<i32, i32> {
+    let val: i32 = compute_result(true)?;
+    return Result<i32, i32>::Ok(val + 10);
+}
+
+fn call_try_err() -> Result<i32, i32> {
+    let val: i32 = compute_result(false)?;
+    return Result<i32, i32>::Ok(val + 10);
+}
+
+fn main() -> i32 {
+    // RULE-EXPR-001: Precedence: multiplication binds tighter than addition
+    let a: i32 = 2 + 3 * 4;
+    assert(a == 14);
+
+    let b: i32 = (2 + 3) * 4;
+    assert(b == 20);
+
+    // RULE-EXPR-002: Match expression returns value from matching pattern
+    let score: i32 = 85;
+    let grade: i32 = match (score) {
+        100 => 1,
+        85 => 2,
+        _ => 3
+    };
+    assert(grade == 2);
+
+    // RULE-EXPR-003: Pipeline operator x |> f passes x as first arg to f
+    let piped: i32 = 5 |> add_one |> double_it;
+    assert(piped == 12); // (5 + 1) * 2 = 12
+
+    // RULE-EXPR-004: Try operator ? unwraps Ok or early-returns Err
+    let r_ok = call_try_ok();
+    assert(r_ok.is_ok());
+    assert(r_ok.unwrap() == 52);
+
+    let r_err = call_try_err();
+    assert(r_err.is_err());
+    assert(r_err.err == 99);
+
+    printf("PASS: RULE-EXPR-001, RULE-EXPR-002, RULE-EXPR-003, RULE-EXPR-004\n");
+    return 0;
+}
