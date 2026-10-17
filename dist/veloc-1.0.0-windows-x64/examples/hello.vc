@@ -1,5 +1,0 @@
-// Canonical VeloC Hello World
-fn main() -> i32 {
-    printf("Hello, VeloC!\n");
-    return 0;
-}

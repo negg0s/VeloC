@@ -17,13 +17,8 @@ BUILD_DIR = ROOT_DIR / "build"
 CACHE_DIR = ROOT_DIR / ".cache"
 BENCH_DIR = ROOT_DIR / "benchmarks"
 
-# Import VeloC Compiler Subsystems
+# VeloC compiler subsystems added to sys.path
 sys.path.insert(0, str(SRC_DIR))
-from lexer import Lexer, LexerError
-from parser import Parser, ParseError, MultiParseError
-from codegen import CppCodegen
-from diagnostics import DiagnosticReporter, DiagnosticCode, explain_error_code
-from transpiler import VeloCTranspiler
 
 # Clang compiler path discovered on system
 CLANG_PATH = Path("C:/Program Files/Windhawk/Compiler/bin/clang++.exe")
@@ -116,10 +111,12 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     t_macro = (time.perf_counter() - t_macro_start) * 1000.0
 
     t_lex_start = time.perf_counter()
+    from lexer import Lexer
     tokens = Lexer(source_str, str(source_path)).tokenize()
     t_lex = (time.perf_counter() - t_lex_start) * 1000.0
 
     t_parse_start = time.perf_counter()
+    from parser import Parser
     program = None
     try:
         program = Parser(tokens, source_str, str(source_path)).parse_program()
@@ -173,6 +170,8 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     # C++ Codegen
     t_codegen_start = time.perf_counter()
+    from codegen import CppCodegen
+    from transpiler import VeloCTranspiler
     try:
         if program:
             codegen = CppCodegen(str(INCLUDE_DIR), test_mode=test_mode)
@@ -425,6 +424,8 @@ def show_info():
     print("==================================================")
 
 def run_static_check(source_path: Path, bounds_report: bool = False):
+    from lexer import Lexer
+    from parser import Parser
     from analyzer import StaticAnalyzer
     source_str = source_path.read_text(encoding="utf-8")
     tokens = Lexer(source_str, str(source_path)).tokenize()
@@ -467,6 +468,9 @@ def run_semver_check(old_file: Path, new_file: Path):
 
 def run_query_trace(source_path: Path):
     from query import QueryEngine
+    from lexer import Lexer
+    from parser import Parser
+    from codegen import CppCodegen
     engine = QueryEngine(ROOT_DIR / ".cache" / "cas")
     
     content = engine.query("file_read", str(source_path), lambda: source_path.read_text(encoding="utf-8"))

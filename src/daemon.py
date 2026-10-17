@@ -11,6 +11,7 @@ import time
 import sys
 import subprocess
 from pathlib import Path
+from typing import Optional, Dict
 
 HOST = "127.0.0.1"
 PORT = 45731
@@ -18,7 +19,8 @@ ROOT_DIR = Path("D:/VeloC")
 PID_FILE = ROOT_DIR / ".cache" / "veloc_daemon.pid"
 
 class CompilerDaemon:
-    def __init__(self, host: str = HOST, port: int = PORT):
+    def __init__(self, root_dir: Path = ROOT_DIR, host: str = HOST, port: int = PORT):
+        self.root_dir = Path(root_dir)
         self.host = host
         self.port = port
         self.running = False
@@ -123,16 +125,24 @@ def send_daemon_build(file_path: Path, opt: str = "-O3", profile: str = None) ->
     except Exception:
         return None
 
-def stop_daemon():
+def daemon_client_request(req_dict: dict, host: str = HOST, port: int = PORT) -> dict:
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(1.0)
-        s.connect((HOST, PORT))
-        s.sendall(json.dumps({"command": "stop"}).encode("utf-8"))
+        s.settimeout(3.0)
+        s.connect((host, port))
+        cmd = req_dict.get("cmd") or req_dict.get("command")
+        if cmd == "shutdown":
+            cmd = "stop"
+        req = dict(req_dict)
+        req["command"] = cmd
+        s.sendall(json.dumps(req).encode("utf-8"))
+        res = json.loads(s.recv(65536).decode("utf-8"))
         s.close()
-        print("[VeloC Daemon] Stop signal sent.")
-    except Exception:
-        print("[VeloC Daemon] Daemon is not running.")
+        return res
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+VeloCDaemonServer = CompilerDaemon
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "stop":

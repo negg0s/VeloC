@@ -1,8 +1,7 @@
 # Build & compilation outputs
 build/
 bin/
-dist/*.zip
-dist/*.tar.gz
+dist/
 *.exe
 *.o
 *.obj
