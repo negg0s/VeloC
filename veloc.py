@@ -367,7 +367,11 @@ def watch_veloc(source_path: Path):
     except KeyboardInterrupt:
         print("\n[VeloC Watch] Stopped watching.")
 
-def test_veloc(source_path: Path, verbose: bool = False):
+def test_veloc(source_path: Path = None, verbose: bool = False):
+    if source_path is None:
+        print("[VeloC Test Runner] Running golden regression test suite...")
+        res = subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "test_golden.py")])
+        return res.returncode
     exe_path = build_veloc(source_path, test_mode=True, verbose=verbose)
     print(f"[VeloC Testing] Running built-in test suite for {source_path.name}...")
     res = subprocess.run([str(exe_path)])
@@ -489,6 +493,7 @@ def run_query_trace(source_path: Path):
 
 def main():
     parser = argparse.ArgumentParser(description="VeloC: The High-Performance Faster C++ Dialect & Toolchain")
+    parser.add_argument("-V", "--version", action="version", version="VeloC 1.0.0 (x86_64-pc-windows-msvc/clang)")
     subparsers = parser.add_subparsers(dest="command")
 
     build_p = subparsers.add_parser("build", help="Compile a .vc source file")
@@ -512,7 +517,7 @@ def main():
     run_p.add_argument("args", nargs=argparse.REMAINDER, help="Arguments to pass to the program")
 
     test_p = subparsers.add_parser("test", help="Compile and run built-in test blocks (test \"...\")")
-    test_p.add_argument("file", help="Path to .vc file containing tests")
+    test_p.add_argument("file", nargs="?", default=None, help="Path to .vc file containing tests (or run all tests if omitted)")
     test_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     init_p = subparsers.add_parser("init", help="Scaffold a new VeloC project in current directory")
@@ -736,7 +741,7 @@ def main():
         else:
             watch_veloc(Path(args.file))
     elif args.command == "test":
-        test_veloc(Path(args.file), verbose=args.verbose)
+        test_veloc(Path(args.file) if args.file else None, verbose=args.verbose)
     elif args.command == "init":
         from pkg.manager import PackageManager
         pm = PackageManager(ROOT_DIR)
