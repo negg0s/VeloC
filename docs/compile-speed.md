@@ -15,7 +15,7 @@ Prior to Stage 9, every VeloC application compiled from a cold state in approxim
 Detailed LLVM `-ftime-trace` execution graphs revealed that:
 1. **VeloC Frontend (Python):** Lexing, parsing, and transpiling 1,000 to 10,000 lines of code accounted for only **15 to 35 ms** (< 1% of total time).
 2. **Fixed Clang C++ Overhead (97%):** Every compilation unit unconditionally prepended the monolithic `include/veloc.h` (3,716 lines) which pulled in heavy C++ standard library headers: `<iostream>`, `<chrono>`, `<thread>`, `<vector>`, `<unordered_map>`, `<sstream>`, `<fstream>`, and `<functional>`.
-3. **Linker Overhead (GNU ld):** Default MinGW `ld.exe` performed single-threaded section resolution, relocation, and debug info generation, consuming 350–550 ms per invocation.
+3. **Linker Overhead (GNU ld):** Default MinGW `ld.exe` performed single-threaded section resolution, relocation, and debug info generation, consuming 350-550 ms per invocation.
 
 ---
 

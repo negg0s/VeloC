@@ -1,6 +1,6 @@
 # VeloC 8.5: Ультимативный диалект C++ для экстремальной производительности
 
-**VeloC** (*Velocity + C*) — язык системного программирования на базе C++, устраняющий многолетние боли разработчиков (жалобы r/cpp, Hacker News, GameDev сообществ) и дающий рекордную аппаратную скорость за счет AVX2 SIMD, SoA, Core Pinning, branchless алгоритмов и zero-allocation архитектуры.
+**VeloC** (*Velocity + C*) - язык системного программирования на базе C++, устраняющий многолетние боли разработчиков (жалобы r/cpp, Hacker News, GameDev сообществ) и дающий рекордную аппаратную скорость за счет AVX2 SIMD, SoA, Core Pinning, branchless алгоритмов и zero-allocation архитектуры.
 
 ---
 
@@ -16,20 +16,20 @@
 | **GEMM (L1 Cache)** | Naive C++ (-O3) | `strict` | $64 \times 64$ | 1T | **35.0 GFLOPS** | **50.8% FMA Single**| 0 ULP |
 | **Dot Product** | `std::inner_product` (-O3) | `strict` | 20M floats (80MB) | 1T | **9.51 GB/s** | **23.7% STREAM** | 0 ULP |
 | **STREAM Memory Copy** | Reference STREAM C (-O3)| `strict` | 10M floats (40MB) | 1T | **40.13 GB/s** | **94.1% DDR4 Max** | Exact |
-| **Eytzinger Search (L1)**| `std::lower_bound` (-O3) | Integer | 1,024 elements | 1T | **15.4 ns / op** (4.26x) | — | Exact |
-| **Eytzinger Search (RAM)**| `std::lower_bound` (-O3)| Integer | 4,194,304 elements | 1T | **256.5 ns / op** (2.43x)| — | Exact |
-| **SwissTable (Insert)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **70.2 ns / op** (10.4x) | — | Exact |
-| **SwissTable (Hit)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **87.9 ns / op** (1.34x) | — | Exact |
-| **SwissTable (Miss)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **25.1 ns / op** (6.52x) | — | Exact |
+| **Eytzinger Search (L1)**| `std::lower_bound` (-O3) | Integer | 1,024 elements | 1T | **15.4 ns / op** (4.26x) | - | Exact |
+| **Eytzinger Search (RAM)**| `std::lower_bound` (-O3)| Integer | 4,194,304 elements | 1T | **256.5 ns / op** (2.43x)| - | Exact |
+| **SwissTable (Insert)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **70.2 ns / op** (10.4x) | - | Exact |
+| **SwissTable (Hit)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **87.9 ns / op** (1.34x) | - | Exact |
+| **SwissTable (Miss)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **25.1 ns / op** (6.52x) | - | Exact |
 | **Hardware CRC32C** | zlib / Software CRC (-O3) | Bitwise | 64-byte chunks | 1T | **25.53 GB/s** | Hardware SSE4.2 | 0 ULP |
-| **Quicksort (Sorted)** | `std::sort` (-O3) | Integer | 1,000,000 ints | 1T | **2.27 ms** (441M/s) | — | Exact |
-| **Quicksort (Random)** | `std::sort` (-O3) | Integer | 1,000,000 ints | 1T | **61.90 ms** (16M/s) | — | Exact |
+| **Quicksort (Sorted)** | `std::sort` (-O3) | Integer | 1,000,000 ints | 1T | **2.27 ms** (441M/s) | - | Exact |
+| **Quicksort (Random)** | `std::sort` (-O3) | Integer | 1,000,000 ints | 1T | **61.90 ms** (16M/s) | - | Exact |
 | **Math: `exp(x)`** | `libm expf` (C99 -O3) | `strict` | Uniform & Tricky | 1T | **46.6 ns** | IEEE-754 | **0.0 ULP** |
-| **Math: `exp_fast(x)`** | SLEEF / Polynomial (-O3) | `fast` | Uniform & Tricky | 1T | **34.9 ns** (1.33x) | — | **<= 2.8 ULP** |
-| **Math: `log_fast(x)`** | `libm logf` (C99 -O3) | `fast` | Uniform & Tricky | 1T | **10.3 ns** (3.2x) | — | **<= 1.0 ULP** |
-| **Math: `sqrt_fast(x)`**| `libm sqrtf` (C99 -O3) | `fast` | Uniform & Tricky | 1T | **2.65 ns** (3.4x) | — | **<= 3.0 ULP** |
-| **Kahan Reduction** | Naive float sum (-O3) | `reproducible` | Ill-conditioned $10^8$| 1T | **1000.0 (Exact)** | — | **0 ULP** (vs Naive 0.0) |
-| **Pairwise Reduction** | Naive parallel sum (-O3)| `reproducible` | 100,000 floats | 1..12T| **100% Bit-Identical**| — | **0 ULP** |
+| **Math: `exp_fast(x)`** | SLEEF / Polynomial (-O3) | `fast` | Uniform & Tricky | 1T | **34.9 ns** (1.33x) | - | **<= 2.8 ULP** |
+| **Math: `log_fast(x)`** | `libm logf` (C99 -O3) | `fast` | Uniform & Tricky | 1T | **10.3 ns** (3.2x) | - | **<= 1.0 ULP** |
+| **Math: `sqrt_fast(x)`**| `libm sqrtf` (C99 -O3) | `fast` | Uniform & Tricky | 1T | **2.65 ns** (3.4x) | - | **<= 3.0 ULP** |
+| **Kahan Reduction** | Naive float sum (-O3) | `reproducible` | Ill-conditioned $10^8$| 1T | **1000.0 (Exact)** | - | **0 ULP** (vs Naive 0.0) |
+| **Pairwise Reduction** | Naive parallel sum (-O3)| `reproducible` | 100,000 floats | 1..12T| **100% Bit-Identical**| - | **0 ULP** |
 
 ---
 

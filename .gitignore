@@ -1,10 +1,51 @@
+# Build & compilation outputs
 build/
-.cache/
-__pycache__/
-*.pyc
+bin/
+dist/*.zip
+dist/*.tar.gz
 *.exe
 *.o
+*.obj
+*.pyd
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
 *.hash
-projects/bench_incremental/
+
+# Caches & temporary files
+.cache/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tmp
+*.temp
+
+# Virtual environments
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+env/
+ENV/
+
+# IDE & editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs and runtime artifacts
 *.log
+wal.log
 game_frame_trace.json
+projects/bench_incremental/
+.veloc/learn/workspace/autograding/

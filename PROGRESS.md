@@ -110,7 +110,7 @@
   - 2D пространственный хэш-грид (`SpatialGrid2D`) для широкой фазы коллизий
   - AVX2 SIMD физический движок частиц (`SIMDParticles2D`, 8-wide SoA)
   - Тесты: `packages/veloc-game/tests/test_ecs.vc` (PASSED)
-  - Бенчмарк: `bench_ecs_1m.vc` — 1,000,000 компонентов за **0.96 ms** (1,040.75 M сущностей/сек)
+  - Бенчмарк: `bench_ecs_1m.vc` - 1,000,000 компонентов за **0.96 ms** (1,040.75 M сущностей/сек)
   - Демо: `packages/veloc-game/examples/demo_game.vc` (128k частиц, 120 кадров, экспорт трейса)
 - [x] **9.2 Вертикаль 2: ИИ и тензорный движок (`packages/veloc-ai`)**:
   - N-мерные тензоры (`Tensor<T>`) с непрерывным выровненным по 32 байта хранилищем и срезами
@@ -118,46 +118,46 @@
   - BPE токенизатор (`BPETokenizer`) для NLP/LLM
   - Micro Autograd & многослойный перцептрон (`MLP`) с обратным распространением ошибки
   - Тесты: `packages/veloc-ai/tests/test_ai.vc` (PASSED)
-  - Бенчмарк: `bench_gemm.vc` — AVX2 FMA GEMM 256x256 за 1.09 ms (30.72 GFLOPS)
-  - Демо: `packages/veloc-ai/examples/demo_ai.vc` — обучение MLP на нелинейной задаче XOR (0.000000 MSE)
+  - Бенчмарк: `bench_gemm.vc` - AVX2 FMA GEMM 256x256 за 1.09 ms (30.72 GFLOPS)
+  - Демо: `packages/veloc-ai/examples/demo_ai.vc` - обучение MLP на нелинейной задаче XOR (0.000000 MSE)
 - [x] **9.3 Вертикаль 3: Научные вычисления (`packages/veloc-sci`)**:
   - Линейная алгебра: разложение Холецкого (`cholesky`), LU-разложение с выбором ведущего элемента и решение СЛАУ (`lu_solve`)
   - Быстрое преобразование Фурье: Cooley-Tukey Radix-2 FFT (**56.17 M сэмплов/сек**, ускорение 6,898x против прямого ДПФ)
   - Численное интегрирование ОДУ 4-го порядка (`rk4_step`) с нулевым дрейфом энергии ($< 10^{-8}$)
   - Метод Монте-Карло (`monte_carlo_integrate_1d`)
   - Тесты: `packages/veloc-sci/tests/test_sci.vc` (PASSED)
-  - Бенчмарк: `bench_fft.vc` — 16k комплексный FFT за 0.29 ms
-  - Демо: `packages/veloc-sci/examples/demo_sci.vc` — симуляция орбиты планеты и расчет числа PI
+  - Бенчмарк: `bench_fft.vc` - 16k комплексный FFT за 0.29 ms
+  - Демо: `packages/veloc-sci/examples/demo_sci.vc` - симуляция орбиты планеты и расчет числа PI
 - [x] **9.4 Вертикаль 4: Обработка данных и БД (`packages/veloc-data`)**:
   - Arrow-подобный колоночный DataFrame (`DataFrame`, `Column<T>`) с bitmap валидности
   - AVX2 векторизованное агрегирование колонок (`sum_f64`) с пропускной способностью **18.89 GB/s** (ускорение 3.2x против строк)
   - Быстрый CSV парсер (`CSVReader`) без динамических аллокаций на ячейку
   - Встраиваемая LSM-Tree база данных (`LSMTree`) с MemTable и бинарным журналом упреждающей записи (`wal.log`), краш-тесты
   - Тесты: `packages/veloc-data/tests/test_data.vc` (PASSED)
-  - Бенчмарк: `bench_dataframe.vc` — сканирование 1M строк за 0.42 ms (18.89 GB/s)
-  - Демо: `packages/veloc-data/examples/demo_data.vc` — пайплайн загрузки CSV транзакций в LSM-хранилище
+  - Бенчмарк: `bench_dataframe.vc` - сканирование 1M строк за 0.42 ms (18.89 GB/s)
+  - Демо: `packages/veloc-data/examples/demo_data.vc` - пайплайн загрузки CSV транзакций в LSM-хранилище
 - [x] **9.5 Вертикаль 5: Сетевой стек и веб (`packages/veloc-net`)**:
   - Кроссплатформенная абстракция сокетов Winsock2 / POSIX (`NetInit`)
   - HTTP/1.1 парсер запросов (`HttpRequest`) и сериализатор ответов (`HttpResponse`) с производительностью **3,406,261 req/s**
   - Движок синхронизации сетевого состояния игр с поддержкой отката (`RollbackEngine`)
   - Тесты: `packages/veloc-net/tests/test_net.vc` (PASSED)
-  - Бенчмарк: `bench_http.vc` — 100,000 HTTP запросов за 29.36 ms (3.4M req/s)
-  - Демо: `packages/veloc-net/examples/demo_net.vc` — неблокирующий роутинг REST API
+  - Бенчмарк: `bench_http.vc` - 100,000 HTTP запросов за 29.36 ms (3.4M req/s)
+  - Демо: `packages/veloc-net/examples/demo_net.vc` - неблокирующий роутинг REST API
 - [x] **9.6 Вертикаль 6: Встраиваемые системы без кучи (`packages/veloc-embedded`)**:
   - Полностью статический пул памяти без использования кучи (`StaticPool`) с детерминированным O(1) временем
   - Фиксированная точка Q16.16 (`Fixed16`) для вычислений без аппаратного FPU (**478.23 MOPS**)
   - Стандартная аппаратная/табличная контрольная сумма IEEE CRC32 (`crc32`)
   - Детерминированные конечные автоматы (`FSM`)
   - Тесты: `packages/veloc-embedded/tests/test_embedded.vc` (PASSED)
-  - Бенчмарк: `bench_fixed.vc` — 10,000,000 операций с фиксированной точкой за 20.91 ms (478.23 MOPS)
-  - Демо: `packages/veloc-embedded/examples/demo_embedded.vc` — автономный сенсорный узел телеметрии
+  - Бенчмарк: `bench_fixed.vc` - 10,000,000 операций с фиксированной точкой за 20.91 ms (478.23 MOPS)
+  - Демо: `packages/veloc-embedded/examples/demo_embedded.vc` - автономный сенсорный узел телеметрии
 - [x] **9.7 Вертикаль 7: CLI инструментарий и поиск (`packages/veloc-cli`)**:
   - Парсер аргументов командной строки (`ArgParser`)
   - Форматированные цветные ANSI терминальные таблицы (`TerminalTable`) с автоподбором ширины
   - AVX2 SIMD поиск подстрок (`SIMDGrep`) со сканированием на скорости шины памяти (**10.32 GB/s**)
   - Тесты: `packages/veloc-cli/tests/test_cli.vc` (PASSED)
-  - Бенчмарк: `bench_grep.vc` — сканирование 16 МБ буфера за 1.63 ms
-  - Демо: `packages/veloc-cli/examples/demo_cli.vc` — рендеринг таблицы компонентов и поиск по корпусу
+  - Бенчмарк: `bench_grep.vc` - сканирование 16 МБ буфера за 1.63 ms
+  - Демо: `packages/veloc-cli/examples/demo_cli.vc` - рендеринг таблицы компонентов и поиск по корпусу
 
 ### 10. Этап 4: Самохостинг, Миграция, Playground, Инструменты (Tooling & Ecosystem)
 - [x] **10.1 Bootstrap компилятор на VeloC (`src/bootstrap/veloc_stage1.vc`)**:
@@ -387,11 +387,11 @@
 - [x] **16.1 Блок A: Диагностика и выявление узких мест**:
   - Флаги `--timings` и `--json` для профилирования холодной сборки по фазам с точностью до 0.1 мс.
   - Анализ `-ftime-trace`: 97% времени уходило на компиляцию монолитного заголовка `veloc.h` (3,716 строк) и STL-шаблонов (`<iostream>`, `<chrono>`, `<thread>`, `<vector>`, `<unordered_map>`, `<sstream>`, `<fstream>`).
-  - Базовые замеры Clang++ в `benchmarks/results/build_benchmarks.json`: пустой C++ (440.4 ms), stdio hello (470.4 ms), iostream hello (1,894.4 ms), full `veloc.h` (3,518.9 ms), 1k LOC (512.3 ms), 10k LOC (994.3 ms), 100k LOC (5,391.9 ms), 7 флагманских приложений (~3.2–3.8 s).
+  - Базовые замеры Clang++ в `benchmarks/results/build_benchmarks.json`: пустой C++ (440.4 ms), stdio hello (470.4 ms), iostream hello (1,894.4 ms), full `veloc.h` (3,518.9 ms), 1k LOC (512.3 ms), 10k LOC (994.3 ms), 100k LOC (5,391.9 ms), 7 флагманских приложений (~3.2-3.8 s).
 - [x] **16.2 Блок B: Устранение фиксированной цены сборки**:
   - Создан облегченный рантайм `include/veloc_core.h` без тяжелых контейнеров STL (компиляция 867.2 ms на холодную).
   - Разработан менеджер PCH `src/pch_manager.py` с автоматической генерацией и валидацией флагов компилятора (`-std=c++20`, `-static`, `-fwrapv`).
-  - Сокращение времени сборки: с 3,518.9 ms до **713.6 ms** (`veloc.h` + PCH) и **398.1 ms** (`veloc_core.h` + PCH) — **ускорение от 5x до 9x**!
+  - Сокращение времени сборки: с 3,518.9 ms до **713.6 ms** (`veloc.h` + PCH) и **398.1 ms** (`veloc_core.h` + PCH) - **ускорение от 5x до 9x**!
   - Интеграция параллельного линкера LLD (`ld.lld.exe`) с флагами `-fuse-ld=lld` и `-Wl,--gc-sections` (1.8x ускорение линковки).
 - [x] **16.3 Блок C: Фоновый демон, кэш объектов и Hot Reload**:
   - Фоновый сервер компиляции `src/daemon.py` (`veloc daemon`) с прогретым кэшем AST в памяти на порту 45731.

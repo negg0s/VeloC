@@ -13,7 +13,7 @@ This guide is designed for Rust developers who appreciate memory safety and stro
 | **Error Handling** | `Result<T, E>`, `Option<T>`, `?` | `Result<T, E>`, `Option<T>`, `?` | Identical idiomatic pattern |
 | **Destructors** | `Drop` trait at scope end | `defer` statement + RAII structs | Explicit execution order without drop-check edge cases |
 | **SIMD** | `std::simd` (nightly) or intrinsics | First-class `soa struct` + `f32x8` | Native compiler support for SoA alignment |
-| **Build Times** | Often 30s – 5min for medium crates | Sub-second with PCH and LLD | Instant iterative development feedback |
+| **Build Times** | Often 30s - 5min for medium crates | Sub-second with PCH and LLD | Instant iterative development feedback |
 
 ---
 

@@ -1,6 +1,6 @@
 # АУДИТ ПРОЕКТА VELOC (Состояние до перехода к VeloC 9.0)
 Дата аудита: 2026-10-16
-Окружение: Windows, Intel Core i5-10400F (6 физических ядер, 12 потоков Comet Lake, 2.9–4.3 GHz, 12 MB L3, AVX2, FMA3)
+Окружение: Windows, Intel Core i5-10400F (6 физических ядер, 12 потоков Comet Lake, 2.9-4.3 GHz, 12 MB L3, AVX2, FMA3)
 Компилятор: Clang 20 (Windhawk LLVM toolchain, target: i686-w64-windows-gnu)
 
 ---
@@ -34,24 +34,24 @@
 
 ## 2. Статус текущих файлов и тестов
 * На чистом кэше запущены и проверены все 19 примеров в `D:\VeloC\examples`:
-  - `ai_gelu_and_lerp.vc` — PASSED
-  - `ai_loss_and_argmax.vc` — PASSED
-  - `ai_rmsnorm_and_iflet.vc` — PASSED
-  - `ai_scan_and_clamp.vc` — PASSED
-  - `ai_silu_and_cosine.vc` — PASSED
-  - `ai_softmax_and_search.vc` — PASSED
-  - `ai_vectors_and_syntax.vc` — PASSED
-  - `boost_killer.vc` — PASSED
-  - `community_features.vc` — PASSED
-  - `extreme_simd_and_lambdas.vc` — PASSED
-  - `extreme_speed.vc` — PASSED
-  - `json_and_functional.vc` — PASSED
-  - `modern_wishes.vc` — PASSED
-  - `particles.vc` — PASSED
-  - `particles_turbo.vc` — PASSED
-  - `pipe_and_streaming.vc` — PASSED
-  - `radix_and_reflection.vc` — PASSED
-  - `reflection_and_simd3d.vc` — PASSED
-  - `simd_media_and_coalesce.vc` — PASSED
+  - `ai_gelu_and_lerp.vc` - PASSED
+  - `ai_loss_and_argmax.vc` - PASSED
+  - `ai_rmsnorm_and_iflet.vc` - PASSED
+  - `ai_scan_and_clamp.vc` - PASSED
+  - `ai_silu_and_cosine.vc` - PASSED
+  - `ai_softmax_and_search.vc` - PASSED
+  - `ai_vectors_and_syntax.vc` - PASSED
+  - `boost_killer.vc` - PASSED
+  - `community_features.vc` - PASSED
+  - `extreme_simd_and_lambdas.vc` - PASSED
+  - `extreme_speed.vc` - PASSED
+  - `json_and_functional.vc` - PASSED
+  - `modern_wishes.vc` - PASSED
+  - `particles.vc` - PASSED
+  - `particles_turbo.vc` - PASSED
+  - `pipe_and_streaming.vc` - PASSED
+  - `radix_and_reflection.vc` - PASSED
+  - `reflection_and_simd3d.vc` - PASSED
+  - `simd_media_and_coalesce.vc` - PASSED
 * **Результат:** 19 из 19 примеров работоспособны, синтаксические конструкции функционируют.
 * Кэш `.cache` полностью очищен.
