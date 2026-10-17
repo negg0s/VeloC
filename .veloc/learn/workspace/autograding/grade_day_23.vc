@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    int max_i32 = 2147483647;
+    int wrapped = max_i32 + 1;
+    printf("Wrapped: %d\n", wrapped);
+    return 0;
+}

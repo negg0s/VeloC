@@ -1,0 +1,5 @@
+fn main() -> i32 {
+    usize total_bytes = 1024;
+    printf("Tracking Alloc: %llu bytes\n", (unsigned long long)total_bytes);
+    return 0;
+}

@@ -1,0 +1,39 @@
+trigger:
+  - main
+  - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+strategy:
+  matrix:
+    Python311:
+      python.version: '3.11'
+    Python312:
+      python.version: '3.12'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y clang lld ninja-build cmake
+  displayName: 'Install LLVM / Clang Toolchain'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install pytest numpy ipykernel
+  displayName: 'Install Python Dependencies'
+
+- script: |
+    python src/doc_manager.py --check
+    python src/doc_manager.py --test
+  displayName: 'Verify Documentation & Snippets'
+
+- script: |
+    python tests/test_golden.py
+    pytest tests/test_bilingual_diagnostics.py
+  displayName: 'Run Regression Suite'

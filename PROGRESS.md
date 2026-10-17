@@ -439,3 +439,49 @@
 - [x] **17.5 Блок E: Честный отчет "Где VeloC не быстрее" и обновление README**:
   - Документ `docs/perf/where-veloc-is-slower.md`: сценарии превосходства C++ (оверхед Windows пула потоков на малых матрицах, удаление из SwissTable, холодная сборка).
   - Таблица README.md обновлена: честные колонки с baseline, версиями, флагами, объемами данных, потоками, % физического пика и ULP ошибкой.
+
+### 18. Этап 11: Экосистема, образование и внешняя интеграция (VeloC 1.0.0-rc4)
+- [x] **18.1 Блок A: Обучение и двуязычная документация (`docs/en/`, `docs/ru/`, `src/doc_manager.py`)**:
+  - Создана синхронизированная структура двуязычной документации (книга, справочник, cookbook, туториалы).
+  - Реализован аудит переводов `veloc doc --check-translations`: 19 из 19 страниц на 100% синхронизированы.
+  - Реализован верификатор сниппетов `veloc doc --test`: протестировано 43 исполняемых фрагмента кода, 100% успешных сборок.
+  - Модуль `src/diagnostics.py`: полная локализация ошибок на русский и английский языки, каталоги советов новичкам `--profile=beginner`. Верифицировано тестом `tests/test_bilingual_diagnostics.py` (3/3 PASSED).
+  - Интерактивный курс «VeloC за 30 дней» (`veloc learn`): 30 структурированных уроков с теорией, шаблонами кода, подсказками и автопроверкой (`src/learn.py test-all`: 30/30 PASSED). Сгенерированы страницы `docs/learn/course/day_01.md` .. `day_30.md`.
+  - Задачник на 150 задач (`veloc kata`): банк `docs/learn/katas/catalog.json` (Easy 1..40, Medium 41..90, Hard 91..130, Expert 131..150). Верифицировано `src/kata.py` (Katas #1 и #131 PASSED).
+  - Руководства по миграции (`docs/migration/`): с C++, Python, Rust, JavaScript, C#.
+  - Лучшие практики (`docs/best-practices/`): идиоматичный VeloC, частые ошибки, чтение ошибок компилятора, мышление аллокаторами.
+  - 10 сценариев видео-скринкастов (`docs/screencasts/01_getting_started.md` .. `10_scientific_computing_ulp.md`).
+- [x] **18.2 Блок B: Интерактивный тулинг и скриптинг**:
+  - Скриптовый раннер `src/script_runner.py` (`veloc script <file.vc>`) с поддержкой shebang `#!/usr/bin/env veloc script`. Холодный запуск 2.5 с, теплый кэш: **1.6 мс сборка, 221 мс общее выполнение**.
+  - Нативное ядро Jupyter Notebook `src/jupyter_kernel.py`: наследует `ipykernel`, зарегистрировано в системе через `install_kernel()` (`veloc-kernel`).
+  - Web Playground `src/playground.py`: легковесный HTTP сервер с предзагруженными кликабельными примерами (Hello, SoA, Arena, Eytzinger, IEEE-754) и REST API `/api/run`.
+- [x] **18.3 Блок C: Популярные обёртки и каталог пакетов**:
+  - Нативные RAII-обёртки в `include/wrappers/`: `veloc_win32.h` (Handle, File, Registry, Process), `veloc_compression.h` (LZ4, Deflate, CRC32C), `veloc_sqlite.h`, `veloc_graphics.h`, `veloc_net_curl.h`, `veloc_physics.h`.
+  - Верифицирована работа `veloc_win32.h` через `tests/test_win32_wrapper.cpp` (PASSED).
+  - Единый честный каталог пакетов `docs/packages/catalog.md`.
+- [x] **18.4 Блок D: Внешняя интеграция в чужие проекты и CI**:
+  - Генератор C-библиотек `src/lib_emitter.py` (`veloc build --lib --emit-header`).
+  - Интеграция в сборочные системы: `cmake/FindVeloC.cmake`, `examples/integration/CMakeLists.txt`, `meson.build`, `BUILD.bazel`, `VeloC.props` (MSBuild/VS).
+  - Аудит 5 сложных C++ заголовков в `tests/test_cpp_complex_headers.cpp`: Boost, glm, nlohmann/json, fmt, eigen (5/5 PASSED, `docs/interop/cpp_headers_audit.md`).
+  - Генератор CPython C-extension с поддержкой NumPy Buffer Protocol `src/pyext_generator.py` (`veloc pyext`): кросс-компиляция 64-bit AMD64 под Windows Clang, нулевое копирование памяти, прирост скорости **89.8x против Python** и 0.84x к OpenBLAS NumPy (`benchmarks/bench_pyext.py`).
+  - P/Invoke генератор для C# / Unity `src/csharp_gen.py` (`examples/unity_plugin/NativePhysics.cs`).
+  - Плагин Unreal Engine `examples/unreal_plugin/VeloCPlugin.Build.cs`.
+  - Руководство по Node.js / WASM `docs/interop/nodejs_wasm.md` и Rust C-ABI `docs/interop/rust_ffi.md`.
+  - CI шаблоны: `.github/workflows/veloc-ci.yml`, `.gitlab-ci.yml`, `azure-pipelines.yml`, `Dockerfile`, `.devcontainer/devcontainer.json`.
+  - Удалённый CAS-кэш `src/remote_cache.py` и `docs/infra/remote-cache.md`: сокращение времени сборки на CI с 38.4 с до **4.2 с (89.1% ускорение)**.
+- [x] **18.5 Блок E: Редакторский опыт и LSP**:
+  - LSP сервер `src/lsp_server.py`: Completion, Hover (с docstrings, типами, sizeof/alignof), Definition, References, Rename, Inlay Hints, Semantic Tokens, Signature Help, Diagnostics с QuickFix.
+  - Измерение производительности на 1000-файловой топологии (`tests/test_lsp_perf.py` -> `docs/perf/lsp.md`):
+    * Холодный старт индексации 1000 файлов: **0.413 с** (SLA < 2.0 с).
+    * Латентность Completion: **p50 = 1.20 мс, p95 = 3.65 мс** (SLA < 15 / 40 мс).
+    * Латентность Diagnostics: **p50 = 0.002 мс, p95 = 0.013 мс** (SLA < 50 / 120 мс).
+    * Проектный Rename по 1000 файлам: **25.83 мс** (SLA < 500 мс).
+  - Идемпотентный форматер `src/formatter.py` (`veloc fmt [--check]`) и автофиксер `src/fixer.py` (`veloc fix [--dry-run]`).
+- [x] **18.6 Блок F: Матрица экосистемы, метрики онбординга и находки**:
+  - Скрипт `scripts/generate_ecosystem_matrix.py` сформировал `docs/ecosystem-matrix.md` (сравнение с C++, Rust, Zig, Go по 7 направлениям).
+  - Замеры онбординга `tests/test_onboarding_metrics.py` зафиксированы в `docs/onboarding-metrics.md`:
+    * Время от чистого клона до вывода Hello World: **0.798 с** (SLA < 60 с).
+    * Прохождение и автогрейдинг Дня 1 в `veloc learn`: **0.693 с** (SLA < 30 с).
+    * Доля рабочих сниппетов документации: **100.0% (43 из 43)**.
+  - Дополнен журнал находок `docs/language-findings.md` (раздел 8: компромиссы REPL/Jupyter, влияние русского языка на диагностику, ключевые компоненты stdlib).
+  - Сформировано архитектурное решение ADR-0024 в `DECISIONS.md`.

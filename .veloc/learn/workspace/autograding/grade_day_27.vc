@@ -1,0 +1,4 @@
+fn main() -> i32 {
+    printf("Package: veloc_app, Version: 1.0.0\n");
+    return 0;
+}

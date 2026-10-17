@@ -1,0 +1,5 @@
+fn main() -> i32 {
+    int inline_arr[4] = {1, 2, 3, 4};
+    printf("Inline count: 4, item[3]: %d\n", inline_arr[3]);
+    return 0;
+}

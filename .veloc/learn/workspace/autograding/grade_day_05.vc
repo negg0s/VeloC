@@ -1,0 +1,12 @@
+fn sum_to_n(n: i32) -> i32 {
+    let mut total: i32 = 0;
+    for (int i = 1; i <= n; i++) {
+        total += i;
+    }
+    return total;
+}
+
+fn main() -> i32 {
+    printf("Sum: %d\n", sum_to_n(10));
+    return 0;
+}

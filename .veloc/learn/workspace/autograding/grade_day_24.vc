@@ -1,0 +1,5 @@
+fn main() -> i32 {
+    f32 inf_val = 1.0f / 0.0f;
+    printf("Is Inf: %d\n", isinf(inf_val) ? 1 : 0);
+    return 0;
+}

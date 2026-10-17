@@ -1,0 +1,6 @@
+#!/usr/bin/env veloc script
+
+fn main() -> i32 {
+    printf("Script executed successfully via shebang!\n");
+    return 0;
+}

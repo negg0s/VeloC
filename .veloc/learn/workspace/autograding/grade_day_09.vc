@@ -1,0 +1,19 @@
+enum Status {
+    Ok = 0,
+    Warn = 1,
+    Fail = 2,
+};
+
+fn evaluate(s: Status) -> i32 {
+    switch (s) {
+        case Ok: return 200;
+        case Warn: return 300;
+        case Fail: return 500;
+    }
+    return 0;
+}
+
+fn main() -> i32 {
+    printf("Code: %d\n", evaluate(Ok));
+    return 0;
+}

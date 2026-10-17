@@ -47,3 +47,11 @@
   - [x] Блок C: Ядра против сильных baseline (STREAM 40.13 GB/s, AVX2 FMA GEMM 35.0 GFLOPS, Eytzinger search 4.26x к `std::lower_bound`, SwissTable 10.36x к `std::unordered_map`, CRC32C 25.53 GB/s, документация ядер в `docs/perf/kernels/`).
   - [x] Блок D: Безопасность хвостовых итераций и граничные условия (длины 0..67, canaries 0 corruptions, невыровненные указатели, NaN/subnormal дорожки, `tests/test_simd_dispatch_tails.py`).
   - [x] Блок E: Честный отчет "Где VeloC не быстрее" (`docs/perf/where-veloc-is-slower.md`) и обновление таблицы README.md.
+- [x] **ЭТАП 11**: Экосистема, образование и внешняя интеграция (VeloC 1.0.0-rc4). (Выполнен 2026-10-17).
+  - [x] Блок A: Обучение и двуязычная документация (`docs/en/` и `docs/ru/`, `veloc doc --check-translations` 100% sync, `veloc doc --test` 43/43 pass, двуязычные диагностики `src/diagnostics.py`, интерактивный курс `veloc learn` 30/30 lessons, 150 Katas `veloc kata`, 5 гайдов по миграции, 10 скринкастов).
+  - [x] Блок B: Интерактивный тулинг и скриптинг (`veloc script` shebang с 1.6 ms кэшем, Jupyter Kernel `src/jupyter_kernel.py`, Web Playground `src/playground.py`).
+  - [x] Блок C: Популярные обёртки и каталог пакетов (`veloc_win32.h`, `veloc_compression.h`, `veloc_sqlite.h`, `veloc_graphics.h`, `veloc_net_curl.h`, `veloc_physics.h`, `docs/packages/catalog.md`).
+  - [x] Блок D: Внешняя интеграция в чужие проекты и CI (`FindVeloC.cmake`, `meson.build`, `BUILD.bazel`, `VeloC.props`, аудит C++ заголовков 5/5, `veloc pyext` с NumPy buffer protocol 89.8x к Python, C# P/Invoke `src/csharp_gen.py`, Unreal Engine plugin, CI шаблоны, CAS кэш `src/remote_cache.py` с 89.1% ускорением).
+  - [x] Блок E: Редакторский опыт и LSP (`src/lsp_server.py`, замеры на 1,000 файлах в `docs/perf/lsp.md`: cold start < 0.42 с, completion p50 = 1.20 мс, diagnostics p50 = 0.002 мс, rename 25.83 мс, `veloc fmt [--check]`, `veloc fix [--dry-run]`).
+  - [x] Блок F: Матрица экосистемы и онбординг (`scripts/generate_ecosystem_matrix.py` -> `docs/ecosystem-matrix.md`, замеры онбординга `tests/test_onboarding_metrics.py` -> `docs/onboarding-metrics.md`, журнал находок `docs/language-findings.md`, ADR-0024 в `DECISIONS.md`).
+

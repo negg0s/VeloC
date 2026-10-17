@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    int count = 11;
+    int simd_chunks = count / 8;
+    int tail_rem = count % 8;
+    printf("Chunks: %d, Tail: %d\n", simd_chunks, tail_rem);
+    return 0;
+}

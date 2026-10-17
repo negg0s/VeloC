@@ -1,0 +1,60 @@
+name: VeloC CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (Windows / Linux)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install System Toolchain (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld ninja-build cmake
+
+      - name: Install System Toolchain (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install -y llvm ninja
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest numpy ipykernel
+
+      - name: Validate Golden Suite & Regression Tests
+        run: |
+          python tests/test_golden.py
+          pytest tests/test_bilingual_diagnostics.py
+          pytest tests/test_learn.py
+
+      - name: Documentation Translation & Snippet Audit
+        run: |
+          python src/doc_manager.py --check
+          python src/doc_manager.py --test
+
+      - name: Run Crater Smoke Validation
+        run: |
+          python veloc.py crater --smoke

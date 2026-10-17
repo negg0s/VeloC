@@ -1,0 +1,21 @@
+{
+  "name": "VeloC Development Container",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/usr/bin/python3"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "llvm-vs-code-extensions.vscode-clangd"
+      ]
+    }
+  },
+  "remoteUser": "root"
+}

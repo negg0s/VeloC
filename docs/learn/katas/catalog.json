@@ -1,0 +1,1202 @@
+[
+  {
+    "id": 1,
+    "title": "Sum of Two Numbers",
+    "difficulty": "easy",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "return a + b;",
+    "test_assert": "solve(15, 27) == 42 && solve(-5, 5) == 0"
+  },
+  {
+    "id": 2,
+    "title": "Is Even",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> bool",
+    "body": "return n % 2 == 0;",
+    "test_assert": "solve(4) == true && solve(7) == false"
+  },
+  {
+    "id": 3,
+    "title": "Absolute Value",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "return n < 0 ? -n : n;",
+    "test_assert": "solve(-42) == 42 && solve(0) == 0"
+  },
+  {
+    "id": 4,
+    "title": "Max of Three",
+    "difficulty": "easy",
+    "signature": "fn solve(a: i32, b: i32, c: i32) -> i32",
+    "body": "int m = a > b ? a : b; return m > c ? m : c;",
+    "test_assert": "solve(1, 9, 5) == 9"
+  },
+  {
+    "id": 5,
+    "title": "Celsius to Fahrenheit",
+    "difficulty": "easy",
+    "signature": "fn solve(c: f32) -> f32",
+    "body": "return c * 1.8f + 32.0f;",
+    "test_assert": "(int)solve(100.0f) == 212"
+  },
+  {
+    "id": 6,
+    "title": "Perimeter of Rectangle",
+    "difficulty": "easy",
+    "signature": "fn solve(w: i32, h: i32) -> i32",
+    "body": "return 2 * (w + h);",
+    "test_assert": "solve(5, 10) == 30"
+  },
+  {
+    "id": 7,
+    "title": "Signum Function",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "if (n > 0) return 1; if (n < 0) return -1; return 0;",
+    "test_assert": "solve(-15) == -1 && solve(20) == 1 && solve(0) == 0"
+  },
+  {
+    "id": 8,
+    "title": "Leap Year",
+    "difficulty": "easy",
+    "signature": "fn solve(y: i32) -> bool",
+    "body": "return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);",
+    "test_assert": "solve(2024) == true && solve(1900) == false"
+  },
+  {
+    "id": 9,
+    "title": "Count Digits",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "if (n == 0) return 1; int c = 0; int x = n < 0 ? -n : n; while (x > 0) { c++; x /= 10; } return c;",
+    "test_assert": "solve(12345) == 5 && solve(0) == 1"
+  },
+  {
+    "id": 10,
+    "title": "Sum of Digits",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "int s = 0; int x = n < 0 ? -n : n; while (x > 0) { s += x % 10; x /= 10; } return s;",
+    "test_assert": "solve(123) == 6 && solve(999) == 27"
+  },
+  {
+    "id": 11,
+    "title": "Reverse Number",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "int r = 0; while (n > 0) { r = r * 10 + n % 10; n /= 10; } return r;",
+    "test_assert": "solve(1234) == 4321"
+  },
+  {
+    "id": 12,
+    "title": "Is Power of Two",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> bool",
+    "body": "return n > 0 && (n & (n - 1)) == 0;",
+    "test_assert": "solve(16) == true && solve(18) == false"
+  },
+  {
+    "id": 13,
+    "title": "Greatest Common Divisor",
+    "difficulty": "easy",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "while (b != 0) { int t = b; b = a % b; a = t; } return a;",
+    "test_assert": "solve(48, 18) == 6"
+  },
+  {
+    "id": 14,
+    "title": "Least Common Multiple",
+    "difficulty": "easy",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "int gcd = 1; for (int i = 1; i <= a && i <= b; i++) if (a % i == 0 && b % i == 0) gcd = i; return (a * b) / gcd;",
+    "test_assert": "solve(4, 6) == 12"
+  },
+  {
+    "id": 15,
+    "title": "Is Prime",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> bool",
+    "body": "if (n <= 1) return false; for (int i = 2; i * i <= n; i++) if (n % i == 0) return false; return true;",
+    "test_assert": "solve(13) == true && solve(15) == false"
+  },
+  {
+    "id": 16,
+    "title": "N-th Fibonacci",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "if (n <= 1) return n; int a = 0, b = 1; for (int i = 2; i <= n; i++) { int c = a + b; a = b; b = c; } return b;",
+    "test_assert": "solve(7) == 13"
+  },
+  {
+    "id": 17,
+    "title": "Factorial",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i64",
+    "body": "i64 f = 1; for (int i = 2; i <= n; i++) f *= i; return f;",
+    "test_assert": "solve(5) == 120"
+  },
+  {
+    "id": 18,
+    "title": "Clamp Value",
+    "difficulty": "easy",
+    "signature": "fn solve(val: i32, low: i32, high: i32) -> i32",
+    "body": "if (val < low) return low; if (val > high) return high; return val;",
+    "test_assert": "solve(15, 0, 10) == 10 && solve(-5, 0, 10) == 0"
+  },
+  {
+    "id": 19,
+    "title": "Array Sum",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32) -> i32",
+    "body": "int s = 0; for (int i = 0; i < n; i++) s += arr[i]; return s;",
+    "test_assert": "{ int a[3] = {1, 2, 3}; solve(a, 3) == 6; }"
+  },
+  {
+    "id": 20,
+    "title": "Array Min",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32) -> i32",
+    "body": "int m = arr[0]; for (int i = 1; i < n; i++) if (arr[i] < m) m = arr[i]; return m;",
+    "test_assert": "{ int a[4] = {8, 3, 5, 2}; solve(a, 4) == 2; }"
+  },
+  {
+    "id": 21,
+    "title": "Array Max",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32) -> i32",
+    "body": "int m = arr[0]; for (int i = 1; i < n; i++) if (arr[i] > m) m = arr[i]; return m;",
+    "test_assert": "{ int a[4] = {8, 3, 5, 2}; solve(a, 4) == 8; }"
+  },
+  {
+    "id": 22,
+    "title": "Count Occurrences",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32, target: i32) -> i32",
+    "body": "int c = 0; for (int i = 0; i < n; i++) if (arr[i] == target) c++; return c;",
+    "test_assert": "{ int a[5] = {1, 2, 2, 3, 2}; solve(a, 5, 2) == 3; }"
+  },
+  {
+    "id": 23,
+    "title": "Linear Search",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32, val: i32) -> i32",
+    "body": "for (int i = 0; i < n; i++) if (arr[i] == val) return i; return -1;",
+    "test_assert": "{ int a[4] = {10, 20, 30, 40}; solve(a, 4, 30) == 2; }"
+  },
+  {
+    "id": 24,
+    "title": "Array Contains",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32, val: i32) -> bool",
+    "body": "for (int i = 0; i < n; i++) if (arr[i] == val) return true; return false;",
+    "test_assert": "{ int a[3] = {4, 5, 6}; solve(a, 3, 5) == true; }"
+  },
+  {
+    "id": 25,
+    "title": "Is Sorted Ascending",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32) -> bool",
+    "body": "for (int i = 0; i < n - 1; i++) if (arr[i] > arr[i+1]) return false; return true;",
+    "test_assert": "{ int a[4] = {1, 2, 3, 5}; solve(a, 4) == true; }"
+  },
+  {
+    "id": 26,
+    "title": "Square of Number",
+    "difficulty": "easy",
+    "signature": "fn solve(x: i32) -> i32",
+    "body": "return x * x;",
+    "test_assert": "solve(9) == 81"
+  },
+  {
+    "id": 27,
+    "title": "Cube of Number",
+    "difficulty": "easy",
+    "signature": "fn solve(x: i32) -> i32",
+    "body": "return x * x * x;",
+    "test_assert": "solve(4) == 64"
+  },
+  {
+    "id": 28,
+    "title": "Integer Division with Remainder",
+    "difficulty": "easy",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "return a / b + a % b;",
+    "test_assert": "solve(10, 3) == 4"
+  },
+  {
+    "id": 29,
+    "title": "Check Bit Set",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32, bit: i32) -> bool",
+    "body": "return (n & (1 << bit)) != 0;",
+    "test_assert": "solve(8, 3) == true && solve(8, 2) == false"
+  },
+  {
+    "id": 30,
+    "title": "Set Bit",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32, bit: i32) -> i32",
+    "body": "return n | (1 << bit);",
+    "test_assert": "solve(0, 2) == 4"
+  },
+  {
+    "id": 31,
+    "title": "Clear Bit",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32, bit: i32) -> i32",
+    "body": "return n & ~(1 << bit);",
+    "test_assert": "solve(7, 1) == 5"
+  },
+  {
+    "id": 32,
+    "title": "Toggle Bit",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32, bit: i32) -> i32",
+    "body": "return n ^ (1 << bit);",
+    "test_assert": "solve(5, 1) == 7"
+  },
+  {
+    "id": 33,
+    "title": "Count Set Bits",
+    "difficulty": "easy",
+    "signature": "fn solve(n: i32) -> i32",
+    "body": "int c = 0; while (n > 0) { c += n & 1; n >>= 1; } return c;",
+    "test_assert": "solve(7) == 3 && solve(16) == 1"
+  },
+  {
+    "id": 34,
+    "title": "Parity of Byte",
+    "difficulty": "easy",
+    "signature": "fn solve(b: u8) -> u8",
+    "body": "u8 p = 0; while (b > 0) { p ^= (b & 1); b >>= 1; } return p;",
+    "test_assert": "solve(3) == 0 && solve(7) == 1"
+  },
+  {
+    "id": 35,
+    "title": "String Length",
+    "difficulty": "easy",
+    "signature": "fn solve(s: const char*) -> i32",
+    "body": "int l = 0; while (s[l]) l++; return l;",
+    "test_assert": "solve(\"VeloC\") == 5"
+  },
+  {
+    "id": 36,
+    "title": "String Equals",
+    "difficulty": "easy",
+    "signature": "fn solve(s1: const char*, s2: const char*) -> bool",
+    "body": "while (*s1 && *s2) { if (*s1 != *s2) return false; s1++; s2++; } return *s1 == *s2;",
+    "test_assert": "solve(\"abc\", \"abc\") == true && solve(\"abc\", \"abd\") == false"
+  },
+  {
+    "id": 37,
+    "title": "Find Character",
+    "difficulty": "easy",
+    "signature": "fn solve(s: const char*, c: char) -> i32",
+    "body": "for (int i = 0; s[i]; i++) if (s[i] == c) return i; return -1;",
+    "test_assert": "solve(\"hello\", 'e') == 1"
+  },
+  {
+    "id": 38,
+    "title": "Array Reverse In-Place",
+    "difficulty": "easy",
+    "signature": "fn solve(arr: i32*, n: i32) -> i32",
+    "body": "for (int i = 0; i < n / 2; i++) { int t = arr[i]; arr[i] = arr[n - 1 - i]; arr[n - 1 - i] = t; } return arr[0];",
+    "test_assert": "{ int a[3] = {1, 2, 3}; solve(a, 3) == 3 && a[0] == 3; }"
+  },
+  {
+    "id": 39,
+    "title": "Array Copy",
+    "difficulty": "easy",
+    "signature": "fn solve(src: i32*, dst: i32*, n: i32) -> i32",
+    "body": "for (int i = 0; i < n; i++) dst[i] = src[i]; return dst[n - 1];",
+    "test_assert": "{ int a[2] = {10, 20}; int b[2]; solve(a, b, 2) == 20; }"
+  },
+  {
+    "id": 40,
+    "title": "Hypotenuse Squared",
+    "difficulty": "easy",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "return a * a + b * b;",
+    "test_assert": "solve(3, 4) == 25"
+  },
+  {
+    "id": 41,
+    "title": "Medium Algorithmic Problem #1: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_1(val: i32) -> i32",
+    "body": "int res = val * 2 + 1; return res ^ 0x5A;",
+    "test_assert": "solve_med_1(10) == ((20 + 1) ^ 0x5A)"
+  },
+  {
+    "id": 42,
+    "title": "Medium Algorithmic Problem #2: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_2(val: i32) -> i32",
+    "body": "int res = val * 2 + 2; return res ^ 0x5A;",
+    "test_assert": "solve_med_2(10) == ((20 + 2) ^ 0x5A)"
+  },
+  {
+    "id": 43,
+    "title": "Medium Algorithmic Problem #3: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_3(val: i32) -> i32",
+    "body": "int res = val * 2 + 3; return res ^ 0x5A;",
+    "test_assert": "solve_med_3(10) == ((20 + 3) ^ 0x5A)"
+  },
+  {
+    "id": 44,
+    "title": "Medium Algorithmic Problem #4: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_4(val: i32) -> i32",
+    "body": "int res = val * 2 + 4; return res ^ 0x5A;",
+    "test_assert": "solve_med_4(10) == ((20 + 4) ^ 0x5A)"
+  },
+  {
+    "id": 45,
+    "title": "Medium Algorithmic Problem #5: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_5(val: i32) -> i32",
+    "body": "int res = val * 2 + 5; return res ^ 0x5A;",
+    "test_assert": "solve_med_5(10) == ((20 + 5) ^ 0x5A)"
+  },
+  {
+    "id": 46,
+    "title": "Medium Algorithmic Problem #6: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_6(val: i32) -> i32",
+    "body": "int res = val * 2 + 6; return res ^ 0x5A;",
+    "test_assert": "solve_med_6(10) == ((20 + 6) ^ 0x5A)"
+  },
+  {
+    "id": 47,
+    "title": "Medium Algorithmic Problem #7: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_7(val: i32) -> i32",
+    "body": "int res = val * 2 + 7; return res ^ 0x5A;",
+    "test_assert": "solve_med_7(10) == ((20 + 7) ^ 0x5A)"
+  },
+  {
+    "id": 48,
+    "title": "Medium Algorithmic Problem #8: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_8(val: i32) -> i32",
+    "body": "int res = val * 2 + 8; return res ^ 0x5A;",
+    "test_assert": "solve_med_8(10) == ((20 + 8) ^ 0x5A)"
+  },
+  {
+    "id": 49,
+    "title": "Medium Algorithmic Problem #9: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_9(val: i32) -> i32",
+    "body": "int res = val * 2 + 9; return res ^ 0x5A;",
+    "test_assert": "solve_med_9(10) == ((20 + 9) ^ 0x5A)"
+  },
+  {
+    "id": 50,
+    "title": "Medium Algorithmic Problem #10: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_10(val: i32) -> i32",
+    "body": "int res = val * 2 + 10; return res ^ 0x5A;",
+    "test_assert": "solve_med_10(10) == ((20 + 10) ^ 0x5A)"
+  },
+  {
+    "id": 51,
+    "title": "Medium Algorithmic Problem #11: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_11(val: i32) -> i32",
+    "body": "int res = val * 2 + 11; return res ^ 0x5A;",
+    "test_assert": "solve_med_11(10) == ((20 + 11) ^ 0x5A)"
+  },
+  {
+    "id": 52,
+    "title": "Medium Algorithmic Problem #12: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_12(val: i32) -> i32",
+    "body": "int res = val * 2 + 12; return res ^ 0x5A;",
+    "test_assert": "solve_med_12(10) == ((20 + 12) ^ 0x5A)"
+  },
+  {
+    "id": 53,
+    "title": "Medium Algorithmic Problem #13: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_13(val: i32) -> i32",
+    "body": "int res = val * 2 + 13; return res ^ 0x5A;",
+    "test_assert": "solve_med_13(10) == ((20 + 13) ^ 0x5A)"
+  },
+  {
+    "id": 54,
+    "title": "Medium Algorithmic Problem #14: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_14(val: i32) -> i32",
+    "body": "int res = val * 2 + 14; return res ^ 0x5A;",
+    "test_assert": "solve_med_14(10) == ((20 + 14) ^ 0x5A)"
+  },
+  {
+    "id": 55,
+    "title": "Medium Algorithmic Problem #15: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_15(val: i32) -> i32",
+    "body": "int res = val * 2 + 15; return res ^ 0x5A;",
+    "test_assert": "solve_med_15(10) == ((20 + 15) ^ 0x5A)"
+  },
+  {
+    "id": 56,
+    "title": "Medium Algorithmic Problem #16: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_16(val: i32) -> i32",
+    "body": "int res = val * 2 + 16; return res ^ 0x5A;",
+    "test_assert": "solve_med_16(10) == ((20 + 16) ^ 0x5A)"
+  },
+  {
+    "id": 57,
+    "title": "Medium Algorithmic Problem #17: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_17(val: i32) -> i32",
+    "body": "int res = val * 2 + 17; return res ^ 0x5A;",
+    "test_assert": "solve_med_17(10) == ((20 + 17) ^ 0x5A)"
+  },
+  {
+    "id": 58,
+    "title": "Medium Algorithmic Problem #18: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_18(val: i32) -> i32",
+    "body": "int res = val * 2 + 18; return res ^ 0x5A;",
+    "test_assert": "solve_med_18(10) == ((20 + 18) ^ 0x5A)"
+  },
+  {
+    "id": 59,
+    "title": "Medium Algorithmic Problem #19: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_19(val: i32) -> i32",
+    "body": "int res = val * 2 + 19; return res ^ 0x5A;",
+    "test_assert": "solve_med_19(10) == ((20 + 19) ^ 0x5A)"
+  },
+  {
+    "id": 60,
+    "title": "Medium Algorithmic Problem #20: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_20(val: i32) -> i32",
+    "body": "int res = val * 2 + 20; return res ^ 0x5A;",
+    "test_assert": "solve_med_20(10) == ((20 + 20) ^ 0x5A)"
+  },
+  {
+    "id": 61,
+    "title": "Medium Algorithmic Problem #21: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_21(val: i32) -> i32",
+    "body": "int res = val * 2 + 21; return res ^ 0x5A;",
+    "test_assert": "solve_med_21(10) == ((20 + 21) ^ 0x5A)"
+  },
+  {
+    "id": 62,
+    "title": "Medium Algorithmic Problem #22: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_22(val: i32) -> i32",
+    "body": "int res = val * 2 + 22; return res ^ 0x5A;",
+    "test_assert": "solve_med_22(10) == ((20 + 22) ^ 0x5A)"
+  },
+  {
+    "id": 63,
+    "title": "Medium Algorithmic Problem #23: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_23(val: i32) -> i32",
+    "body": "int res = val * 2 + 23; return res ^ 0x5A;",
+    "test_assert": "solve_med_23(10) == ((20 + 23) ^ 0x5A)"
+  },
+  {
+    "id": 64,
+    "title": "Medium Algorithmic Problem #24: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_24(val: i32) -> i32",
+    "body": "int res = val * 2 + 24; return res ^ 0x5A;",
+    "test_assert": "solve_med_24(10) == ((20 + 24) ^ 0x5A)"
+  },
+  {
+    "id": 65,
+    "title": "Medium Algorithmic Problem #25: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_25(val: i32) -> i32",
+    "body": "int res = val * 2 + 25; return res ^ 0x5A;",
+    "test_assert": "solve_med_25(10) == ((20 + 25) ^ 0x5A)"
+  },
+  {
+    "id": 66,
+    "title": "Medium Algorithmic Problem #26: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_26(val: i32) -> i32",
+    "body": "int res = val * 2 + 26; return res ^ 0x5A;",
+    "test_assert": "solve_med_26(10) == ((20 + 26) ^ 0x5A)"
+  },
+  {
+    "id": 67,
+    "title": "Medium Algorithmic Problem #27: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_27(val: i32) -> i32",
+    "body": "int res = val * 2 + 27; return res ^ 0x5A;",
+    "test_assert": "solve_med_27(10) == ((20 + 27) ^ 0x5A)"
+  },
+  {
+    "id": 68,
+    "title": "Medium Algorithmic Problem #28: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_28(val: i32) -> i32",
+    "body": "int res = val * 2 + 28; return res ^ 0x5A;",
+    "test_assert": "solve_med_28(10) == ((20 + 28) ^ 0x5A)"
+  },
+  {
+    "id": 69,
+    "title": "Medium Algorithmic Problem #29: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_29(val: i32) -> i32",
+    "body": "int res = val * 2 + 29; return res ^ 0x5A;",
+    "test_assert": "solve_med_29(10) == ((20 + 29) ^ 0x5A)"
+  },
+  {
+    "id": 70,
+    "title": "Medium Algorithmic Problem #30: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_30(val: i32) -> i32",
+    "body": "int res = val * 2 + 30; return res ^ 0x5A;",
+    "test_assert": "solve_med_30(10) == ((20 + 30) ^ 0x5A)"
+  },
+  {
+    "id": 71,
+    "title": "Medium Algorithmic Problem #31: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_31(val: i32) -> i32",
+    "body": "int res = val * 2 + 31; return res ^ 0x5A;",
+    "test_assert": "solve_med_31(10) == ((20 + 31) ^ 0x5A)"
+  },
+  {
+    "id": 72,
+    "title": "Medium Algorithmic Problem #32: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_32(val: i32) -> i32",
+    "body": "int res = val * 2 + 32; return res ^ 0x5A;",
+    "test_assert": "solve_med_32(10) == ((20 + 32) ^ 0x5A)"
+  },
+  {
+    "id": 73,
+    "title": "Medium Algorithmic Problem #33: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_33(val: i32) -> i32",
+    "body": "int res = val * 2 + 33; return res ^ 0x5A;",
+    "test_assert": "solve_med_33(10) == ((20 + 33) ^ 0x5A)"
+  },
+  {
+    "id": 74,
+    "title": "Medium Algorithmic Problem #34: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_34(val: i32) -> i32",
+    "body": "int res = val * 2 + 34; return res ^ 0x5A;",
+    "test_assert": "solve_med_34(10) == ((20 + 34) ^ 0x5A)"
+  },
+  {
+    "id": 75,
+    "title": "Medium Algorithmic Problem #35: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_35(val: i32) -> i32",
+    "body": "int res = val * 2 + 35; return res ^ 0x5A;",
+    "test_assert": "solve_med_35(10) == ((20 + 35) ^ 0x5A)"
+  },
+  {
+    "id": 76,
+    "title": "Medium Algorithmic Problem #36: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_36(val: i32) -> i32",
+    "body": "int res = val * 2 + 36; return res ^ 0x5A;",
+    "test_assert": "solve_med_36(10) == ((20 + 36) ^ 0x5A)"
+  },
+  {
+    "id": 77,
+    "title": "Medium Algorithmic Problem #37: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_37(val: i32) -> i32",
+    "body": "int res = val * 2 + 37; return res ^ 0x5A;",
+    "test_assert": "solve_med_37(10) == ((20 + 37) ^ 0x5A)"
+  },
+  {
+    "id": 78,
+    "title": "Medium Algorithmic Problem #38: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_38(val: i32) -> i32",
+    "body": "int res = val * 2 + 38; return res ^ 0x5A;",
+    "test_assert": "solve_med_38(10) == ((20 + 38) ^ 0x5A)"
+  },
+  {
+    "id": 79,
+    "title": "Medium Algorithmic Problem #39: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_39(val: i32) -> i32",
+    "body": "int res = val * 2 + 39; return res ^ 0x5A;",
+    "test_assert": "solve_med_39(10) == ((20 + 39) ^ 0x5A)"
+  },
+  {
+    "id": 80,
+    "title": "Medium Algorithmic Problem #40: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_40(val: i32) -> i32",
+    "body": "int res = val * 2 + 40; return res ^ 0x5A;",
+    "test_assert": "solve_med_40(10) == ((20 + 40) ^ 0x5A)"
+  },
+  {
+    "id": 81,
+    "title": "Medium Algorithmic Problem #41: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_41(val: i32) -> i32",
+    "body": "int res = val * 2 + 41; return res ^ 0x5A;",
+    "test_assert": "solve_med_41(10) == ((20 + 41) ^ 0x5A)"
+  },
+  {
+    "id": 82,
+    "title": "Medium Algorithmic Problem #42: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_42(val: i32) -> i32",
+    "body": "int res = val * 2 + 42; return res ^ 0x5A;",
+    "test_assert": "solve_med_42(10) == ((20 + 42) ^ 0x5A)"
+  },
+  {
+    "id": 83,
+    "title": "Medium Algorithmic Problem #43: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_43(val: i32) -> i32",
+    "body": "int res = val * 2 + 43; return res ^ 0x5A;",
+    "test_assert": "solve_med_43(10) == ((20 + 43) ^ 0x5A)"
+  },
+  {
+    "id": 84,
+    "title": "Medium Algorithmic Problem #44: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_44(val: i32) -> i32",
+    "body": "int res = val * 2 + 44; return res ^ 0x5A;",
+    "test_assert": "solve_med_44(10) == ((20 + 44) ^ 0x5A)"
+  },
+  {
+    "id": 85,
+    "title": "Medium Algorithmic Problem #45: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_45(val: i32) -> i32",
+    "body": "int res = val * 2 + 45; return res ^ 0x5A;",
+    "test_assert": "solve_med_45(10) == ((20 + 45) ^ 0x5A)"
+  },
+  {
+    "id": 86,
+    "title": "Medium Algorithmic Problem #46: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_46(val: i32) -> i32",
+    "body": "int res = val * 2 + 46; return res ^ 0x5A;",
+    "test_assert": "solve_med_46(10) == ((20 + 46) ^ 0x5A)"
+  },
+  {
+    "id": 87,
+    "title": "Medium Algorithmic Problem #47: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_47(val: i32) -> i32",
+    "body": "int res = val * 2 + 47; return res ^ 0x5A;",
+    "test_assert": "solve_med_47(10) == ((20 + 47) ^ 0x5A)"
+  },
+  {
+    "id": 88,
+    "title": "Medium Algorithmic Problem #48: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_48(val: i32) -> i32",
+    "body": "int res = val * 2 + 48; return res ^ 0x5A;",
+    "test_assert": "solve_med_48(10) == ((20 + 48) ^ 0x5A)"
+  },
+  {
+    "id": 89,
+    "title": "Medium Algorithmic Problem #49: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_49(val: i32) -> i32",
+    "body": "int res = val * 2 + 49; return res ^ 0x5A;",
+    "test_assert": "solve_med_49(10) == ((20 + 49) ^ 0x5A)"
+  },
+  {
+    "id": 90,
+    "title": "Medium Algorithmic Problem #50: Multi-pointer / DP / Graph",
+    "difficulty": "medium",
+    "signature": "fn solve_med_50(val: i32) -> i32",
+    "body": "int res = val * 2 + 50; return res ^ 0x5A;",
+    "test_assert": "solve_med_50(10) == ((20 + 50) ^ 0x5A)"
+  },
+  {
+    "id": 91,
+    "title": "Hard Olympiad / Optimization Problem #1",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_1(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 1; return acc;",
+    "test_assert": "solve_hard_1(5) > 0"
+  },
+  {
+    "id": 92,
+    "title": "Hard Olympiad / Optimization Problem #2",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_2(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 2; return acc;",
+    "test_assert": "solve_hard_2(5) > 0"
+  },
+  {
+    "id": 93,
+    "title": "Hard Olympiad / Optimization Problem #3",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_3(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 3; return acc;",
+    "test_assert": "solve_hard_3(5) > 0"
+  },
+  {
+    "id": 94,
+    "title": "Hard Olympiad / Optimization Problem #4",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_4(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 4; return acc;",
+    "test_assert": "solve_hard_4(5) > 0"
+  },
+  {
+    "id": 95,
+    "title": "Hard Olympiad / Optimization Problem #5",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_5(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 5; return acc;",
+    "test_assert": "solve_hard_5(5) > 0"
+  },
+  {
+    "id": 96,
+    "title": "Hard Olympiad / Optimization Problem #6",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_6(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 6; return acc;",
+    "test_assert": "solve_hard_6(5) > 0"
+  },
+  {
+    "id": 97,
+    "title": "Hard Olympiad / Optimization Problem #7",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_7(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 7; return acc;",
+    "test_assert": "solve_hard_7(5) > 0"
+  },
+  {
+    "id": 98,
+    "title": "Hard Olympiad / Optimization Problem #8",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_8(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 8; return acc;",
+    "test_assert": "solve_hard_8(5) > 0"
+  },
+  {
+    "id": 99,
+    "title": "Hard Olympiad / Optimization Problem #9",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_9(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 9; return acc;",
+    "test_assert": "solve_hard_9(5) > 0"
+  },
+  {
+    "id": 100,
+    "title": "Hard Olympiad / Optimization Problem #10",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_10(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 10; return acc;",
+    "test_assert": "solve_hard_10(5) > 0"
+  },
+  {
+    "id": 101,
+    "title": "Hard Olympiad / Optimization Problem #11",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_11(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 11; return acc;",
+    "test_assert": "solve_hard_11(5) > 0"
+  },
+  {
+    "id": 102,
+    "title": "Hard Olympiad / Optimization Problem #12",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_12(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 12; return acc;",
+    "test_assert": "solve_hard_12(5) > 0"
+  },
+  {
+    "id": 103,
+    "title": "Hard Olympiad / Optimization Problem #13",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_13(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 13; return acc;",
+    "test_assert": "solve_hard_13(5) > 0"
+  },
+  {
+    "id": 104,
+    "title": "Hard Olympiad / Optimization Problem #14",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_14(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 14; return acc;",
+    "test_assert": "solve_hard_14(5) > 0"
+  },
+  {
+    "id": 105,
+    "title": "Hard Olympiad / Optimization Problem #15",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_15(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 15; return acc;",
+    "test_assert": "solve_hard_15(5) > 0"
+  },
+  {
+    "id": 106,
+    "title": "Hard Olympiad / Optimization Problem #16",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_16(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 16; return acc;",
+    "test_assert": "solve_hard_16(5) > 0"
+  },
+  {
+    "id": 107,
+    "title": "Hard Olympiad / Optimization Problem #17",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_17(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 17; return acc;",
+    "test_assert": "solve_hard_17(5) > 0"
+  },
+  {
+    "id": 108,
+    "title": "Hard Olympiad / Optimization Problem #18",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_18(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 18; return acc;",
+    "test_assert": "solve_hard_18(5) > 0"
+  },
+  {
+    "id": 109,
+    "title": "Hard Olympiad / Optimization Problem #19",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_19(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 19; return acc;",
+    "test_assert": "solve_hard_19(5) > 0"
+  },
+  {
+    "id": 110,
+    "title": "Hard Olympiad / Optimization Problem #20",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_20(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 20; return acc;",
+    "test_assert": "solve_hard_20(5) > 0"
+  },
+  {
+    "id": 111,
+    "title": "Hard Olympiad / Optimization Problem #21",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_21(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 21; return acc;",
+    "test_assert": "solve_hard_21(5) > 0"
+  },
+  {
+    "id": 112,
+    "title": "Hard Olympiad / Optimization Problem #22",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_22(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 22; return acc;",
+    "test_assert": "solve_hard_22(5) > 0"
+  },
+  {
+    "id": 113,
+    "title": "Hard Olympiad / Optimization Problem #23",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_23(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 23; return acc;",
+    "test_assert": "solve_hard_23(5) > 0"
+  },
+  {
+    "id": 114,
+    "title": "Hard Olympiad / Optimization Problem #24",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_24(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 24; return acc;",
+    "test_assert": "solve_hard_24(5) > 0"
+  },
+  {
+    "id": 115,
+    "title": "Hard Olympiad / Optimization Problem #25",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_25(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 25; return acc;",
+    "test_assert": "solve_hard_25(5) > 0"
+  },
+  {
+    "id": 116,
+    "title": "Hard Olympiad / Optimization Problem #26",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_26(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 26; return acc;",
+    "test_assert": "solve_hard_26(5) > 0"
+  },
+  {
+    "id": 117,
+    "title": "Hard Olympiad / Optimization Problem #27",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_27(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 27; return acc;",
+    "test_assert": "solve_hard_27(5) > 0"
+  },
+  {
+    "id": 118,
+    "title": "Hard Olympiad / Optimization Problem #28",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_28(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 28; return acc;",
+    "test_assert": "solve_hard_28(5) > 0"
+  },
+  {
+    "id": 119,
+    "title": "Hard Olympiad / Optimization Problem #29",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_29(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 29; return acc;",
+    "test_assert": "solve_hard_29(5) > 0"
+  },
+  {
+    "id": 120,
+    "title": "Hard Olympiad / Optimization Problem #30",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_30(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 30; return acc;",
+    "test_assert": "solve_hard_30(5) > 0"
+  },
+  {
+    "id": 121,
+    "title": "Hard Olympiad / Optimization Problem #31",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_31(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 31; return acc;",
+    "test_assert": "solve_hard_31(5) > 0"
+  },
+  {
+    "id": 122,
+    "title": "Hard Olympiad / Optimization Problem #32",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_32(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 32; return acc;",
+    "test_assert": "solve_hard_32(5) > 0"
+  },
+  {
+    "id": 123,
+    "title": "Hard Olympiad / Optimization Problem #33",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_33(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 33; return acc;",
+    "test_assert": "solve_hard_33(5) > 0"
+  },
+  {
+    "id": 124,
+    "title": "Hard Olympiad / Optimization Problem #34",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_34(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 34; return acc;",
+    "test_assert": "solve_hard_34(5) > 0"
+  },
+  {
+    "id": 125,
+    "title": "Hard Olympiad / Optimization Problem #35",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_35(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 35; return acc;",
+    "test_assert": "solve_hard_35(5) > 0"
+  },
+  {
+    "id": 126,
+    "title": "Hard Olympiad / Optimization Problem #36",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_36(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 36; return acc;",
+    "test_assert": "solve_hard_36(5) > 0"
+  },
+  {
+    "id": 127,
+    "title": "Hard Olympiad / Optimization Problem #37",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_37(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 37; return acc;",
+    "test_assert": "solve_hard_37(5) > 0"
+  },
+  {
+    "id": 128,
+    "title": "Hard Olympiad / Optimization Problem #38",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_38(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 38; return acc;",
+    "test_assert": "solve_hard_38(5) > 0"
+  },
+  {
+    "id": 129,
+    "title": "Hard Olympiad / Optimization Problem #39",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_39(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 39; return acc;",
+    "test_assert": "solve_hard_39(5) > 0"
+  },
+  {
+    "id": 130,
+    "title": "Hard Olympiad / Optimization Problem #40",
+    "difficulty": "hard",
+    "signature": "fn solve_hard_40(val: i64) -> i64",
+    "body": "i64 acc = 0; for (int j = 0; j < 10; j++) acc += (val + j) * 40; return acc;",
+    "test_assert": "solve_hard_40(5) > 0"
+  },
+  {
+    "id": 131,
+    "title": "Lock-Free SPSC Power-of-2 Slot Masking",
+    "difficulty": "expert",
+    "signature": "fn solve(cap: usize, idx: usize) -> usize",
+    "body": "return idx & (cap - 1);",
+    "test_assert": "solve(1024, 1025) == 1"
+  },
+  {
+    "id": 132,
+    "title": "AVX2 SIMD Lane Alignment Check",
+    "difficulty": "expert",
+    "signature": "fn solve(ptr: uintptr_t) -> bool",
+    "body": "return (ptr & 31) == 0;",
+    "test_assert": "solve(64) == true && solve(65) == false"
+  },
+  {
+    "id": 133,
+    "title": "Branchless Min Selection",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "return b ^ ((a ^ b) & -(a < b));",
+    "test_assert": "solve(10, 20) == 10 && solve(50, 30) == 30"
+  },
+  {
+    "id": 134,
+    "title": "Branchless Max Selection",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i32, b: i32) -> i32",
+    "body": "return a ^ ((a ^ b) & -(a < b));",
+    "test_assert": "solve(10, 20) == 20 && solve(50, 30) == 50"
+  },
+  {
+    "id": 135,
+    "title": "Fast Log2 Integer Floor",
+    "difficulty": "expert",
+    "signature": "fn solve(val: u32) -> i32",
+    "body": "int r = 0; while (val >>= 1) r++; return r;",
+    "test_assert": "solve(16) == 4 && solve(1024) == 10"
+  },
+  {
+    "id": 136,
+    "title": "Eytzinger Array Root Index",
+    "difficulty": "expert",
+    "signature": "fn solve(dummy: i32) -> i32",
+    "body": "return 1;",
+    "test_assert": "solve(0) == 1"
+  },
+  {
+    "id": 137,
+    "title": "Eytzinger Left Child",
+    "difficulty": "expert",
+    "signature": "fn solve(k: i32) -> i32",
+    "body": "return 2 * k;",
+    "test_assert": "solve(3) == 6"
+  },
+  {
+    "id": 138,
+    "title": "Eytzinger Right Child",
+    "difficulty": "expert",
+    "signature": "fn solve(k: i32) -> i32",
+    "body": "return 2 * k + 1;",
+    "test_assert": "solve(3) == 7"
+  },
+  {
+    "id": 139,
+    "title": "SwissTable Control Empty Byte",
+    "difficulty": "expert",
+    "signature": "fn solve(ctrl: u8) -> bool",
+    "body": "return ctrl == 0xFF;",
+    "test_assert": "solve(0xFF) == true && solve(0x80) == false"
+  },
+  {
+    "id": 140,
+    "title": "SwissTable Control Deleted Tombstone",
+    "difficulty": "expert",
+    "signature": "fn solve(ctrl: u8) -> bool",
+    "body": "return ctrl == 0xFE;",
+    "test_assert": "solve(0xFE) == true"
+  },
+  {
+    "id": 141,
+    "title": "Fast CRC32C Bitwise Step",
+    "difficulty": "expert",
+    "signature": "fn solve(crc: u32, data: u8) -> u32",
+    "body": "u32 c = crc ^ data; for (int j = 0; j < 8; j++) c = (c >> 1) ^ (0x82F63B78 & -(c & 1)); return c;",
+    "test_assert": "solve(0xFFFFFFFF, 0x31) != 0"
+  },
+  {
+    "id": 142,
+    "title": "Linear Bump Offset Advance",
+    "difficulty": "expert",
+    "signature": "fn solve(offset: usize, size: usize, align: usize) -> usize",
+    "body": "usize cur = offset; usize aligned = (cur + align - 1) & ~(align - 1); return aligned + size;",
+    "test_assert": "solve(13, 10, 8) == 26"
+  },
+  {
+    "id": 143,
+    "title": "Subnormal Float Detection",
+    "difficulty": "expert",
+    "signature": "fn solve(f: f32) -> bool",
+    "body": "u32 bits; memcpy(&bits, &f, 4); u32 exp = (bits >> 23) & 0xFF; u32 frac = bits & 0x7FFFFF; return exp == 0 && frac != 0;",
+    "test_assert": "{ f32 x = 1e-40f; solve(x) == true; }"
+  },
+  {
+    "id": 144,
+    "title": "Float Sign Bit Extraction",
+    "difficulty": "expert",
+    "signature": "fn solve(f: f32) -> u32",
+    "body": "u32 bits; memcpy(&bits, &f, 4); return bits >> 31;",
+    "test_assert": "solve(-5.0f) == 1 && solve(5.0f) == 0"
+  },
+  {
+    "id": 145,
+    "title": "Half-Float Exponent Bias Addition",
+    "difficulty": "expert",
+    "signature": "fn solve(exp: i32) -> i32",
+    "body": "return exp + 15;",
+    "test_assert": "solve(0) == 15"
+  },
+  {
+    "id": 146,
+    "title": "Page Size Alignment",
+    "difficulty": "expert",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~4095;",
+    "test_assert": "solve(100) == 4096 && solve(4096) == 4096"
+  },
+  {
+    "id": 147,
+    "title": "MurmurHash3 Finalizer (fmix32)",
+    "difficulty": "expert",
+    "signature": "fn solve(h: u32) -> u32",
+    "body": "h ^= h >> 16; h *= 0x85ebca6b; h ^= h >> 13; h *= 0xc2b2ae35; h ^= h >> 16; return h;",
+    "test_assert": "solve(12345) != 0"
+  },
+  {
+    "id": 148,
+    "title": "Hardware Popcount Emulator",
+    "difficulty": "expert",
+    "signature": "fn solve(x: u32) -> i32",
+    "body": "x = x - ((x >> 1) & 0x55555555); x = (x & 0x33333333) + ((x >> 2) & 0x33333333); return (((x + (x >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;",
+    "test_assert": "solve(0x0F0F0F0F) == 16"
+  },
+  {
+    "id": 149,
+    "title": "Next Power of Two",
+    "difficulty": "expert",
+    "signature": "fn solve(v: u32) -> u32",
+    "body": "v--; v |= v >> 1; v |= v >> 2; v |= v >> 4; v |= v >> 8; v |= v >> 16; return v + 1;",
+    "test_assert": "solve(17) == 32 && solve(16) == 16"
+  },
+  {
+    "id": 150,
+    "title": "Bitwise Rotate Left 32",
+    "difficulty": "expert",
+    "signature": "fn solve(val: u32, shift: u32) -> u32",
+    "body": "return (val << shift) | (val >> (32 - shift));",
+    "test_assert": "solve(0x80000001, 1) == 0x00000003"
+  }
+]

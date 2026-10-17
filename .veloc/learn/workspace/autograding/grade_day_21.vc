@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    int key = 42;
+    int val = 1337;
+    printf("KV: %d -> %d\n", key, val);
+    return 0;
+}

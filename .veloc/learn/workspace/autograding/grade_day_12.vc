@@ -1,0 +1,16 @@
+struct Vec2 {
+    f32 x;
+    f32 y;
+
+    void add(Vec2 other) {
+        x += other.x;
+        y += other.y;
+    }
+};
+
+fn main() -> i32 {
+    let mut v = Vec2 { 1.0f, 2.0f };
+    v.add(Vec2 { 3.0f, 4.0f });
+    printf("Vec: %.1f %.1f\n", v.x, v.y);
+    return 0;
+}

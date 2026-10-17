@@ -1,0 +1,5 @@
+fn main() -> i32 {
+    const char* str = "VeloC Systems";
+    printf("Len: %d\n", (int)strlen(str));
+    return 0;
+}

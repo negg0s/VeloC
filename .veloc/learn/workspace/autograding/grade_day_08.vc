@@ -1,0 +1,13 @@
+fn swap_vals(a: i32*, b: i32*) {
+    let temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+fn main() -> i32 {
+    let mut x: i32 = 1;
+    let mut y: i32 = 2;
+    swap_vals(&x, &y);
+    printf("Swapped: %d %d\n", x, y);
+    return 0;
+}

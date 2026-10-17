@@ -1,0 +1,12 @@
+fn max_val(a: i32, b: i32) -> i32 {
+    if a > b {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+fn main() -> i32 {
+    printf("Max: %d\n", max_val(42, 17));
+    return 0;
+}

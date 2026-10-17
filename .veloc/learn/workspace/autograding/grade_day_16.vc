@@ -1,0 +1,12 @@
+soa struct Unit {
+    f32 x;
+    f32 y;
+};
+
+fn main() -> i32 {
+    Unit_SoA units = Unit_SoA::create(10);
+    defer units.destroy();
+    units.push(10.0f, 20.0f);
+    printf("Unit 0: %.1f %.1f\n", units.x[0], units.y[0]);
+    return 0;
+}

@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    printf("Start\n");
+    defer printf("Cleanup\n");
+    printf("Work\n");
+    return 0;
+}

@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    VeloC_Timer timer;
+    timer.start();
+    f64 ms = timer.elapsed_ms();
+    printf("Timer ok: %d\n", ms >= 0.0 ? 1 : 0);
+    return 0;
+}

@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    let int_val: i32 = 7;
+    let float_val: f32 = 2.0;
+    let ratio: f32 = (int_val as f32) / float_val;
+    printf("Ratio: %.2f\n", ratio);
+    return 0;
+}

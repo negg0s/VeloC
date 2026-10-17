@@ -1,0 +1,12 @@
+fn main() -> i32 {
+    VeloC_Arena arena = VeloC_Arena::create(1024 * 1024);
+    defer arena.destroy();
+
+    i32* arr = arena.alloc_array<i32>(10);
+    for (int i = 0; i < 10; i++) {
+        arr[i] = i * 2;
+    }
+    printf("Arena[5]: %d\n", arr[5]);
+    arena.reset();
+    return 0;
+}

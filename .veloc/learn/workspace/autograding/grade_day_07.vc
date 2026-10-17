@@ -1,0 +1,9 @@
+fn main() -> i32 {
+    i32 arr[4] = {10, 20, 30, 40};
+    let mut sum: i32 = 0;
+    for (int i = 0; i < 4; i++) {
+        sum += arr[i];
+    }
+    printf("Mean: %d\n", sum / 4);
+    return 0;
+}

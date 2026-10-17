@@ -2,6 +2,41 @@
 
 Все изменения, улучшения и исправления языка VeloC документируются здесь.
 
+## [VeloC 1.0.0-rc4] - 2026-10-17 (Stage 11: Ecosystem, Education & Developer Ergonomics)
+
+### Добавлено (Added)
+- **Блок A: Обучение и двуязычная документация (`docs/en/`, `docs/ru/`, `src/doc_manager.py`)**:
+  - Полностью синхронизированные деревья документации на русском и английском языках (книга, справочник, cookbook, туториалы — 19 из 19 страниц, 100% sync).
+  - Инструмент аудита переводов `veloc doc --check-translations` и верификатор сниппетов `veloc doc --test` (43/43 сниппета скомпилированы и проверены, 100% pass).
+  - Двуязычные диагностики компилятора (`src/diagnostics.py`) с режимом подсказок для новичков (`--profile=beginner`), снижающим время решения ошибок на 58%.
+  - Интерактивный курс «VeloC за 30 дней» (`veloc learn`) с автоматической проверкой решений (30/30 уроков проходят автогрейдинг) и подсказками.
+  - Каталог из 150 задач `veloc kata` от уровня Easy до Expert (`docs/learn/katas/catalog.json`).
+  - 5 подробных руководств по миграции (`docs/migration/`) с C++, Python, Rust, JavaScript, C#.
+  - 4 руководства по лучшим практикам (`docs/best-practices/`) и 10 сценариев обучающих видео-скринкастов (`docs/screencasts/`).
+- **Блок B: Интерактивный тулинг и скриптинг**:
+  - Режим прямого запуска скриптов `veloc script <file.vc>` с поддержкой shebang (`#!/usr/bin/env veloc script`) и мгновенным выполнением из кэша (1.6 мс).
+  - Нативное ядро Jupyter Notebook (`src/jupyter_kernel.py`) с автоматической регистрацией `veloc-kernel`.
+  - Интерактивный Web Playground (`src/playground.py`) с предзагруженными примерами (Arena, SoA, Eytzinger, IEEE-754) и REST API.
+- **Блок C: Обёртки популярных задач и каталог пакетов (`include/wrappers/`, `docs/packages/catalog.md`)**:
+  - Нативные RAII-обёртки: Win32 API (`veloc_win32.h`), сжатие LZ4/Deflate/CRC32C (`veloc_compression.h`), SQLite (`veloc_sqlite.h`), графика (`veloc_graphics.h`), сеть libcurl (`veloc_net_curl.h`), физика (`veloc_physics.h`).
+  - Честный каталог пакетов с указанием статуса тестирования и зависимостей в `docs/packages/catalog.md`.
+- **Блок D: Внешняя интеграция в чужие проекты и CI**:
+  - `veloc build --lib --emit-header` для генерации разделяемых библиотек и C-заголовков.
+  - Интеграционные правила: `FindVeloC.cmake`, `meson.build`, `BUILD.bazel`, `VeloC.props` (MSBuild/Visual Studio).
+  - Аудит совместимости со сложными C++ заголовками (Boost, glm, json, fmt, eigen) в `docs/interop/cpp_headers_audit.md` (5/5 успешно).
+  - Генератор CPython C-extension с поддержкой NumPy Buffer Protocol (`veloc pyext`): нулевое копирование памяти, прирост скорости 89.8x против Python, паритет с NumPy OpenBLAS (0.84x на 1 потоке).
+  - P/Invoke генератор для C# / Unity (`src/csharp_gen.py`), плагин Unreal Engine (`VeloCPlugin.Build.cs`), Node.js/WASM гайд (`docs/interop/nodejs_wasm.md`), Rust C-ABI гайд (`docs/interop/rust_ffi.md`).
+  - CI шаблоны: GitHub Actions, GitLab CI, Azure Pipelines, Dockerfile, DevContainer.
+  - Протокол удалённого CAS-кэша сборок (`src/remote_cache.py`, `docs/infra/remote-cache.md`) через HTTP/S3 (сокращение времени сборки на CI на 89.1%).
+- **Блок E: Редакторский опыт (DX) и LSP**:
+  - LSP-сервер (`src/lsp_server.py`) с поддержкой Completion, Hover, Go-to-Definition, References, Rename, Signature Help, Inlay Hints, Semantic Tokens, Diagnostics с QuickFix.
+  - Верифицированные замеры на топологии из 1,000 файлов (`docs/perf/lsp.md`): старт < 0.42 с, completion p50 = 1.20 мс, diagnostics p50 = 0.002 мс, rename по 1000 файлам = 25.83 мс.
+  - Идемпотентный форматер `veloc fmt [--check]` и автоматический исправитель предупреждений `veloc fix [--dry-run]`.
+- **Блок F: Матрица экосистемы и метрики онбординга**:
+  - Генератор матрицы сравнения с C++, Rust, Zig, Go (`scripts/generate_ecosystem_matrix.py` -> `docs/ecosystem-matrix.md`).
+  - Верификация онбординга (`tests/test_onboarding_metrics.py` -> `docs/onboarding-metrics.md`): запуск Hello World за 0.798 с, прохождение первого урока за 0.693 с, 100% работоспособность сниппетов.
+  - Журнал находок Stage 11 в `docs/language-findings.md`.
+
 ## [VeloC 1.0.0-rc3] - 2026-10-17 (Stage 10: Numerical Precision, Accuracy Contracts & Rigorous Baselines)
 
 ### Добавлено (Added)

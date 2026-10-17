@@ -219,7 +219,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     t_sema = (time.perf_counter() - t_sema_start) * 1000.0
 
     # Header and PCH Selection
-    is_lean_candidate = lean or not any(k in source_str for k in ["std::vector", "std::string", "std::unordered", "<thread>", "<chrono>", "<sstream>", "<fstream>"])
+    is_lean_candidate = lean
     header_name = "veloc_core.h" if is_lean_candidate else "veloc.h"
 
     if cpp_target.exists():
@@ -629,7 +629,39 @@ def main():
     subparsers.add_parser("triage", help="Run contributor issue triage and good first issues")
     subparsers.add_parser("dev-setup", help="Verify developer environment toolchain and directories")
     subparsers.add_parser("crater", help="Run ecosystem-wide regression build verification across all apps and packages")
-    subparsers.add_parser("health", help="Generate codebase health metrics and HTML dashboard")
+    learn_p = subparsers.add_parser("learn", help="Interactive 30-Day VeloC curriculum and grader")
+    learn_p.add_argument("action", choices=["status", "start", "check", "hint", "test-all"], default="status", nargs="?")
+    learn_p.add_argument("day", type=int, nargs="?", default=None)
+
+    kata_p = subparsers.add_parser("kata", help="Interactive problem solving (150 Katas)")
+    kata_p.add_argument("action", choices=["list", "info", "test", "stats"], default="list", nargs="?")
+    kata_p.add_argument("kata_id", type=int, nargs="?", default=None)
+
+    doc_p = subparsers.add_parser("doc", help="Documentation manager and translation synchronization")
+    doc_p.add_argument("--check-translations", action="store_true", help="Audit bilingual sync")
+    doc_p.add_argument("--test", action="store_true", help="Test all executable code blocks")
+
+    script_p = subparsers.add_parser("script", help="Run VeloC scripts directly with shebang support")
+    script_p.add_argument("file", help="Path to .vc script file")
+    script_p.add_argument("script_args", nargs="*", help="Arguments passed to script")
+
+    pyext_p = subparsers.add_parser("pyext", help="Build high-performance CPython/NumPy extension (.pyd)")
+    pyext_p.add_argument("file", help="Path to .vc source file")
+    pyext_p.add_argument("-o", "--output", help="Optional output .pyd path")
+
+    fmt_p = subparsers.add_parser("fmt", help="Format VeloC source code")
+    fmt_p.add_argument("target", nargs="?", default=".", help="File or directory to format")
+    fmt_p.add_argument("--check", action="store_true", help="Check formatting without modifying files")
+
+    fix_p = subparsers.add_parser("fix", help="Automatically apply safe compiler suggestions")
+    fix_p.add_argument("target", nargs="?", default=".", help="File or directory to fix")
+    fix_p.add_argument("--dry-run", action="store_true", help="Show proposed diff without modifying files")
+
+    cache_srv_p = subparsers.add_parser("cache-server", help="Launch local/LAN HTTP CAS build cache daemon")
+    cache_srv_p.add_argument("--port", type=int, default=8080, help="HTTP port (default 8080)")
+    cache_srv_p.add_argument("--dir", default="D:/VeloC/.cache/remote", help="Storage directory")
+
+    lsp_p = subparsers.add_parser("lsp", help="Run Language Server Protocol (LSP) server")
 
     args = parser.parse_args()
 
@@ -863,6 +895,80 @@ def main():
     elif args.command == "health":
         from health_dashboard import generate_health_report
         generate_health_report(ROOT_DIR)
+    elif args.command == "learn":
+        from learn import LearnManager
+        lm = LearnManager()
+        if args.action == "status":
+            st = lm.status()
+            print(f"VeloC in 30 Days Progress: {st['completed_count']}/{st['total_days']} ({st['percentage']}%)")
+            print(f"Current Day: {st['current_day']}")
+        elif args.action == "start":
+            res = lm.start_day(args.day)
+            print(f"=== Day {res['day']}: {res['title']} ===")
+            print(f"Goal:   {res['goal']}")
+            print(f"Theory: {res['theory']}")
+            print(f"Edit solution in: {res['solution_file']}")
+        elif args.action == "check":
+            chk = lm.check_current()
+            print(chk["message"])
+            if chk["status"] == "failed":
+                print("Expected output:", chk["expected"])
+                print("Hint:", chk["hint"])
+        elif args.action == "hint":
+            print("Hint:", lm.hint())
+        elif args.action == "test-all":
+            res = lm.auto_grade_all()
+            print(f"Results: {res['passed']}/{res['total']} passed ({res['failed']} failed)")
+    elif args.command == "kata":
+        from kata import run_kata_cli
+        run_kata_cli(args.action, args.kata_id)
+    elif args.command == "doc":
+        from doc_manager import DocManager
+        dm = DocManager()
+        if args.test:
+            res = dm.test_snippets()
+            print(f"Tested: {res['total_tested']} | Passed: {res['passed']} | Failed: {res['failed']}")
+        else:
+            rep = dm.check_translations()
+            print(dm.format_check_report(rep))
+    elif args.command == "script":
+        from script_runner import run_script
+        sys.exit(run_script(Path(args.file), args.script_args))
+    elif args.command == "pyext":
+        from pyext_generator import build_python_extension
+        out = Path(args.output) if args.output else None
+        pyd = build_python_extension(Path(args.file), out)
+        print(f"[VeloC PyExt] Generated Python extension: {pyd}")
+    elif args.command == "fmt":
+        from formatter import format_file, format_directory
+        target_path = Path(args.target)
+        if target_path.is_file():
+            ok = format_file(target_path, check_only=args.check)
+            if args.check and not ok:
+                sys.exit(1)
+        else:
+            total, mismatches = format_directory(target_path, check_only=args.check)
+            print(f"[VeloC Fmt] Scanned {total} files. Mismatches: {mismatches}")
+            if args.check and mismatches > 0:
+                sys.exit(1)
+    elif args.command == "fix":
+        from fixer import run_fix
+        res = run_fix(Path(args.target), dry_run=args.dry_run)
+        print(f"[VeloC Fix] Scanned {res['total_files']} files. Modified: {res['modified_files']}")
+        for f in res["fixes"]:
+            print(f"  * {f}")
+        if args.dry_run:
+            for d in res["diffs"]:
+                print(d)
+    elif args.command == "cache-server":
+        from remote_cache import run_cache_server
+        run_cache_server(port=args.port, storage_dir=Path(args.dir))
+    elif args.command == "lsp":
+        from lsp_server import VeloCLanguageServer
+        srv = VeloCLanguageServer(ROOT_DIR)
+        print("[*] VeloC LSP Server initialized.")
+        res = srv.index_workspace()
+        print(f"[*] Indexed {res['indexed_files']} files in {res['elapsed_sec']:.3f} s.")
     else:
         parser.print_help()
 
