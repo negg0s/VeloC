@@ -1198,5 +1198,2805 @@
     "signature": "fn solve(val: u32, shift: u32) -> u32",
     "body": "return (val << shift) | (val >> (32 - shift));",
     "test_assert": "solve(0x80000001, 1) == 0x00000003"
+  },
+  {
+    "id": 151,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 1)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 152,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 1)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 153,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 1)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 154,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 1)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 155,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 1)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 156,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 2)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 157,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 2)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 158,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 2)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 159,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 2)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 160,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 2)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 161,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 3)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 162,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 3)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 163,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 3)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 164,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 3)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 165,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 3)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 166,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 4)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 167,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 4)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 168,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 4)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 169,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 4)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 170,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 4)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 171,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 5)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 172,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 5)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 173,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 5)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 174,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 5)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 175,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 5)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 176,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 6)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 177,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 6)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 178,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 6)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 179,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 6)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 180,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 6)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 181,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 7)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 182,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 7)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 183,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 7)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 184,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 7)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 185,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 7)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 186,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 8)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 187,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 8)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 188,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 8)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 189,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 8)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 190,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 8)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 191,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 9)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 192,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 9)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 193,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 9)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 194,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 9)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 195,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 9)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 196,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 10)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 197,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 10)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 198,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 10)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 199,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 10)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 200,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 10)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 201,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 11)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 202,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 11)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 203,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 11)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 204,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 11)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 205,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 11)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 206,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 12)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 207,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 12)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 208,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 12)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 209,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 12)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 210,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 12)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 211,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 13)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 212,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 13)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 213,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 13)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 214,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 13)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 215,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 13)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 216,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 14)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 217,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 14)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 218,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 14)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 219,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 14)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 220,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 14)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 221,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 15)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 222,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 15)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 223,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 15)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 224,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 15)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 225,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 15)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 226,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 16)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 227,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 16)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 228,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 16)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 229,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 16)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 230,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 16)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 231,
+    "title": "[Data Science & Tensor] Vector Dot Product (Variant 17)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {1.0f, 2.0f}; float y[] = {3.0f, 4.0f}; solve(x, y, 2) == 11.0f; }"
+  },
+  {
+    "id": 232,
+    "title": "[Data Science & Tensor] Matrix Trace (Variant 17)",
+    "difficulty": "medium",
+    "signature": "fn solve(m: *const f32, dim: usize) -> f32",
+    "body": "float tr = 0.0f; for (size_t i = 0; i < dim; i++) tr += m[i * dim + i]; return tr;",
+    "test_assert": "{ float mat[] = {1.0f, 0.0f, 0.0f, 5.0f}; solve(mat, 2) == 6.0f; }"
+  },
+  {
+    "id": 233,
+    "title": "[Data Science & Tensor] L2 Norm Squared (Variant 17)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += v[i] * v[i]; return s;",
+    "test_assert": "{ float v[] = {3.0f, 4.0f}; solve(v, 2) == 25.0f; }"
+  },
+  {
+    "id": 234,
+    "title": "[Data Science & Tensor] Cosine Similarity Numerator (Variant 17)",
+    "difficulty": "medium",
+    "signature": "fn solve(a: *const f32, b: *const f32, n: usize) -> f32",
+    "body": "float s = 0.0f; for (size_t i = 0; i < n; i++) s += a[i] * b[i]; return s;",
+    "test_assert": "{ float x[] = {2.0f, 5.0f}; float y[] = {1.0f, 2.0f}; solve(x, y, 2) == 12.0f; }"
+  },
+  {
+    "id": 235,
+    "title": "[Data Science & Tensor] Softmax Max Exponent Subtraction (Variant 17)",
+    "difficulty": "medium",
+    "signature": "fn solve(v: *const f32, n: usize) -> f32",
+    "body": "float m = v[0]; for (size_t i = 1; i < n; i++) if (v[i] > m) m = v[i]; return m;",
+    "test_assert": "{ float a[] = {-2.0f, 3.5f, 1.2f}; solve(a, 3) == 3.5f; }"
+  },
+  {
+    "id": 236,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 237,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 238,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 239,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 240,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 241,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 242,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 243,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 244,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 245,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 246,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 247,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 248,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 249,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 250,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 251,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 252,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 253,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 254,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 255,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 256,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 257,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 258,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 259,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 260,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 261,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 262,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 263,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 264,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 265,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 266,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 267,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 268,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 269,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 270,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 271,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 272,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 273,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 274,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 275,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 276,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 277,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 278,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 279,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 280,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 281,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 282,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 283,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 284,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 285,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 286,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 287,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 288,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 289,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 290,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 291,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 292,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 293,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 294,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 295,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 296,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 297,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 298,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 299,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 300,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 301,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 302,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 303,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 304,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 305,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 306,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 307,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 308,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 309,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 310,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 311,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 312,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 313,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 314,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 315,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 316,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 317,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 318,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 319,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 320,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 321,
+    "title": "[GameDev & Physics] AABB Overlap Test 2D (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(min_ax: f32, min_ay: f32, max_ax: f32, max_ay: f32, min_bx: f32, min_by: f32, max_bx: f32, max_by: f32) -> bool",
+    "body": "return !(max_ax < min_bx || min_ax > max_bx || max_ay < min_by || min_ay > max_by);",
+    "test_assert": "solve(0, 0, 10, 10, 5, 5, 15, 15) == true && solve(0, 0, 2, 2, 5, 5, 10, 10) == false"
+  },
+  {
+    "id": 322,
+    "title": "[GameDev & Physics] Linear Interpolation (LERP) (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(a: f32, b: f32, t: f32) -> f32",
+    "body": "return a + t * (b - a);",
+    "test_assert": "solve(10.0f, 20.0f, 0.5f) == 15.0f"
+  },
+  {
+    "id": 323,
+    "title": "[GameDev & Physics] Ray-Sphere Intersection Discriminant (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(radius: f32, ray_dist_sq: f32) -> f32",
+    "body": "return radius * radius - ray_dist_sq;",
+    "test_assert": "solve(5.0f, 9.0f) == 16.0f"
+  },
+  {
+    "id": 324,
+    "title": "[GameDev & Physics] Entity Distance Squared (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(x1: f32, y1: f32, x2: f32, y2: f32) -> f32",
+    "body": "float dx = x2 - x1; float dy = y2 - y1; return dx*dx + dy*dy;",
+    "test_assert": "solve(0, 0, 3, 4) == 25.0f"
+  },
+  {
+    "id": 325,
+    "title": "[GameDev & Physics] Reflect Velocity Vector (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(v: f32, restitution: f32) -> f32",
+    "body": "return -v * restitution;",
+    "test_assert": "solve(100.0f, 0.8f) == -80.0f"
+  },
+  {
+    "id": 326,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 327,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 328,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 329,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 330,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 1)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 331,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 332,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 333,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 334,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 335,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 2)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 336,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 337,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 338,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 339,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 340,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 3)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 341,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 342,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 343,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 344,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 345,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 4)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 346,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 347,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 348,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 349,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 350,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 5)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 351,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 352,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 353,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 354,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 355,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 6)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 356,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 357,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 358,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 359,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 360,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 7)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 361,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 362,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 363,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 364,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 365,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 8)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 366,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 367,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 368,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 369,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 370,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 9)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 371,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 372,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 373,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 374,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 375,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 10)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 376,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 377,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 378,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 379,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 380,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 11)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 381,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 382,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 383,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 384,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 385,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 12)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 386,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 387,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 388,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 389,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 390,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 13)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 391,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 392,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 393,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 394,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 395,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 14)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 396,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 397,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 398,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 399,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 400,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 15)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 401,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 402,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 403,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 404,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 405,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 16)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 406,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 407,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 408,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 409,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 410,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 17)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 411,
+    "title": "[Systems & OS] Align To Page Size 4096 (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(addr: usize) -> usize",
+    "body": "return (addr + 4095) & ~((size_t)4095);",
+    "test_assert": "solve(1) == 4096 && solve(4096) == 4096 && solve(4097) == 8192"
+  },
+  {
+    "id": 412,
+    "title": "[Systems & OS] Fast Power of Two Check (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(n: u64) -> bool",
+    "body": "return n > 0 && ((n & (n - 1)) == 0);",
+    "test_assert": "solve(16) == true && solve(18) == false && solve(0) == false"
+  },
+  {
+    "id": 413,
+    "title": "[Systems & OS] Circular Ring Buffer Next Index (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(idx: usize, cap: usize) -> usize",
+    "body": "return (idx + 1) % cap;",
+    "test_assert": "solve(0, 16) == 1 && solve(15, 16) == 0"
+  },
+  {
+    "id": 414,
+    "title": "[Systems & OS] Network Byte Order Swap 32 (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(val: u32) -> u32",
+    "body": "return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val >> 24) & 0xFF);",
+    "test_assert": "solve(0x12345678) == 0x78563412"
+  },
+  {
+    "id": 415,
+    "title": "[Systems & OS] Bitmap Test Bit (Variant 18)",
+    "difficulty": "hard",
+    "signature": "fn solve(bitmap: u64, bit_idx: u32) -> bool",
+    "body": "return (bitmap & (1ULL << bit_idx)) != 0;",
+    "test_assert": "solve(0x05, 0) == true && solve(0x05, 1) == false && solve(0x05, 2) == true"
+  },
+  {
+    "id": 416,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 1)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 417,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 1)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 418,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 1)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 419,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 1)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 420,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 1)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 421,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 2)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 422,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 2)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 423,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 2)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 424,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 2)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 425,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 2)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 426,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 3)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 427,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 3)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 428,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 3)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 429,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 3)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 430,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 3)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 431,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 4)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 432,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 4)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 433,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 4)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 434,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 4)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 435,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 4)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 436,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 5)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 437,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 5)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 438,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 5)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 439,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 5)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 440,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 5)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 441,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 6)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 442,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 6)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 443,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 6)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 444,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 6)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 445,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 6)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 446,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 7)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 447,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 7)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 448,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 7)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 449,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 7)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 450,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 7)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 451,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 8)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 452,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 8)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 453,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 8)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 454,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 8)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 455,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 8)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 456,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 9)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 457,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 9)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 458,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 9)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 459,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 9)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 460,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 9)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 461,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 10)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 462,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 10)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 463,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 10)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 464,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 10)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 465,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 10)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 466,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 11)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 467,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 11)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 468,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 11)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 469,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 11)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 470,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 11)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 471,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 12)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 472,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 12)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 473,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 12)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 474,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 12)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 475,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 12)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 476,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 13)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 477,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 13)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 478,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 13)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 479,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 13)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 480,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 13)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 481,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 14)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 482,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 14)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 483,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 14)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 484,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 14)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 485,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 14)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 486,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 15)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 487,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 15)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 488,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 15)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 489,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 15)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 490,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 15)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 491,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 16)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 492,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 16)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 493,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 16)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 494,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 16)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 495,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 16)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
+  },
+  {
+    "id": 496,
+    "title": "[Crypto & HFT] FNV-1a 64-bit Hash Step (Variant 17)",
+    "difficulty": "expert",
+    "signature": "fn solve(hash_state: u64, byte_val: u8) -> u64",
+    "body": "return (hash_state ^ (uint64_t)byte_val) * 1099511628211ULL;",
+    "test_assert": "solve(14695981039346656037ULL, 65) != 0"
+  },
+  {
+    "id": 497,
+    "title": "[Crypto & HFT] Order Book Spread (Cents) (Variant 17)",
+    "difficulty": "expert",
+    "signature": "fn solve(bid: i64, ask: i64) -> i64",
+    "body": "return ask - bid;",
+    "test_assert": "solve(15000, 15005) == 5"
+  },
+  {
+    "id": 498,
+    "title": "[Crypto & HFT] Saturating Add 64-bit (Variant 17)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u64, b: u64) -> u64",
+    "body": "uint64_t sum = a + b; return (sum < a) ? 0xFFFFFFFFFFFFFFFFULL : sum;",
+    "test_assert": "solve(100, 200) == 300 && solve(0xFFFFFFFFFFFFFFFFULL, 1) == 0xFFFFFFFFFFFFFFFFULL"
+  },
+  {
+    "id": 499,
+    "title": "[Crypto & HFT] Constant-Time Equality Check (Variant 17)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: u32, b: u32) -> bool",
+    "body": "uint32_t diff = a ^ b; return ((diff | -diff) >> 31) == 0;",
+    "test_assert": "solve(42, 42) == true && solve(42, 43) == false"
+  },
+  {
+    "id": 500,
+    "title": "[Crypto & HFT] Fixed-Point Multiplication (Q16.16) (Variant 17)",
+    "difficulty": "expert",
+    "signature": "fn solve(a: i64, b: i64) -> i64",
+    "body": "return (a * b) >> 16;",
+    "test_assert": "solve(1 << 16, 2 << 16) == (2 << 16)"
   }
 ]

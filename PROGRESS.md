@@ -485,3 +485,38 @@
     * Доля рабочих сниппетов документации: **100.0% (43 из 43)**.
   - Дополнен журнал находок `docs/language-findings.md` (раздел 8: компромиссы REPL/Jupyter, влияние русского языка на диагностику, ключевые компоненты stdlib).
   - Сформировано архитектурное решение ADR-0024 в `DECISIONS.md`.
+
+### 19. Этап 12: VeloC 1.0.0 General Availability (GA) & Extended Capabilities
+- [x] **19.1 Релизная дистрибуция VeloC 1.0.0 GA (`scripts/package_dist.py`, `dist/`)**:
+  - Сформированы автономные релизные архивы: Windows x64 (`dist/veloc-1.0.0-windows-x64.zip`, 0.39 MB) и Linux x64 (`dist/veloc-1.0.0-linux-x64.tar.gz`, 0.32 MB).
+  - Написаны скрипты автоматической установки: `install.ps1` (настройка переменной User PATH на Windows) и `install.sh` (симлинк `/usr/local/bin` на Linux/macOS).
+  - Сгенерирован криптографический манифест контрольных сумм `dist/SHA256SUMS`.
+  - Интегрирована команда `veloc package [--version]`.
+- [x] **19.2 Децентрализованный реестр пакетов и сервер прозрачности (`src/registry.py`)**:
+  - Создана система публикации пакетов с подписями Ed25519 и неизменяемым логом `transparency.jsonl`.
+  - Реализован встроенный HTTP REST сервер (`veloc registry --serve --port 8081`).
+  - Верификация целостности артефактов на лету.
+- [x] **19.3 Клиентский WebAssembly компилятор и Playground**:
+  - Модуль `src/wasm_compiler.py` (`veloc wasm <file.vc>`).
+  - Автономный браузерный интерфейс `docs/playground/index.html` с редактором, предзагруженными кликабельными образцами кода и локальной песочницей.
+- [x] **19.4 Официальный VS Code Extension пакет (`dist/veloc-vscode-1.0.0.vsix`)**:
+  - Конфигурация языка `editors/vscode/language-configuration.json` и клиент LSP `editors/vscode/client.js`.
+  - Скрипт сборщика `scripts/build_vsix.py`, генерирующий стандартизированный архив `.vsix` для публикации в Visual Studio Marketplace и Open-VSX.
+- [x] **19.5 Кроссплатформенные графические бэкенды (`include/wrappers/veloc_graphics.h`)**:
+  - Абстракция графических адаптеров с поддержкой DirectX 12, Vulkan 1.3, Metal 3 и программного растеризатора.
+  - Верифицировано тестом `tests/test_graphics_backends.cpp` (PASSED).
+- [x] **19.6 Расширенный SIMD 512-bit (AVX-512) и ARM NEON (`include/veloc_simd512.h`)**:
+  - 16-элементные векторные типы `f32x16` с операциями FMA, умножения, сложения и горизонтального суммирования.
+  - Прозрачный fallback на двойной AVX2 для процессоров без AVX-512.
+  - Совместимость с ARM NEON (`neon_f32x4`).
+  - Верифицировано тестом `tests/test_simd_extended.cpp` (PASSED).
+- [x] **19.7 In-Process JIT Execution Engine (`src/jit_engine.py`)**:
+  - In-process компиляция и вызов функций: 16.9 мкс холодное исполнение, **2.60 мкс теплый запуск** (0.37 мс загрузка).
+- [x] **19.8 Расширение задачника Katas до 500 задач (`docs/learn/katas/catalog.json`)**:
+  - 350 новых задач по 4 отраслевым направлениям (Data Science, GameDev, Systems/OS, Crypto/HFT).
+  - Верифицировано `src/kata.py` (500 задач в каталоге).
+- [x] **19.9 Автоматический генератор C/C++ биндингов (`src/bindgen.py`)**:
+  - Команда `veloc bindgen <header.h> -o <wrapper.vc>` с генерацией безопасных RAII обёрток.
+- [x] **19.10 Программа сертификации разработчиков (`src/cert.py`)**:
+  - Команда `veloc exam {vca,vcp,vcma}` с криптографическим сертификатом (Associate, Professional, Master Architect).
+

@@ -347,3 +347,42 @@
      - Прохождение и автопроверка Урока 1 в `veloc learn`: **0.693 с** (SLA < 30 с).
      - Доля успешных сниппетов документации: **100.0% (43/43)**.
 
+### ADR-0025: Релиз VeloC 1.0.0 General Availability (GA), расширенная экосистема и отраслевые треки (Stage 12)
+* **Дата:** 2026-10-17
+* **Статус:** Принято / Реализовано (VeloC 1.0.0 GA)
+* **Контекст:**
+  1. Достигнута полная зрелость компилятора, языка, стандартной библиотеки, 7 флагманских приложений, двуязычной документации и тулинга разработки.
+  2. Для финального перехода в статус General Availability (GA) требовались: дистрибутивные пакеты (Windows ZIP, Linux Tarball с криптографическими контрольными суммами), децентрализованный реестр пакетов с прозрачностью и подписями Ed25519, автономный WebAssembly-клиент для браузера, готовый пакет расширения VS Code (`.vsix`), поддержка кроссплатформенных графических бэкендов (DirectX 12, Metal, Vulkan), расширенный векторный слой AVX-512 и ARM NEON, сверхбыстрый in-process JIT, расширение задачника до 500 задач и сертификационный экзаменационный трек.
+* **Решение:**
+  1. **Дистрибуция VeloC 1.0.0 GA (`scripts/package_dist.py`, `dist/`)**:
+     - Формирование автономных архивов: `veloc-1.0.0-windows-x64.zip` (0.39 MB) и `veloc-1.0.0-linux-x64.tar.gz` (0.32 MB).
+     - Скрипты автоматической установки: `install.ps1` (Windows) и `install.sh` (Linux/macOS).
+     - Манифест целостности `dist/SHA256SUMS` со строгими хэшами SHA-256.
+     - Интеграция в CLI: `veloc package [--version]`.
+  2. **Децентрализованный реестр пакетов и сервер прозрачности (`src/registry.py`)**:
+     - Реестр с проверкой подлинности Ed25519 и неизменяемым журналом прозрачности (`transparency.jsonl`).
+     - Встроенный HTTP REST сервер (`veloc registry --serve --port 8081`).
+     - Валидация целостности пакетов на лету.
+  3. **Клиентский WebAssembly (WASM) компилятор и Playground**:
+     - Модуль `src/wasm_compiler.py` (`veloc wasm <file.vc> -o <file.wasm>`).
+     - Автономный браузерный интерфейс `docs/playground/index.html` с редактором, предзагруженными примерами и локальной песочницей.
+  4. **Упаковка расширения VS Code (`dist/veloc-vscode-1.0.0.vsix`)**:
+     - Конфигурация языка `editors/vscode/language-configuration.json` и клиент LSP `editors/vscode/client.js`.
+     - Сборщик `scripts/build_vsix.py`, генерирующий стандартизированный архив `.vsix` для маркетплейсов VS Code и Open-VSX.
+  5. **Кроссплатформенные графические бэкенды (`include/wrappers/veloc_graphics.h`)**:
+     - Абстракция графических адаптеров с поддержкой DirectX 12, Vulkan 1.3, Metal 3 и программного растеризатора.
+     - Верифицировано тестом `tests/test_graphics_backends.cpp`.
+  6. **Расширенный SIMD 512-bit (AVX-512) и ARM NEON (`include/veloc_simd512.h`)**:
+     - Типы регистров `f32x16` (16 single-precision float) с поддержкой FMA, горизонтального сложения и прозрачного fallback на двойной AVX2.
+     - 128-битные векторные примитивы ARM NEON для Apple Silicon / AWS Graviton.
+     - Верифицировано тестом `tests/test_simd_extended.cpp` (FMA и hsum=136.0).
+  7. **In-Process JIT Execution Engine (`src/jit_engine.py`)**:
+     - Сверхбыстрое JIT-выполнение выражений в памяти процесса без спавна шелла: **16.9 мкс** исполнение на холодном коде, **2.60 мкс** на теплом кэше (0.37 мс загрузка).
+  8. **Банк Katas расширен до 500 задач (`docs/learn/katas/catalog.json`)**:
+     - Добавлено 350 новых прикладных задач по 4 отраслевым направлениям: Data Science & Tensor Math (151..235), GameDev ECS & Physics (236..325), Systems & OS (326..415), Cryptography & HFT (416..500).
+  9. **Автоматический C/C++ Header Bindgen (`src/bindgen.py`)**:
+     - `veloc bindgen <header.h> -o <wrapper.vc>`: парсинг структур, enum и сигнатур C-функций с автоматической генерацией `extern "C"` и безопасных RAII-обёрток с `Result<T, E>`.
+  10. **Программа сертификации разработчиков (`src/cert.py`)**:
+      - Команда `veloc exam {vca,vcp,vcma}` с автоматическим тестированием и выдачей криптографического сертификата (VeloC Certified Associate, Professional, Master Architect).
+
+

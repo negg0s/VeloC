@@ -1,0 +1,151 @@
+(* =========================================================================
+   VeloC Language Formal Specification: Grammar (EBNF)
+   Rule Prefix: RULE-GRAMMAR-xxx / RULE-LEX-xxx / RULE-STMT-xxx / RULE-EXPR-xxx
+   ========================================================================= *)
+
+(* 1. Lexical Grammar *)
+
+(* RULE-LEX-001: Whitespace and Comments *)
+Whitespace    = { " " | "\t" | "\r" | "\n" } ;
+LineComment   = "//" , { any_char_except_newline } , "\n" ;
+BlockComment  = "/*" , { any_char } , "*/" ;
+
+(* RULE-LEX-002: Identifiers *)
+Letter        = "a" ... "z" | "A" ... "Z" | "_" ;
+Digit         = "0" ... "9" ;
+Identifier    = Letter , { Letter | Digit } ;
+
+(* RULE-LEX-003: Numeric Literals *)
+DecDigit      = Digit ;
+HexDigit      = Digit | "a" ... "f" | "A" ... "F" ;
+BinDigit      = "0" | "1" ;
+IntLiteral    = ( "0x" , HexDigit , { HexDigit } )
+              | ( "0b" , BinDigit , { BinDigit } )
+              | ( DecDigit , { DecDigit } ) ;
+
+FloatLiteral  = DecDigit , { DecDigit } , "." , DecDigit , { DecDigit } , [ ( "e" | "E" ) , [ "+" | "-" ] , DecDigit , { DecDigit } ] , [ "f" ] ;
+
+(* RULE-LEX-004: String & Character Literals *)
+StringLiteral = '"' , { EscapeSeq | any_char_except_quote_or_newline } , '"' ;
+FStringLiteral= 'f"' , { EscapeSeq | "{" , Expression , "}" | any_char_except_quote_or_newline } , '"' ;
+CharLiteral   = "'" , ( EscapeSeq | any_char_except_single_quote ) , "'" ;
+EscapeSeq     = "\" , ( "n" | "t" | "r" | "\" | '"' | "'" | "0" | "x" , HexDigit , HexDigit ) ;
+
+(* 2. Types *)
+
+(* RULE-TYPE-001: Primitive Types *)
+PrimitiveType = "i8" | "i16" | "i32" | "i64"
+              | "u8" | "u16" | "u32" | "u64"
+              | "f32" | "f64"
+              | "bool" | "char" | "void" | "usize" ;
+
+(* RULE-TYPE-002: Compound and Generic Types *)
+Type          = [ "const" ] , ( PrimitiveType | Identifier , [ "<" , TypeList , ">" ] ) , { "*" | "&" } ;
+TypeList      = Type , { "," , Type } ;
+
+(* 3. Expressions (Pratt Precedence Levels 5..160) *)
+
+(* RULE-EXPR-001: Primary Expressions *)
+PrimaryExpr   = Identifier
+              | IntLiteral
+              | FloatLiteral
+              | StringLiteral
+              | FStringLiteral
+              | CharLiteral
+              | "true" | "false" | "NULL"
+              | "(" , Expression , ")"
+              | "(" , Type , ")" , Expression   (* C-style cast *)
+              | LambdaExpr ;
+
+(* RULE-EXPR-002: Postfix and Member Access *)
+PostfixExpr   = PrimaryExpr , { PostfixOp } ;
+PostfixOp     = ( "[" , Expression , "]" )      (* Indexing: a[i] *)
+              | ( "." , Identifier , [ "<" , TypeList , ">" ] ) (* Member access: a.b or a.b<T> *)
+              | ( "(" , [ ArgumentList ] , ")" ) (* Call: f(x, y) *)
+              | "!"                              (* Non-null unwrap: opt! *)
+              | "?" ;                            (* Try operator: res? *)
+
+(* RULE-EXPR-003: Unary Operators *)
+UnaryExpr     = ( "+" | "-" | "!" | "~" | "*" | "&" ) , UnaryExpr
+              | PostfixExpr ;
+
+(* RULE-EXPR-004: Binary and Pipeline Expressions *)
+CastExpr      = UnaryExpr , [ "as" , Type ] ;
+MultExpr      = CastExpr , { ( "*" | "/" | "%" ) , CastExpr } ;
+AddExpr       = MultExpr , { ( "+" | "-" ) , MultExpr } ;
+ShiftExpr     = AddExpr , { ( "<<" | ">>" ) , AddExpr } ;
+RelExpr       = ShiftExpr , { ( "<" | "<=" | ">" | ">=" ) , ShiftExpr } ;
+EqExpr        = RelExpr , { ( "==" | "!=" ) , RelExpr } ;
+BitAndExpr    = EqExpr , { "&" , EqExpr } ;
+BitXorExpr    = BitAndExpr , { "^" , BitAndExpr } ;
+BitOrExpr     = BitXorExpr , { "|" , BitXorExpr } ;
+LogicalAnd    = BitOrExpr , { "&&" , BitOrExpr } ;
+LogicalOr     = LogicalAnd , { "||" , LogicalAnd } ;
+CoalesceExpr  = LogicalOr , [ "??" , CoalesceExpr ] ;
+PipeExpr      = CoalesceExpr , { "|>" , CoalesceExpr } ;
+AssignExpr    = PipeExpr , [ "=" , AssignExpr ] ;
+Expression    = AssignExpr ;
+
+ArgumentList  = Expression , { "," , Expression } ;
+LambdaExpr    = "|" , [ IdentList ] , "|" , "=>" , Expression ;
+IdentList     = Identifier , { "," , Identifier } ;
+
+(* 4. Statements *)
+
+(* RULE-STMT-001: Statement Disjunction *)
+Statement     = LetStatement
+              | ReturnStatement
+              | DeferStatement
+              | BenchStatement
+              | IfStatement
+              | WhileStatement
+              | ForStatement
+              | MatchStatement
+              | BlockStatement
+              | PreprocessorDirective
+              | ExpressionStatement ;
+
+(* RULE-STMT-002: Declarations *)
+LetStatement  = "let" , [ "mut" ] , ( ( "(" , IdentList , ")" ) | ( Identifier , [ ":" , Type ] ) ) , [ "=" , Expression ] , ";"
+              | [ "const" ] , Type , Identifier , [ ( "=" , Expression ) | ( "(" , [ ArgumentList ] , ")" ) ] , { "," , Identifier , [ ( "=" , Expression ) | ( "(" , [ ArgumentList ] , ")" ) ] } , ";" ;
+
+ReturnStatement = "return" , [ Expression ] , ";" ;
+DeferStatement  = "defer" , ( BlockStatement | Statement ) ;
+BenchStatement  = "bench" , StringLiteral , BlockStatement ;
+BlockStatement  = "{" , { Statement } , "}" ;
+ExpressionStatement = [ Expression ] , ";" ;
+PreprocessorDirective = "#" , { any_char_except_newline } , "\n" ;
+
+(* RULE-STMT-003: Control Flow *)
+IfStatement   = "if" , [ "let" , ( "Some" | "Ok" ) , "(" , Identifier , ")" , "=" ] , ( Expression | "(" , Expression , ")" ) , ( BlockStatement | Statement ) , [ "else" , ( BlockStatement | IfStatement | Statement ) ] ;
+
+WhileStatement= "while" , [ "let" , ( "Some" | "Ok" ) , "(" , Identifier , ")" , "=" ] , ( Expression | "(" , Expression , ")" ) , BlockStatement ;
+
+ForStatement  = "for" , "(" , "let" , [ "mut" ] , ( ( "(" , Identifier , "," , Identifier , ")" , "in" , Expression ) | ( Identifier , "in" , Expression ) ) , ")" , BlockStatement
+              | "for" , "(" , [ Statement ] , [ Expression ] , ";" , [ Expression ] , ")" , BlockStatement ;
+
+MatchStatement= "match" , [ "(" ] , Expression , [ ")" ] , "{" , { MatchArm } , "}" ;
+MatchArm      = ( StringLiteral | IntLiteral | "_" ) , "=>" , ( BlockStatement | Statement ) ;
+
+(* 5. Top-Level Program Declarations *)
+
+(* RULE-DECL-001: Declarations *)
+Program       = { Declaration } ;
+Declaration   = ModuleDecl
+              | ImportDecl
+              | SoAStructDecl
+              | TestDecl
+              | FnDecl
+              | PreprocessorDirective
+              | Statement ;
+
+ModuleDecl    = "module" , Identifier , ";" ;
+ImportDecl    = "import" , Identifier , { "." , Identifier } , ";" ;
+
+SoAStructDecl = "soa" , "struct" , Identifier , "{" , { Type , Identifier , ";" } , "}" , [ ";" ] ;
+
+TestDecl      = "test" , StringLiteral , BlockStatement ;
+
+FnDecl        = [ "pub" ] , ( "fn" , Identifier , "(" , [ FnParamList ] , ")" , [ "->" , Type ] | Type , Identifier , "(" , [ FnParamList ] , ")" ) , BlockStatement ;
+FnParamList   = FnParam , { "," , FnParam } ;
+FnParam       = [ Type ] , Identifier ;

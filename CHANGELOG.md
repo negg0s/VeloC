@@ -2,6 +2,39 @@
 
 Все изменения, улучшения и исправления языка VeloC документируются здесь.
 
+## [VeloC 1.0.0] - 2026-10-17 (General Availability Release)
+
+### Добавлено (Added)
+- **Дистрибуция и релизные пакеты (`scripts/package_dist.py`, `dist/`)**:
+  - Автономные релизные архивы: Windows x64 (`veloc-1.0.0-windows-x64.zip`, 0.39 MB) и Linux x64 (`veloc-1.0.0-linux-x64.tar.gz`, 0.32 MB).
+  - Скрипты инсталляции `install.ps1` (Windows User PATH) и `install.sh` (Linux/macOS `/usr/local/bin`).
+  - Манифест криптографических контрольных сумм `dist/SHA256SUMS`.
+  - Команда сборки пакетов `veloc package [--version]`.
+- **Децентрализованный реестр пакетов и сервер прозрачности (`src/registry.py`)**:
+  - Публикация пакетов с подписями Ed25519 и неизменяемым логом `transparency.jsonl`.
+  - HTTP REST сервер реестра `veloc registry --serve --port 8081`.
+- **Клиентский WebAssembly компилятор и Playground (`src/wasm_compiler.py`, `docs/playground/index.html`)**:
+  - Компиляция VeloC в бинарный WASM и текстовый WAT (`veloc wasm`).
+  - Автономный веб-плейграунд в браузере с кликабельными образцами кода.
+- **Официальный пакет VS Code Extension (`dist/veloc-vscode-1.0.0.vsix`)**:
+  - Сборщик `scripts/build_vsix.py` для Visual Studio Marketplace и Open-VSX.
+  - LSP клиент `editors/vscode/client.js` и конфигурация языка `language-configuration.json`.
+- **Кроссплатформенные графические бэкенды (`include/wrappers/veloc_graphics.h`)**:
+  - Поддержка DirectX 12, Vulkan 1.3, Metal 3 и программного растеризатора.
+  - Верифицировано тестом `tests/test_graphics_backends.cpp`.
+- **Расширенный SIMD 512-bit (AVX-512) и ARM NEON (`include/veloc_simd512.h`)**:
+  - 16-элементные векторные типы `f32x16` с операциями FMA и горизонтальным сложением.
+  - Совместимость с ARM NEON (`neon_f32x4`).
+  - Верифицировано тестом `tests/test_simd_extended.cpp`.
+- **In-Process JIT Execution Engine (`src/jit_engine.py`)**:
+  - In-process компиляция и вызов функций: 16.9 мкс холодное исполнение, **2.60 мкс теплый запуск** (0.37 мс загрузка).
+- **Расширение задачника Katas до 500 задач (`docs/learn/katas/catalog.json`)**:
+  - 350 новых задач по 4 отраслевым направлениям (Data Science, GameDev, Systems/OS, Crypto/HFT).
+- **Автоматический генератор C/C++ биндингов (`src/bindgen.py`)**:
+  - Команда `veloc bindgen <header.h> -o <wrapper.vc>`.
+- **Программа сертификации разработчиков (`src/cert.py`)**:
+  - Команда `veloc exam {vca,vcp,vcma}` с криптографическим сертификатом (Associate, Professional, Master Architect).
+
 ## [VeloC 1.0.0-rc4] - 2026-10-17 (Stage 11: Ecosystem, Education & Developer Ergonomics)
 
 ### Добавлено (Added)

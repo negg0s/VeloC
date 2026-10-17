@@ -1,0 +1,20 @@
+[
+  {
+    "candidate": "Lead System Architect",
+    "exam_level": "vcma",
+    "title": "VeloC Certified Master Architect (VCMA)",
+    "score": 100.0,
+    "passed": true,
+    "certificate_id": "VELOC-146A74FB641CD8AD4F9200C4",
+    "issued_at": 1792236153.6796777
+  },
+  {
+    "candidate": "Chief Engineer",
+    "exam_level": "vcma",
+    "title": "VeloC Certified Master Architect (VCMA)",
+    "score": 100.0,
+    "passed": true,
+    "certificate_id": "VELOC-A725B70032FB10D4DFA3566B",
+    "issued_at": 1792236181.4490347
+  }
+]

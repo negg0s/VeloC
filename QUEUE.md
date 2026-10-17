@@ -54,4 +54,16 @@
   - [x] Блок D: Внешняя интеграция в чужие проекты и CI (`FindVeloC.cmake`, `meson.build`, `BUILD.bazel`, `VeloC.props`, аудит C++ заголовков 5/5, `veloc pyext` с NumPy buffer protocol 89.8x к Python, C# P/Invoke `src/csharp_gen.py`, Unreal Engine plugin, CI шаблоны, CAS кэш `src/remote_cache.py` с 89.1% ускорением).
   - [x] Блок E: Редакторский опыт и LSP (`src/lsp_server.py`, замеры на 1,000 файлах в `docs/perf/lsp.md`: cold start < 0.42 с, completion p50 = 1.20 мс, diagnostics p50 = 0.002 мс, rename 25.83 мс, `veloc fmt [--check]`, `veloc fix [--dry-run]`).
   - [x] Блок F: Матрица экосистемы и онбординг (`scripts/generate_ecosystem_matrix.py` -> `docs/ecosystem-matrix.md`, замеры онбординга `tests/test_onboarding_metrics.py` -> `docs/onboarding-metrics.md`, журнал находок `docs/language-findings.md`, ADR-0024 в `DECISIONS.md`).
+- [x] **ЭТАП 12**: VeloC 1.0.0 General Availability (GA) & Extended Capabilities. (Выполнен 2026-10-17).
+  - [x] 1. Релизная дистрибуция VeloC 1.0.0 GA: автономные пакеты `dist/veloc-1.0.0-windows-x64.zip` и `veloc-1.0.0-linux-x64.tar.gz`, инсталлеры `install.ps1`/`install.sh`, контрольные суммы `dist/SHA256SUMS`, команда `veloc package`.
+  - [x] 2. Децентрализованный реестр пакетов `src/registry.py`: Ed25519 подписи, неизменяемый журнал прозрачности `transparency.jsonl`, локальный HTTP сервер `veloc registry --serve --port 8081`.
+  - [x] 3. Клиентский WebAssembly компилятор `src/wasm_compiler.py` (`veloc wasm`) и автономный браузерный Playground `docs/playground/index.html`.
+  - [x] 4. Официальный VS Code Extension пакет `dist/veloc-vscode-1.0.0.vsix`: `scripts/build_vsix.py`, LSP клиент `client.js`, `language-configuration.json`.
+  - [x] 5. Кроссплатформенные графические бэкенды `include/wrappers/veloc_graphics.h`: DirectX 12, Vulkan 1.3, Metal 3, Software rasterizer (`tests/test_graphics_backends.cpp` PASSED).
+  - [x] 6. Расширенный SIMD 512-bit (AVX-512) и ARM NEON `include/veloc_simd512.h`: 16-wide `f32x16` FMA и hsum=136.0 (`tests/test_simd_extended.cpp` PASSED).
+  - [x] 7. In-Process JIT Execution Engine `src/jit_engine.py`: запуск выражений за 16.9 мкс (холодный) и **2.60 мкс** (теплый).
+  - [x] 8. Банк Katas расширен до **500 задач** `docs/learn/katas/catalog.json` по 4 отраслевым направлениям (Data Science, GameDev, Systems/OS, Crypto/HFT).
+  - [x] 9. Автоматический C/C++ Header Bindgen `src/bindgen.py` (`veloc bindgen <header.h> -o <wrapper.vc>`).
+  - [x] 10. Программа сертификации разработчиков `src/cert.py` (`veloc exam {vca,vcp,vcma}` с выдачей криптографического сертификата).
+
 

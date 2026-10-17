@@ -1,0 +1,105 @@
+// VeloC 6.0: AI SIMD Softmax, Branchless Binary Search, Parallel Transform & Non-null Assertion
+#include <algorithm>
+
+fn test_softmax() -> void {
+    println("--- 1. Testing AVX2 SIMD Softmax for AI/Transformer LLM Inference ---");
+    let count: usize = 32768; // 32k logits (e.g. Vocabulary distribution)
+    let logits = (f32*)veloc_aligned_alloc(32, sizeof(f32) * count);
+    defer veloc_aligned_free(logits);
+
+    for (let i in range(0, count as i64, 1)) {
+        logits[i] = ((i % 100) as f32) * 0.1f - 5.0f;
+    }
+
+    // Benchmark SIMD Softmax
+    bench "AVX2 SIMD Softmax (32k logits)" {
+        simd_softmax(logits, count);
+    }
+
+    // Verify sum of probabilities == 1.0f
+    let mut sum: f32 = 0.0f;
+    for (let i in range(0, count as i64, 1)) {
+        sum += logits[i];
+    }
+    println(f"Softmax probability sum = {sum} (Expected: ~1.0)");
+    assert_true(sum > 0.99f && sum < 1.01f);
+}
+
+fn test_branchless_binary_search() -> void {
+    println("--- 2. Testing Branchless CMOV Binary Search vs std::lower_bound ---");
+    let count: usize = 1000000;
+    let data = (u32*)veloc_aligned_alloc(32, sizeof(u32) * count);
+    defer veloc_aligned_free(data);
+
+    for (let i in range(0, count as i64, 1)) {
+        data[i] = (i * 2) as u32;
+    }
+
+    let queries: usize = 100000;
+    let targets = (u32*)veloc_aligned_alloc(32, sizeof(u32) * queries);
+    defer veloc_aligned_free(targets);
+
+    for (let i in range(0, queries as i64, 1)) {
+        targets[i] = ((i * 37) % (count * 2)) as u32;
+    }
+
+    let mut sum_std: usize = 0;
+    bench "std::lower_bound (100k queries)" {
+        for (let i in range(0, queries as i64, 1)) {
+            let it = std::lower_bound(data, data + count, targets[i]);
+            sum_std += (it - data);
+        }
+    }
+
+    let mut sum_branchless: usize = 0;
+    bench "Branchless CMOV lower_bound (100k queries)" {
+        for (let i in range(0, queries as i64, 1)) {
+            let idx = branchless_lower_bound(data, count, targets[i]);
+            sum_branchless += idx;
+        }
+    }
+
+    println(f"std sum = {sum_std}, branchless sum = {sum_branchless}");
+    assert_eq(sum_std, sum_branchless);
+}
+
+fn test_parallel_transform() -> void {
+    println("--- 3. Testing parallel_transform across 12 hardware threads ---");
+    let count: usize = 2000000;
+    let arr = (f32*)veloc_aligned_alloc(32, sizeof(f32) * count);
+    defer veloc_aligned_free(arr);
+
+    for (let i in range(0, count as i64, 1)) {
+        arr[i] = 1.0f;
+    }
+
+    bench "parallel_transform (2M floats, 12 threads)" {
+        parallel_transform(arr, count, |x| => x * 3.0f + 5.0f);
+    }
+
+    println(f"Sample arr[0] = {arr[0]}, arr[1000] = {arr[1000]} (Expected: 8.0)");
+    assert_true(arr[0] == 8.0f);
+    assert_true(arr[1000] == 8.0f);
+}
+
+fn test_non_null_assertion() -> void {
+    println("--- 4. Testing Non-null Assertion Operator opt! ---");
+    let opt = Option<i32>::Some(42);
+    let val = opt!;
+    println(f"Unwrapped value via opt! = {val}");
+    assert_eq(val, 42);
+
+    let res = Result<i32, const char*>::Ok(1337);
+    let r_val = res!;
+    println(f"Unwrapped value via res! = {r_val}");
+    assert_eq(r_val, 1337);
+}
+
+int main() {
+    test_softmax();
+    test_branchless_binary_search();
+    test_parallel_transform();
+    test_non_null_assertion();
+    println("ALL VELOC 6.0 CHECKS PASSED PERFECTLY!");
+    return 0;
+}

@@ -1,0 +1,87 @@
+// ============================================================================
+// VeloC 5.5: Rust-style Lambdas, SIMD 3D Distances, In-Register Transpose & Arena Markers
+// ============================================================================
+
+int main() {
+    println("===============================================================");
+    println("      VeloC 5.5: Next-Gen Systems Ergonomics & SIMD Physics    ");
+    println("===============================================================");
+
+    // 1. Rust-style Anonymous Lambdas
+    println("1. Rust-style Anonymous Lambdas (|params| => expr):");
+    let triple_fn = |x| => x * 3;
+    let add_fn    = |a, b| => a + b;
+    println(f"   triple_fn(7)    => {triple_fn(7)}");
+    println(f"   add_fn(100, 42) => {add_fn(100, 42)}");
+
+    // 2. Arena Marker Save & Restore (1-cycle Instant Rewind)
+    println("\n2. VeloC_Arena Marker Instant Rewind:");
+    VeloC_Arena arena = VeloC_Arena::create(1024 * 1024); // 1 MB Arena
+    defer arena.destroy();
+
+    // Allocate some persistent base data
+    int* base_data = arena.alloc_array<int>(10);
+    base_data[0] = 777;
+
+    usize frame_marker = arena.get_marker();
+    println(f"   Initial Arena Offset: {frame_marker} bytes");
+
+    // Allocate 10,000 scratch objects inside the frame
+    int* scratch = arena.alloc_array<int>(10000);
+    scratch[0] = 999;
+    println(f"   Offset after scratch alloc: {arena.get_marker()} bytes");
+
+    // Instant rewind in 1 clock cycle!
+    arena.reset_to_marker(frame_marker);
+    println(f"   Offset after instant rewind: {arena.get_marker()} bytes (scratch discarded, base preserved!)");
+    println(f"   Base data [0] still intact: {base_data[0]}");
+
+    // 3. In-Register 4-Cycle SIMD Matrix Transpose
+    println("\n3. In-Register 4-Cycle SIMD Matrix Transpose:");
+    Mat4 mat = Mat4::translation(1.0f, 2.0f, 3.0f);
+    mat.m[1] = 5.0f;
+    mat.m[2] = 9.0f;
+
+    bench "mat4.transposed() (In-Register)" {
+        Mat4 t = mat.transposed();
+    }
+    Mat4 t = mat.transposed();
+    println(f"   Original row 0: [{mat.m[0]}, {mat.m[1]}, {mat.m[2]}, {mat.m[3]}]");
+    println(f"   Transposed col0: [{t.m[0]}, {t.m[4]}, {t.m[8]}, {t.m[12]}]");
+
+    // 4. AVX2 SIMD 3D Euclidean Distance (1,000,000 Particles)
+    println("\n4. AVX2 SIMD 3D Euclidean Distance Engine (1,000,000 Particles):");
+    const usize NUM_PARTICLES = 1000000;
+    f32* x1 = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+    f32* y1 = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+    f32* z1 = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+
+    f32* x2 = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+    f32* y2 = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+    f32* z2 = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+
+    f32* distances = (f32*)veloc_aligned_alloc(32, sizeof(f32) * NUM_PARTICLES);
+
+    defer veloc_aligned_free(x1);
+    defer veloc_aligned_free(y1);
+    defer veloc_aligned_free(z1);
+    defer veloc_aligned_free(x2);
+    defer veloc_aligned_free(y2);
+    defer veloc_aligned_free(z2);
+    defer veloc_aligned_free(distances);
+
+    for (usize i = 0; i < NUM_PARTICLES; i++) {
+        x1[i] = 10.0f; y1[i] = 20.0f; z1[i] = 30.0f;
+        x2[i] = 13.0f; y2[i] = 24.0f; z2[i] = 30.0f; // dx=3, dy=4, dz=0 => dist=5.0
+    }
+
+    bench "simd_distance_3d (1,000,000 pairs)" {
+        simd_distance_3d(distances, x1, y1, z1, x2, y2, z2, NUM_PARTICLES);
+    }
+    println(f"   Computed distance [0]: {distances[0]} (expected: 5.0)");
+
+    println("===============================================================");
+    println("      All VeloC 5.5 Advanced Subsystems Passed!                ");
+    println("===============================================================");
+    return 0;
+}

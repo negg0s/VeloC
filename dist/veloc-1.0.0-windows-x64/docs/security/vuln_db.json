@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-10-16",
+  "vulnerabilities": [
+    {
+      "id": "VSEC-2026-0001",
+      "package": "legacy-net",
+      "affected_versions": "< 1.4.0",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "title": "Unauthenticated buffer overflow in legacy socket parser",
+      "fixed_in": "1.4.0"
+    },
+    {
+      "id": "VSEC-2026-0002",
+      "package": "insecure-crypto",
+      "affected_versions": "< 2.1.0",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "title": "Predictable RNG seed generation in nonces",
+      "fixed_in": "2.1.0"
+    },
+    {
+      "id": "VSEC-2026-0003",
+      "package": "old-xml-parser",
+      "affected_versions": "< 3.0.0",
+      "severity": "HIGH",
+      "cvss": 8.2,
+      "title": "XML External Entity (XXE) and billion-laughs expansion",
+      "fixed_in": "3.0.0"
+    }
+  ]
+}

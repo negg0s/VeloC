@@ -10,6 +10,10 @@
     "categories": [
         "Programming Languages"
     ],
+    "main": "./client.js",
+    "activationEvents": [
+        "onLanguage:veloc"
+    ],
     "contributes": {
         "languages": [
             {

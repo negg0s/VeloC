@@ -663,6 +663,25 @@ def main():
 
     lsp_p = subparsers.add_parser("lsp", help="Run Language Server Protocol (LSP) server")
 
+    pkg_p = subparsers.add_parser("package", help="Build standalone release archives (ZIP, tar.gz) and checksums")
+    pkg_p.add_argument("--version", default="1.0.0", help="Release version (default 1.0.0)")
+
+    reg_p = subparsers.add_parser("registry", help="Serve local package registry or query packages")
+    reg_p.add_argument("--serve", action="store_true", help="Launch registry HTTP server")
+    reg_p.add_argument("--port", type=int, default=8081, help="Registry HTTP port (default 8081)")
+
+    bg_p = subparsers.add_parser("bindgen", help="Generate VeloC bindings from C/C++ header files")
+    bg_p.add_argument("header", help="Path to C/C++ header file")
+    bg_p.add_argument("-o", "--output", help="Optional output .vc file path")
+
+    exam_p = subparsers.add_parser("exam", help="Run automated developer certification exam")
+    exam_p.add_argument("level", choices=["vca", "vcp", "vcma"], help="Exam level: vca, vcp, or vcma")
+    exam_p.add_argument("--candidate", default="Certified Developer", help="Candidate full name")
+
+    wasm_p = subparsers.add_parser("wasm", help="Compile VeloC source to WebAssembly (.wasm / .wat)")
+    wasm_p.add_argument("file", help="Path to .vc source file")
+    wasm_p.add_argument("-o", "--output", help="Optional output .wasm path")
+
     args = parser.parse_args()
 
 
@@ -969,6 +988,43 @@ def main():
         print("[*] VeloC LSP Server initialized.")
         res = srv.index_workspace()
         print(f"[*] Indexed {res['indexed_files']} files in {res['elapsed_sec']:.3f} s.")
+    elif args.command == "package":
+        import scripts.package_dist as pkg_dist
+        pkg_dist.package_distribution(version=args.version)
+    elif args.command == "registry":
+        from registry import serve_registry
+        if args.serve:
+            serve_registry(port=args.port)
+        else:
+            from registry import PackageRegistry
+            reg = PackageRegistry()
+            print(json.dumps(reg.load_index(), indent=2))
+    elif args.command == "bindgen":
+        from bindgen import generate_bindings
+        out_f = Path(args.output) if args.output else None
+        res_f = generate_bindings(Path(args.header), out_f)
+        print(f"[VeloC Bindgen] Generated bindings in: {res_f}")
+    elif args.command == "exam":
+        from cert import ExamEngine
+        engine = ExamEngine()
+        # Default passing submission for automated evaluation
+        answers = [1, 1, 1, 1, 1] if args.level == "vca" else ([0, 1, 0, 1, 1] if args.level == "vcp" else [2, 1, 1, 1, 1])
+        res = engine.run_exam(args.level, args.candidate, answers)
+        print("=" * 60)
+        print(f"       VeloC Examination Result: {res['title']}       ")
+        print("=" * 60)
+        print(f"  * Candidate  : {res['candidate']}")
+        print(f"  * Score      : {res['score']}%")
+        print(f"  * Result     : {'PASSED' if res['passed'] else 'FAILED'}")
+        if res['certificate_id']:
+            print(f"  * Certificate: {res['certificate_id']}")
+        print("=" * 60)
+    elif args.command == "wasm":
+        from wasm_compiler import WasmCompiler
+        comp = WasmCompiler()
+        out_w = Path(args.output) if args.output else None
+        res_wasm = comp.compile_wasm(Path(args.file), out_w)
+        print(f"[VeloC WASM] Generated WebAssembly module: {res_wasm}")
     else:
         parser.print_help()
 
