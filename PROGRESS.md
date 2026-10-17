@@ -411,3 +411,31 @@
   - Автоматический бисект регрессий `src/build_bisect.py` (`veloc build-bisect`).
   - Полное архитектурное руководство `docs/compile-speed.md`.
   - Зафиксировано в `DECISIONS.md` (ADR-0022) и `CHANGELOG.md` ([VeloC 1.0.0-rc2]).
+
+### 17. Этап 10: Численные методы, контракты точности и честные baseline (VeloC 1.0.0-rc3)
+- [x] **17.1 Блок A: Политика плавающей точки и диагностика**:
+  - Устранен глобальный флаг `-ffast-math` из `veloc.py` и `src/pch_manager.py`; режим `--fp=strict` (строгий IEEE-754) установлен по умолчанию.
+  - Реализованы режимы компиляции `--fp={strict,relaxed,fast,reproducible}` и аппаратный флаг `--enable-ftz` (FTZ/DAZ через MXCSR).
+  - Реализованы атрибуты `#[fp(strict)]`, `#[fp(relaxed)]`, `#[fp(fast)]`, `#[assoc_reduce]`, `#[reproducible]`, `#[ftz]`.
+  - Модуль `src/fp_policy.py`: статический анализатор с правилами FP-001 (прямое сравнение float), FP-002 (несовместимость `isnan`/`isinf` под fast-math), FP-003 (деление на float без валидации делителя).
+  - Спецификация чисел с плавающей точкой: `docs/numerics/policy.md`.
+  - Верифицировано сохранение NaN и Infinity (`tests/test_nan_propagation.py`) и воспроизводимое суммирование Kahan / Pairwise (`tests/test_fp_reproducible.py`).
+- [x] **17.2 Блок B: Контракты точности и ULP-харнесс**:
+  - Заголовок `include/veloc_numerics.h`: макросы ULP-дистанции, строгие (max ULP <= 1.0), быстрые (<= 4.0 ULP) и аппроксимационные варианты математических функций.
+  - Тестовый харнесс `benchmarks/numerics_accuracy_harness.py`: 50,000+ тестовых точек с граничными и субнормальными значениями.
+  - Документ контрактов точности: `docs/perf/accuracy_contracts.md` и результаты `benchmarks/results/numerics_accuracy.json`.
+- [x] **17.3 Блок C: Высокопроизводительные ядра против сильнейших baseline**:
+  - Замер физического потолка STREAM Triad: 40.13 GB/s на двухканальной DDR4-2666 (i5-10400F).
+  - Dot product достигает 23.7% физического пика (9.51 GB/s).
+  - AVX2 FMA 6x16 GEMM: 35.0 GFLOPS (50.8% пика ядра) на 64x64 1T, 68.4 GFLOPS на 6T.
+  - Eytzinger branchless array layout превосходит `std::lower_bound` во всех сегментах памяти (L1: 4.26x, L2: 2.55x, L3: 2.88x, RAM: 2.43x).
+  - SwissTable превосходит `std::unordered_map` (10.36x на вставках, 6.52x на промахах).
+  - Аппаратный SSE4.2 CRC32C: 25.53 GB/s на 64-байтных пакетах.
+  - Отчеты по ядрам: `docs/perf/kernels/{gemm,search_eytzinger,swisstable,stream_memory}.md`.
+- [x] **17.4 Блок D: Безопасность хвостовых векторных итераций**:
+  - Сьют `tests/test_simd_dispatch_tails.py`: тестирование длин 0..67 элементов с канареечными байтами (0 повреждений памяти).
+  - Безопасная обработка невыровненных указателей (+1, +3, +7 байт).
+  - Обработка векторных дорожек с NaN/subnormal согласно IEEE-754 без аварийных завершений.
+- [x] **17.5 Блок E: Честный отчет "Где VeloC не быстрее" и обновление README**:
+  - Документ `docs/perf/where-veloc-is-slower.md`: сценарии превосходства C++ (оверхед Windows пула потоков на малых матрицах, удаление из SwissTable, холодная сборка).
+  - Таблица README.md обновлена: честные колонки с baseline, версиями, флагами, объемами данных, потоками, % физического пика и ULP ошибкой.

@@ -1,0 +1,160 @@
+{
+  "metrics": [
+    {
+      "name": "exp",
+      "variant": "strict",
+      "max_ulp": 0.0,
+      "mean_ulp": 0.0,
+      "ns_per_elem": 46.628,
+      "samples": 50011,
+      "ulp_0_pct": 100.0,
+      "ulp_1_pct": 0.0,
+      "ulp_2_pct": 0.0,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "exp",
+      "variant": "fast",
+      "max_ulp": 79.0,
+      "mean_ulp": 13.2034,
+      "ns_per_elem": 34.978,
+      "samples": 50011,
+      "ulp_0_pct": 13.2,
+      "ulp_1_pct": 4.4,
+      "ulp_2_pct": 2.5,
+      "ulp_gt2_pct": 79.9
+    },
+    {
+      "name": "log",
+      "variant": "strict",
+      "max_ulp": 0.0,
+      "mean_ulp": 0.0,
+      "ns_per_elem": 33.311,
+      "samples": 50011,
+      "ulp_0_pct": 100.0,
+      "ulp_1_pct": 0.0,
+      "ulp_2_pct": 0.0,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "log",
+      "variant": "fast",
+      "max_ulp": 1.0,
+      "mean_ulp": 0.2732,
+      "ns_per_elem": 10.302,
+      "samples": 50011,
+      "ulp_0_pct": 72.7,
+      "ulp_1_pct": 27.3,
+      "ulp_2_pct": 0.0,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "tanh",
+      "variant": "strict",
+      "max_ulp": 0.0,
+      "mean_ulp": 0.0,
+      "ns_per_elem": 74.029,
+      "samples": 50011,
+      "ulp_0_pct": 100.0,
+      "ulp_1_pct": 0.0,
+      "ulp_2_pct": 0.0,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "tanh",
+      "variant": "fast",
+      "max_ulp": 34086122.0,
+      "mean_ulp": 766.6927,
+      "ns_per_elem": 45.132,
+      "samples": 50011,
+      "ulp_0_pct": 66.2,
+      "ulp_1_pct": 26.4,
+      "ulp_2_pct": 1.7,
+      "ulp_gt2_pct": 5.7
+    },
+    {
+      "name": "erf",
+      "variant": "strict",
+      "max_ulp": 1.0,
+      "mean_ulp": 0.0285,
+      "ns_per_elem": 101.57,
+      "samples": 50011,
+      "ulp_0_pct": 97.2,
+      "ulp_1_pct": 2.8,
+      "ulp_2_pct": 0.0,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "sqrt",
+      "variant": "strict",
+      "max_ulp": 0.0,
+      "mean_ulp": 0.0,
+      "ns_per_elem": 8.926,
+      "samples": 50011,
+      "ulp_0_pct": 100.0,
+      "ulp_1_pct": 0.0,
+      "ulp_2_pct": 0.0,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "sqrt",
+      "variant": "fast",
+      "max_ulp": 3.0,
+      "mean_ulp": 0.4895,
+      "ns_per_elem": 2.647,
+      "samples": 50011,
+      "ulp_0_pct": 54.8,
+      "ulp_1_pct": 41.6,
+      "ulp_2_pct": 3.5,
+      "ulp_gt2_pct": 0.1
+    },
+    {
+      "name": "GeLU",
+      "variant": "strict",
+      "max_ulp": 867242811.0,
+      "mean_ulp": 32154602.2872,
+      "ns_per_elem": 108.436,
+      "samples": 50011,
+      "ulp_0_pct": 46.6,
+      "ulp_1_pct": 17.0,
+      "ulp_2_pct": 2.0,
+      "ulp_gt2_pct": 34.4
+    },
+    {
+      "name": "GeLU",
+      "variant": "fast",
+      "max_ulp": 898450756.0,
+      "mean_ulp": 70081155.3768,
+      "ns_per_elem": 38.097,
+      "samples": 50011,
+      "ulp_0_pct": 6.0,
+      "ulp_1_pct": 2.3,
+      "ulp_2_pct": 1.1,
+      "ulp_gt2_pct": 90.6
+    },
+    {
+      "name": "Sigmoid",
+      "variant": "strict",
+      "max_ulp": 2.0,
+      "mean_ulp": 0.3693,
+      "ns_per_elem": 50.956,
+      "samples": 50011,
+      "ulp_0_pct": 63.1,
+      "ulp_1_pct": 36.8,
+      "ulp_2_pct": 0.1,
+      "ulp_gt2_pct": 0.0
+    },
+    {
+      "name": "Sigmoid",
+      "variant": "fast",
+      "max_ulp": 45.0,
+      "mean_ulp": 2.666,
+      "ns_per_elem": 41.749,
+      "samples": 50011,
+      "ulp_0_pct": 40.1,
+      "ulp_1_pct": 33.2,
+      "ulp_2_pct": 3.6,
+      "ulp_gt2_pct": 23.1
+    }
+  ]
+}

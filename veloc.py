@@ -60,7 +60,8 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
                 test_mode: bool = False, verbose: bool = False, quiet: bool = False,
                 opt_report: bool = False, profile: str = None,
                 timings: bool = False, json_output: bool = False,
-                backend: str = "cpp", lean: bool = False, no_pch: bool = False) -> Path:
+                backend: str = "cpp", lean: bool = False, no_pch: bool = False,
+                fp_mode: str = "strict", enable_ftz: bool = False) -> Path:
     t_start = time.perf_counter()
     if profile:
         profile_map = {
@@ -209,23 +210,33 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     for sw in SecretBranchLinter(source_str, str(source_path)).lint():
         print(f"[VeloC Security Warning] {sw['rule']}: Line {sw['line']}: {sw['message']}")
+
+    # Floating-Point Precision & Diagnostics Check
+    from fp_policy import FloatingPointPolicy, FloatingPointLinter, AttributeTransformer
+    for fpl in FloatingPointLinter(source_str, str(source_path), global_mode=fp_mode).lint():
+        print(f"[VeloC FP {fpl['severity'].capitalize()}] {fpl['rule']}: Line {fpl['line']}: {fpl['message']}")
+
     t_sema = (time.perf_counter() - t_sema_start) * 1000.0
 
     # Header and PCH Selection
     is_lean_candidate = lean or not any(k in source_str for k in ["std::vector", "std::string", "std::unordered", "<thread>", "<chrono>", "<sstream>", "<fstream>"])
     header_name = "veloc_core.h" if is_lean_candidate else "veloc.h"
 
-    if is_lean_candidate and cpp_target.exists():
+    if cpp_target.exists():
         gen_cpp = cpp_target.read_text(encoding="utf-8")
-        gen_cpp = gen_cpp.replace("include/veloc.h", "include/veloc_core.h")
-        gen_cpp = gen_cpp.replace("<veloc.h>", "<veloc_core.h>")
+        if is_lean_candidate:
+            gen_cpp = gen_cpp.replace("include/veloc.h", "include/veloc_core.h")
+            gen_cpp = gen_cpp.replace("<veloc.h>", "<veloc_core.h>")
+        gen_cpp = AttributeTransformer.transform_code(gen_cpp)
         cpp_target.write_text(gen_cpp, encoding="utf-8")
 
     from pch_manager import PchManager, LLD_PATH
     pm = PchManager(ROOT_DIR)
 
-    # Clang Flags
-    math_flags = ["-ffast-math"] if profile != "safety" else ["-fno-fast-math", "-frounding-math"]
+    # Clang Flags: Strict IEEE-754 by default!
+    effective_fp = "strict" if profile == "safety" else fp_mode
+    fp_policy = FloatingPointPolicy(effective_fp, enable_ftz=enable_ftz)
+    math_flags = fp_policy.get_compiler_flags()
     cmd = [
         str(CLANG_PATH),
         str(cpp_target),
@@ -258,7 +269,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     # Precompiled Header integration
     if not no_pch:
-        pch = pm.ensure_pch(header_name, opt_level, profile or "max-perf")
+        pch = pm.ensure_pch(header_name, opt_level, profile or "max-perf", fp_mode=effective_fp, enable_ftz=enable_ftz)
         if pch and pch.exists():
             cmd.extend(["-include-pch", str(pch)])
 
@@ -487,6 +498,8 @@ def main():
     build_p.add_argument("--backend", default="cpp", choices=["cpp", "llvm"], help="Compiler backend: cpp (transpiled C++) or llvm (direct LLVM IR text)")
     build_p.add_argument("--lean", action="store_true", help="Force using veloc_core.h lean runtime header")
     build_p.add_argument("--no-pch", action="store_true", help="Disable precompiled header (PCH) usage")
+    build_p.add_argument("--fp", default="strict", choices=["strict", "relaxed", "fast", "reproducible"], help="Floating-point precision semantics (default: strict IEEE-754)")
+    build_p.add_argument("--enable-ftz", action="store_true", help="Enable hardware Flush-to-Zero and Denormals-are-Zero (FTZ/DAZ)")
     build_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     run_p = subparsers.add_parser("run", help="Compile and run a .vc source file")
@@ -629,7 +642,9 @@ def main():
                     json_output=getattr(args, "json", False),
                     backend=getattr(args, "backend", "cpp"),
                     lean=getattr(args, "lean", False),
-                    no_pch=getattr(args, "no_pch", False))
+                    no_pch=getattr(args, "no_pch", False),
+                    fp_mode=getattr(args, "fp", "strict"),
+                    enable_ftz=getattr(args, "enable_ftz", False))
     elif args.command == "ir":
         from ir import IRGenerator, VeloCOptimizer
         src_path = Path(args.file)

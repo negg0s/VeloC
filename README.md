@@ -4,34 +4,32 @@
 
 ---
 
-## ⚡ Результаты бенчмарков (VeloC vs Standard C++)
-Компилятор: Clang 20 -O3, Процессор: Intel Core i5-10400F (6 ядер, 12 потоков, AVX2, FMA3)
+## ⚡ Результаты эталонных бенчмарков (VeloC vs Промышленные Baseline)
+Компилятор: Clang 20 (MinGW-w64), Процессор: Intel Core i5-10400F (6 ядер, 12 потоков, AVX2, FMA3).  
+**Политика плавающей точки по умолчанию:** `strict` (IEEE-754 compliant, `-fno-fast-math`).  
+*Честный анализ компромиссов и сценариев отставания:* [docs/perf/where-veloc-is-slower.md](docs/perf/where-veloc-is-slower.md).  
+*Спецификация контрактов точности:* [docs/perf/accuracy_contracts.md](docs/perf/accuracy_contracts.md).  
 
-| Операция / Алгоритм | Standard C++ | VeloC ULTRA | Ускорение |
-| :--- | :--- | :--- | :--- |
-| **Cross-Entropy Loss (32k vocab)** | `0.6500 ms` (scalar log+exp) | **`0.0361 ms` (`simd_cross_entropy_loss`)**| **В 18.0 раз быстрее (AVX2+FMA)** 🚀 |
-| **ArgMax (32k vocabulary/classes)** | `0.0450 ms` (`std::max_element`)| **`0.0032 ms` (`simd_argmax`)** | **В 14.1 раза быстрее (<10k тактов)** 🚀 |
-| **Ограничение диапазона (1M floats)**| `2.85 ms` (`std::clamp`) | **`0.37 ms` (`simd_clamp_array`)** | **В 7.71 раза быстрее (~10.8 GB/s)** ⚡ |
-| **Префиксная сумма (1M u32 Scan)** | `3.40 ms` (`std::inclusive_scan`) | **`1.04 ms` (`simd_prefix_sum_u32`)** | **В 3.27 раза быстрее (SIMD Carry)** 🚀 |
-| **Cosine Sim (100k queries, dim=4096)**| `184.20 ms` (scalar dot+norms)| **`32.53 ms` (`simd_cosine_similarity`)**| **В 5.66 раза быстрее (40+ GFLOPS)** 🚀 |
-| **SiLU Activation (1M floats, LLaMA)**| `4.15 ms` (scalar exp) | **`0.76 ms` (`simd_silu`)** | **В 5.46 раза быстрее (AVX2+FMA)** 🚀 |
-| **RMSNorm (1M floats, LLaMA 3)** | `4.65 ms` (скалярный mean sq) | **`0.82 ms` (`simd_rms_norm`)** | **В 5.67 раза быстрее (AVX2+FMA)** 🚀 |
-| **GeLU Activation (1M floats, LLM)** | `3.80 ms` (скалярный tanh+cube) | **`0.49 ms` (`simd_gelu`)** | **В 7.75 раза быстрее (AVX2+FMA)** 🚀 |
-| **Линейная интерполяция (1M floats)**| `4.10 ms` (`for loop` lerp) | **`1.74 ms` (`simd_lerp_array`)** | **В 2.35 раза быстрее (FMA3)** ⚡ |
-| **Бинарный поиск (100k запросов)** | `6.33 ms` (`std::lower_bound`) | **`2.93 ms` (`branchless_lower_bound`)** | **В 2.16 раза быстрее (без branch miss)** 🚀 |
-| **Softmax (32,768 logits, AI/LLM)** | `0.48 ms` (скалярный exp+sum) | **`0.0238 ms` (`simd_softmax`)** | **В 20.2 раз быстрее (AVX2+FMA)** 🚀 |
-| **3D Расстояния (1M пар, Физика)** | `11.80 ms` (scalar sqrt) | **`1.96 ms` (`simd_distance_3d`)** | **В 6.02 раза быстрее (>500M/сек)** 🚀 |
-| **Dot Product (10M floats, AI)** | `24.50 ms` (`std::inner_product`) | **`4.29 ms` (`simd_dot_product`)** | **В 5.71 раза быстрее (>46.5 GFLOPS)** 🚀 |
-| **Поиск в тексте (10M символов)** | `12.80 ms` (`std::string::find`) | **`0.55 ms` (`simd_find_char`)** | **В 23.2 раза быстрее (~21.8 GB/s)** 🚀 |
-| **Инверсия изображения (10 MB)** | `4.60 ms` (`for loop`) | **`0.53 ms` (`simd_image_invert`)** | **В 8.68 раза быстрее (~18.8 GB/s)** ⚡ |
-| **Микширование звука (1M samples)** | `4.20 ms` (FPU scalar) | **`1.02 ms` (`simd_audio_mix`)** | **В 4.12 раза быстрее (AVX2+FMA3)** ⚡ |
-| **Хэширование буфера (10 MB)** | `18.20 ms` (`std::hash`) | **`3.66 ms` (`hash64`)** | **В 4.97 раза быстрее (~2.73 GB/s)** ⚡ |
-| **Сортировка 1,000,000 чисел** | `43.77 ms` (`std::sort`) | **`9.64 ms` (`radix_sort_u32`)** | **В 4.54 раза быстрее (минус 99M тактов)** 🚀 |
-| **3D N-Body (16K тел, 268M пар)** | `619.98 ms` (1 поток) | **`27.33 ms` (196.45 GFLOPS, 12 потоков)** | **В 22.7 раза быстрее (+2170%)** 🚀 |
-| **Поиск Min/Max (1M floats)** | `1.45 ms` (`std::minmax_element`) | **`0.25 ms` (`simd_min_max_f32`)** | **В 5.8 раз быстрее (~17.1 GB/s)** ⚡ |
-| **Аллокация 10,000 сущностей** | `0.4500 ms` (`malloc / new`) | **`0.0231 ms` (`FixedPool`)** | **В 19.5 раз быстрее (2.3 нс/объект)** ⚡ |
-| **Транспонирование матрицы 4x4** | 16 инструкций (память/кэш) | **4 инструкции SIMD (`Mat4::transposed`)** | **В 4 раза быстрее (в регистрах)** ⚡ |
-| **Матчинг строк (`match / switch_str`)** | Серия `if (s == "...")` | **Аппаратный Jump Table (str_hash)** | **O(1) без посимвольного сравнения строк** ⚡ |
+| Ядро / Алгоритм | Baseline (Версия, Флаги) | Режим точности | Размер данных | Потоки | VeloC Результат | % от пика железа | ULP Ошибка |
+|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **GEMM (AVX2 6x16)** | OpenBLAS / Eigen (-O3) | `strict` | $512 \times 512$ | 6T | **68.4 GFLOPS** | **17.8% FMA Peak** | 0 ULP |
+| **GEMM (L1 Cache)** | Naive C++ (-O3) | `strict` | $64 \times 64$ | 1T | **35.0 GFLOPS** | **50.8% FMA Single**| 0 ULP |
+| **Dot Product** | `std::inner_product` (-O3) | `strict` | 20M floats (80MB) | 1T | **9.51 GB/s** | **23.7% STREAM** | 0 ULP |
+| **STREAM Memory Copy** | Reference STREAM C (-O3)| `strict` | 10M floats (40MB) | 1T | **40.13 GB/s** | **94.1% DDR4 Max** | Exact |
+| **Eytzinger Search (L1)**| `std::lower_bound` (-O3) | Integer | 1,024 elements | 1T | **15.4 ns / op** (4.26x) | — | Exact |
+| **Eytzinger Search (RAM)**| `std::lower_bound` (-O3)| Integer | 4,194,304 elements | 1T | **256.5 ns / op** (2.43x)| — | Exact |
+| **SwissTable (Insert)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **70.2 ns / op** (10.4x) | — | Exact |
+| **SwissTable (Hit)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **87.9 ns / op** (1.34x) | — | Exact |
+| **SwissTable (Miss)** | `std::unordered_map` (-O3)| Hash | 500k keys (LF 0.85) | 1T | **25.1 ns / op** (6.52x) | — | Exact |
+| **Hardware CRC32C** | zlib / Software CRC (-O3) | Bitwise | 64-byte chunks | 1T | **25.53 GB/s** | Hardware SSE4.2 | 0 ULP |
+| **Quicksort (Sorted)** | `std::sort` (-O3) | Integer | 1,000,000 ints | 1T | **2.27 ms** (441M/s) | — | Exact |
+| **Quicksort (Random)** | `std::sort` (-O3) | Integer | 1,000,000 ints | 1T | **61.90 ms** (16M/s) | — | Exact |
+| **Math: `exp(x)`** | `libm expf` (C99 -O3) | `strict` | Uniform & Tricky | 1T | **46.6 ns** | IEEE-754 | **0.0 ULP** |
+| **Math: `exp_fast(x)`** | SLEEF / Polynomial (-O3) | `fast` | Uniform & Tricky | 1T | **34.9 ns** (1.33x) | — | **<= 2.8 ULP** |
+| **Math: `log_fast(x)`** | `libm logf` (C99 -O3) | `fast` | Uniform & Tricky | 1T | **10.3 ns** (3.2x) | — | **<= 1.0 ULP** |
+| **Math: `sqrt_fast(x)`**| `libm sqrtf` (C99 -O3) | `fast` | Uniform & Tricky | 1T | **2.65 ns** (3.4x) | — | **<= 3.0 ULP** |
+| **Kahan Reduction** | Naive float sum (-O3) | `reproducible` | Ill-conditioned $10^8$| 1T | **1000.0 (Exact)** | — | **0 ULP** (vs Naive 0.0) |
+| **Pairwise Reduction** | Naive parallel sum (-O3)| `reproducible` | 100,000 floats | 1..12T| **100% Bit-Identical**| — | **0 ULP** |
 
 ---
 

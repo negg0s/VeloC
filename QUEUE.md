@@ -41,3 +41,9 @@
   - [x] Блок D: Прямой LLVM IR бэкенд (`src/llvm_backend.py` компилирует за 420.1 ms без C++ транспиляции и STL).
   - [x] Блок E: Анализ размера бинарников и потребления памяти (`src/size_analyzer.py`, стриппинг `-Oz`, время до main 55.09 ms, аудит памяти компилятора: 100k LOC за 10.89 MB RAM, 1M LOC за 110.93 MB RAM).
   - [x] Блок F: Бюджеты сборки и предотвращение регрессий (`perf-budget.toml`, `veloc build-bisect`, `docs/compile-speed.md`, ADR-0022).
+- [x] **ЭТАП 10**: Численные методы, контракты точности и честные baseline (VeloC 1.0.0-rc3). (Выполнен 2026-10-17).
+  - [x] Блок A: Политика плавающей точки (устранение глобального `-ffast-math`, `--fp={strict,relaxed,fast,reproducible}`, `--enable-ftz`, `#[fp(...)]`, линтер `FP-001..003`, `docs/numerics/policy.md`).
+  - [x] Блок B: Контракты точности и ULP-харнесс (`include/veloc_numerics.h`, `#[accuracy(...)]`, 50k точек, `benchmarks/numerics_accuracy_harness.py`, `docs/perf/accuracy_contracts.md`).
+  - [x] Блок C: Ядра против сильных baseline (STREAM 40.13 GB/s, AVX2 FMA GEMM 35.0 GFLOPS, Eytzinger search 4.26x к `std::lower_bound`, SwissTable 10.36x к `std::unordered_map`, CRC32C 25.53 GB/s, документация ядер в `docs/perf/kernels/`).
+  - [x] Блок D: Безопасность хвостовых итераций и граничные условия (длины 0..67, canaries 0 corruptions, невыровненные указатели, NaN/subnormal дорожки, `tests/test_simd_dispatch_tails.py`).
+  - [x] Блок E: Честный отчет "Где VeloC не быстрее" (`docs/perf/where-veloc-is-slower.md`) и обновление таблицы README.md.

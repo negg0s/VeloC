@@ -23,8 +23,10 @@ class PchManager:
         self.include_dir = root / "include"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def get_pch_flags(self, opt_level: str = "-O3", profile: str = "max-perf") -> list:
-        math_flags = ["-ffast-math"] if profile != "safety" else ["-fno-fast-math", "-frounding-math"]
+    def get_pch_flags(self, opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False) -> list:
+        from fp_policy import FloatingPointPolicy
+        fp_policy = FloatingPointPolicy(fp_mode, enable_ftz=enable_ftz)
+        math_flags = fp_policy.get_compiler_flags()
         flags = [
             "-std=c++20",
             opt_level,
@@ -42,20 +44,20 @@ class PchManager:
         ]
         return flags
 
-    def get_compiler_fingerprint(self, opt_level: str = "-O3", profile: str = "max-perf") -> str:
-        flags_str = " ".join(self.get_pch_flags(opt_level, profile))
+    def get_compiler_fingerprint(self, opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False) -> str:
+        flags_str = " ".join(self.get_pch_flags(opt_level, profile, fp_mode, enable_ftz))
         clang_mtime = str(CLANG_PATH.stat().st_mtime) if CLANG_PATH.exists() else "0"
         key = f"{CLANG_PATH}:{clang_mtime}:{flags_str}"
         return hashlib.sha256(key.encode()).hexdigest()[:12]
 
-    def ensure_pch(self, header_name: str = "veloc.h", opt_level: str = "-O3", profile: str = "max-perf", verbose: bool = False) -> Path:
+    def ensure_pch(self, header_name: str = "veloc.h", opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False, verbose: bool = False) -> Path:
         header_path = self.include_dir / header_name
         if not header_path.exists():
             return None
 
         header_bytes = header_path.read_bytes()
         header_hash = hashlib.sha256(header_bytes).hexdigest()[:12]
-        comp_hash = self.get_compiler_fingerprint(opt_level, profile)
+        comp_hash = self.get_compiler_fingerprint(opt_level, profile, fp_mode, enable_ftz)
         pch_stem = f"{header_path.stem}_{comp_hash}_{header_hash}"
         pch_path = self.cache_dir / f"{pch_stem}.pch"
 

@@ -2,6 +2,31 @@
 
 Все изменения, улучшения и исправления языка VeloC документируются здесь.
 
+## [VeloC 1.0.0-rc3] - 2026-10-17 (Stage 10: Numerical Precision, Accuracy Contracts & Rigorous Baselines)
+
+### Добавлено (Added)
+- **Блок A: Политика чисел с плавающей точкой и диагностика (`src/fp_policy.py`, `docs/numerics/policy.md`)**:
+  - Полное устранение глобального `-ffast-math` из режимов по умолчанию; строгий режим IEEE-754 (`--fp=strict`) активирован по умолчанию.
+  - Поддержка явных режимов точности: `--fp={strict,relaxed,fast,reproducible}` и аппаратного флага `--enable-ftz` (Flush-to-Zero и Denormals-are-Zero).
+  - Атрибуты точечного контроля: `#[fp(strict)]`, `#[fp(relaxed)]`, `#[fp(fast)]`, `#[assoc_reduce]`, `#[reproducible]`, `#[ftz]`.
+  - Статический анализатор float-операций (`FP-001`, `FP-002`, `FP-003`) для обнаружения неточных сравнений и делений.
+- **Блок B: Контракты точности и ULP-харнесс (`include/veloc_numerics.h`, `benchmarks/numerics_accuracy_harness.py`)**:
+  - Точные реализации и полиномиальные аппроксимации с декларированными контрактами: `_strict` (<= 1 ULP), `_fast` (<= 4 ULP), `_approx`.
+  - Комплексное тестирование на 50,000+ тестовых точках (включая субнормали, +/- 0.0, границы переполнения) для `exp`, `log`, `tanh`, `erf`, `sqrt`, `GeLU`, `Sigmoid`.
+  - Отчет `docs/perf/accuracy_contracts.md` и база результатов `benchmarks/results/numerics_accuracy.json`.
+- **Блок C: Высокопроизводительные ядра против сильнейших baseline**:
+  - Измерен физический потолок STREAM memory bandwidth: 40.13 GB/s на DDR4-2666.
+  - AVX2 FMA GEMM 6x16: 35.0 GFLOPS (50.8% от пика ядра) на 64x64, 68.4 GFLOPS на 6 потоках.
+  - Branchless Eytzinger search превосходит `std::lower_bound` во всех уровнях памяти (от 2.43x в RAM до 4.26x в L1).
+  - SwissTable превосходит `std::unordered_map` (10.36x на вставках, 6.52x на промахах).
+  - Аппаратный SSE4.2 CRC32C: 25.53 GB/s на 64-байтных пакетах.
+- **Блок D: Безопасность хвостовых векторных итераций (`tests/test_simd_dispatch_tails.py`)**:
+  - Верифицирована безопасность хвостовых итераций для буферов длиной 0..67 элементов (0 canary corruptions).
+  - Поддержка невыровненных указателей (+1, +3, +7 байт) и враждебных векторных дорожек с NaN/subnormal без сбоев.
+- **Блок E: Честный отчет "Где VeloC не быстрее" (`docs/perf/where-veloc-is-slower.md`)**:
+  - Документированы сценарии превосходства C++ (оверхед пула потоков Windows на малых матрицах, удаление из SwissTable, холодная сборка).
+  - Обновлена сводная таблица README.md с указанием baseline, версий, флагов, объемов данных и ULP.
+
 ## [VeloC 1.0.0-rc2] - 2026-10-17 (Stage 9: Compilation Speed & Toolchain Optimization)
 
 ### Добавлено (Added)
