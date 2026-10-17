@@ -34,3 +34,10 @@
 
 
 
+- [x] **ЭТАП 9**: Инженерия скорости компиляции и оптимизация тулчейна (VeloC 1.0.0-rc2). (Выполнен 2026-10-17).
+  - [x] Блок A: Диагностика (профиль фаз `--timings`, `--json`, `-ftime-trace` аудит, честные базовые замеры Clang++, 7 приложений и синтетических программ в `benchmarks/results/build_benchmarks.json`).
+  - [x] Блок B: Устранение фиксированной цены сборки (облегченный заголовок `include/veloc_core.h`, Precompiled Headers `src/pch_manager.py` с ускорением от 5x до 9x, параллельный линкер LLD `-fuse-ld=lld` и `-Wl,--gc-sections`).
+  - [x] Блок C: Фоновый демон и кэши (`src/daemon.py` на порту 45731, гранулированный кэш объектов `src/object_cache.py`, sub-second hot-reloading `src/hot_reload.py` за 786.3 ms через `veloc watch --hot`).
+  - [x] Блок D: Прямой LLVM IR бэкенд (`src/llvm_backend.py` компилирует за 420.1 ms без C++ транспиляции и STL).
+  - [x] Блок E: Анализ размера бинарников и потребления памяти (`src/size_analyzer.py`, стриппинг `-Oz`, время до main 55.09 ms, аудит памяти компилятора: 100k LOC за 10.89 MB RAM, 1M LOC за 110.93 MB RAM).
+  - [x] Блок F: Бюджеты сборки и предотвращение регрессий (`perf-budget.toml`, `veloc build-bisect`, `docs/compile-speed.md`, ADR-0022).

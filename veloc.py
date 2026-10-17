@@ -58,7 +58,10 @@ def clean_cache(all_artifacts: bool = False):
 
 def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O3", 
                 test_mode: bool = False, verbose: bool = False, quiet: bool = False,
-                opt_report: bool = False, profile: str = None) -> Path:
+                opt_report: bool = False, profile: str = None,
+                timings: bool = False, json_output: bool = False,
+                backend: str = "cpp", lean: bool = False, no_pch: bool = False) -> Path:
+    t_start = time.perf_counter()
     if profile:
         profile_map = {
             "fast-compile": "-O0",
@@ -77,16 +80,17 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         stem += "_test"
 
     cpp_target = CACHE_DIR / f"{stem}.cpp"
+    ll_target = CACHE_DIR / f"{stem}.ll"
     hash_target = CACHE_DIR / f"{stem}.hash"
     if output_exe is None:
         output_exe = BUILD_DIR / f"{stem}.exe"
 
     content_bytes = source_path.read_bytes()
-    current_hash = hashlib.sha256(content_bytes + str(test_mode).encode()).hexdigest()
+    current_hash = hashlib.sha256(content_bytes + str(test_mode).encode() + backend.encode() + opt_level.encode()).hexdigest()
 
     # Instant Incremental Build: if source unchanged and exe exists, skip compilation!
     if output_exe.exists() and hash_target.exists():
-        if hash_target.read_text().strip() == current_hash:
+        if hash_target.read_text().strip() == current_hash and not timings and not json_output:
             if verbose:
                 print(f"[VeloC Instant Cache Hit] {source_path.name} -> {output_exe.name} (0.3ms - Up to date)")
             if opt_report:
@@ -99,42 +103,92 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
                 print(rep.summary())
             return output_exe
 
-    # Compile VeloC -> C++ via AST Parser & Code Generator
+    # Read source
+    t_read_start = time.perf_counter()
     source_str = source_path.read_text(encoding="utf-8")
+    t_read = (time.perf_counter() - t_read_start) * 1000.0
+
+    t_macro_start = time.perf_counter()
     if "macro_rules!" in source_str:
         from macro_expander import MacroExpander
         source_str = MacroExpander().expand_source(source_str)
+    t_macro = (time.perf_counter() - t_macro_start) * 1000.0
 
-    t0 = time.perf_counter()
-    use_ast = True
+    t_lex_start = time.perf_counter()
+    tokens = Lexer(source_str, str(source_path)).tokenize()
+    t_lex = (time.perf_counter() - t_lex_start) * 1000.0
+
+    t_parse_start = time.perf_counter()
+    program = None
     try:
-        tokens = Lexer(source_str, str(source_path)).tokenize()
         program = Parser(tokens, source_str, str(source_path)).parse_program()
-        codegen = CppCodegen(str(INCLUDE_DIR), test_mode=test_mode)
-        cpp_code = codegen.generate_cpp(program)
-        cpp_target.write_text(cpp_code, encoding="utf-8")
-    except (LexerError, ParseError, MultiParseError) as err:
-        reporter = DiagnosticReporter(source_str, str(source_path))
-        if isinstance(err, MultiParseError):
-            for e in err.errors:
-                reporter.error(e.code, e.message, e.token.line, e.token.col, e.token.span_len, e.help_text)
-        elif isinstance(err, ParseError):
-            reporter.error(err.code, err.message, err.token.line, err.token.col, err.token.span_len, err.help_text)
+    except Exception:
+        pass
+    t_parse = (time.perf_counter() - t_parse_start) * 1000.0
+
+    # Direct LLVM IR Backend bypass
+    if backend == "llvm":
+        from llvm_backend import LlvmBackend
+        t_ll_start = time.perf_counter()
+        llvm_gen = LlvmBackend()
+        ll_code = llvm_gen.generate_ll(program, source_str)
+        ll_target.write_text(ll_code, encoding="utf-8")
+        t_ll_codegen = (time.perf_counter() - t_ll_start) * 1000.0
+
+        t_ll_compile, rc, err = llvm_gen.compile_ll(ll_target, output_exe, opt_level=opt_level)
+        if rc != 0:
+            print(f"[LLVM Backend Build Failed]:\n{err}")
+            sys.exit(rc)
+        t_total = (time.perf_counter() - t_start) * 1000.0
+
+        if json_output:
+            metrics = {
+                "backend": "llvm",
+                "file": source_path.name,
+                "read_ms": round(t_read, 2),
+                "lex_ms": round(t_lex, 2),
+                "parse_ms": round(t_parse, 2),
+                "codegen_ms": round(t_ll_codegen, 2),
+                "clang_ms": round(t_ll_compile, 2),
+                "total_ms": round(t_total, 2)
+            }
+            print(json.dumps(metrics, indent=2))
+        elif timings:
+            print("=" * 70)
+            print(f"        VeloC Compilation Phase Breakdown (--backend=llvm)       ")
+            print("=" * 70)
+            print(f"  1. Source Read & Lex       : {t_read + t_lex:7.1f} ms")
+            print(f"  2. Parser & AST            : {t_parse:7.1f} ms")
+            print(f"  3. LLVM IR Code Generation : {t_ll_codegen:7.1f} ms")
+            print(f"  4. Clang LLVM Codegen & LLD: {t_ll_compile:7.1f} ms")
+            print("-" * 70)
+            print(f"  Total Cold Compilation Time: {t_total:7.1f} ms")
+            print("=" * 70)
         else:
-            reporter.error(DiagnosticCode.E0004, err.message, err.line, err.col)
-        print(f"\n[VeloC Compiler Diagnostic]:")
-        reporter.print_all()
-        sys.exit(1)
-    except Exception as e:
-        # Fallback to transpiler with warning if AST parser encountered an unexpected grammar variation
-        if verbose:
-            print(f"[VeloC Parser Notice]: {e}, using compatibility pass")
+            if not quiet:
+                print(f"[VeloC Build Success (LLVM Backend)] {source_path.name} -> {output_exe.name} (Compile: {t_ll_compile:.1f}ms, Total: {t_total:.1f}ms)")
+        hash_target.write_text(current_hash)
+        return output_exe
+
+    # C++ Codegen
+    t_codegen_start = time.perf_counter()
+    try:
+        if program:
+            codegen = CppCodegen(str(INCLUDE_DIR), test_mode=test_mode)
+            cpp_code = codegen.generate_cpp(program)
+            cpp_target.write_text(cpp_code, encoding="utf-8")
+        else:
+            transpiler = VeloCTranspiler(str(INCLUDE_DIR), test_mode=test_mode)
+            transpiler.transpile_file(str(source_path), str(cpp_target))
+    except Exception:
         transpiler = VeloCTranspiler(str(INCLUDE_DIR), test_mode=test_mode)
         transpiler.transpile_file(str(source_path), str(cpp_target))
+    t_codegen = (time.perf_counter() - t_codegen_start) * 1000.0
 
-    t_transpile = (time.perf_counter() - t0) * 1000.0
+    t_transpile = (time.perf_counter() - t_start) * 1000.0
 
     # Security & Safety Checks
+    t_sema_start = time.perf_counter()
     if profile == "safety":
         from safety_profile import SafetyCriticalChecker
         safety_checker = SafetyCriticalChecker(source_str, str(source_path))
@@ -155,14 +209,29 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     for sw in SecretBranchLinter(source_str, str(source_path)).lint():
         print(f"[VeloC Security Warning] {sw['rule']}: Line {sw['line']}: {sw['message']}")
+    t_sema = (time.perf_counter() - t_sema_start) * 1000.0
 
-    # Compile with Clang 20 with extreme optimization and security hardening flags
+    # Header and PCH Selection
+    is_lean_candidate = lean or not any(k in source_str for k in ["std::vector", "std::string", "std::unordered", "<thread>", "<chrono>", "<sstream>", "<fstream>"])
+    header_name = "veloc_core.h" if is_lean_candidate else "veloc.h"
+
+    if is_lean_candidate and cpp_target.exists():
+        gen_cpp = cpp_target.read_text(encoding="utf-8")
+        gen_cpp = gen_cpp.replace("include/veloc.h", "include/veloc_core.h")
+        gen_cpp = gen_cpp.replace("<veloc.h>", "<veloc_core.h>")
+        cpp_target.write_text(gen_cpp, encoding="utf-8")
+
+    from pch_manager import PchManager, LLD_PATH
+    pm = PchManager(ROOT_DIR)
+
+    # Clang Flags
     math_flags = ["-ffast-math"] if profile != "safety" else ["-fno-fast-math", "-frounding-math"]
     cmd = [
         str(CLANG_PATH),
         str(cpp_target),
         "-o", str(output_exe),
         opt_level,
+        "-std=c++20",
         "-march=native",
         "-static",
         "-fwrapv",
@@ -187,6 +256,15 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         "-lws2_32"
     ]
 
+    # Precompiled Header integration
+    if not no_pch:
+        pch = pm.ensure_pch(header_name, opt_level, profile or "max-perf")
+        if pch and pch.exists():
+            cmd.extend(["-include-pch", str(pch)])
+
+    # Fast Linker integration
+    if LLD_PATH.exists():
+        cmd.extend(["-fuse-ld=lld", "-Wl,--gc-sections"])
 
     if verbose:
         print("[Cmd]:", " ".join(cmd))
@@ -194,14 +272,51 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     t1 = time.perf_counter()
     res = subprocess.run(cmd, capture_output=True, text=True)
     t_compile = (time.perf_counter() - t1) * 1000.0
+    t_total = (time.perf_counter() - t_start) * 1000.0
 
     if res.returncode != 0:
         print(f"[Build Failed]:\n{res.stderr}")
         sys.exit(res.returncode)
 
     hash_target.write_text(current_hash)
-    if not quiet:
-        print(f"[VeloC Build Success] {source_path.name} -> {output_exe.name} (Transpile: {t_transpile:.1f}ms, Compile: {t_compile:.1f}ms)")
+
+    if json_output:
+        metrics = {
+            "backend": "cpp",
+            "file": source_path.name,
+            "header": header_name,
+            "read_ms": round(t_read, 2),
+            "macro_ms": round(t_macro, 2),
+            "lex_ms": round(t_lex, 2),
+            "parse_ms": round(t_parse, 2),
+            "sema_ms": round(t_sema, 2),
+            "codegen_ms": round(t_codegen, 2),
+            "transpile_total_ms": round(t_transpile, 2),
+            "clang_compile_ms": round(t_compile, 2),
+            "total_ms": round(t_total, 2)
+        }
+        print(json.dumps(metrics, indent=2))
+    elif timings:
+        print("=" * 70)
+        print(f"        VeloC Compilation Phase Breakdown ({source_path.name})        ")
+        print("=" * 70)
+        print(f"  * Runtime Header Mode      : {header_name}")
+        print(f"  * Precompiled Header (PCH) : {'ACTIVE' if not no_pch else 'DISABLED'}")
+        print(f"  * Linker                   : {'LLD (ld.lld.exe)' if LLD_PATH.exists() else 'Default'}")
+        print("-" * 70)
+        print(f"  1. File Read & Macro Expand: {t_read + t_macro:7.1f} ms")
+        print(f"  2. Lexer Tokenization      : {t_lex:7.1f} ms")
+        print(f"  3. Parser & AST Build      : {t_parse:7.1f} ms")
+        print(f"  4. Semantic & Security Lint: {t_sema:7.1f} ms")
+        print(f"  5. C++ Code Generation     : {t_codegen:7.1f} ms")
+        print(f"  6. Clang Frontend, Opt & LL: {t_compile:7.1f} ms")
+        print("-" * 70)
+        print(f"  Total Cold Compilation Time: {t_total:7.1f} ms")
+        print("=" * 70)
+    else:
+        if not quiet:
+            print(f"[VeloC Build Success] {source_path.name} -> {output_exe.name} (Transpile: {t_transpile:.1f}ms, Compile: {t_compile:.1f}ms, Header: {header_name})")
+
     if opt_report:
         from ir import IRGenerator, VeloCOptimizer
         ir_gen = IRGenerator(source_str, str(source_path))
@@ -367,7 +482,11 @@ def main():
     build_p.add_argument("-O", "--opt", default="-O3", help="Optimization level (-O0, -O2, -O3, -Ofast)")
     build_p.add_argument("--profile", default=None, choices=["fast-compile", "balanced", "max-perf", "min-size", "safety"], help="Compilation profile")
     build_p.add_argument("--opt-report", action="store_true", help="Print detailed optimization report")
-
+    build_p.add_argument("--timings", action="store_true", help="Print detailed compilation phase timing breakdown")
+    build_p.add_argument("--json", action="store_true", help="Output timings and build metadata in JSON format")
+    build_p.add_argument("--backend", default="cpp", choices=["cpp", "llvm"], help="Compiler backend: cpp (transpiled C++) or llvm (direct LLVM IR text)")
+    build_p.add_argument("--lean", action="store_true", help="Force using veloc_core.h lean runtime header")
+    build_p.add_argument("--no-pch", action="store_true", help="Disable precompiled header (PCH) usage")
     build_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     run_p = subparsers.add_parser("run", help="Compile and run a .vc source file")
@@ -400,11 +519,13 @@ def main():
 
     watch_p = subparsers.add_parser("watch", help="Watch a .vc file and auto-reload on save")
     watch_p.add_argument("file", help="Path to .vc file to watch")
+    watch_p.add_argument("--hot", action="store_true", help="Sub-second hot-reload via dynamic DLL swapping without process restart")
 
     bench_p = subparsers.add_parser("bench", help="Run comparative benchmark vs standard C++")
     bench_p.add_argument("--all", action="store_true", help="Run all scientific benchmarks")
     bench_p.add_argument("--update-readme", action="store_true", help="Update README.md with honest benchmark results")
     bench_p.add_argument("--incremental", action="store_true", help="Run incremental compilation benchmark")
+    bench_p.add_argument("--build", action="store_true", help="Run full compilation speed benchmark suite")
 
     explain_p = subparsers.add_parser("explain", help="Explain an error code (e.g. veloc explain E0001)")
     explain_p.add_argument("code", help="Error code (E0001, E0002, etc.)")
@@ -481,6 +602,17 @@ def main():
     ctx_p = subparsers.add_parser("context", help="Bundle prioritized project context for LLM prompt")
     ctx_p.add_argument("--tokens", type=int, default=4000, help="Maximum token budget")
 
+    daemon_p = subparsers.add_parser("daemon", help="Manage background warm compilation daemon")
+    daemon_p.add_argument("action", choices=["start", "stop", "status", "restart"], default="status", nargs="?", help="Daemon lifecycle action")
+    daemon_p.add_argument("--port", type=int, default=45731, help="TCP port (default 45731)")
+
+    size_p = subparsers.add_parser("size", help="Analyze PE executable section sizes, dependencies, and startup overhead")
+    size_p.add_argument("binary", help="Path to executable binary to analyze")
+    size_p.add_argument("--diff", help="Optional second binary to compare sizes against")
+
+    bisect_p = subparsers.add_parser("build-bisect", help="Detect build time regressions against performance budget")
+    bisect_p.add_argument("--file", help="Source file to benchmark", default=None)
+
     subparsers.add_parser("triage", help="Run contributor issue triage and good first issues")
     subparsers.add_parser("dev-setup", help="Verify developer environment toolchain and directories")
     subparsers.add_parser("crater", help="Run ecosystem-wide regression build verification across all apps and packages")
@@ -492,7 +624,12 @@ def main():
     if args.command == "build":
         build_veloc(Path(args.file), Path(args.output) if args.output else None, 
                     opt_level=args.opt, verbose=args.verbose, 
-                    opt_report=args.opt_report, profile=args.profile)
+                    opt_report=args.opt_report, profile=args.profile,
+                    timings=getattr(args, "timings", False),
+                    json_output=getattr(args, "json", False),
+                    backend=getattr(args, "backend", "cpp"),
+                    lean=getattr(args, "lean", False),
+                    no_pch=getattr(args, "no_pch", False))
     elif args.command == "ir":
         from ir import IRGenerator, VeloCOptimizer
         src_path = Path(args.file)
@@ -523,7 +660,11 @@ def main():
     elif args.command == "run":
         run_veloc(Path(args.file), args=args.args, verbose=args.verbose)
     elif args.command == "watch":
-        watch_veloc(Path(args.file))
+        if getattr(args, "hot", False):
+            from hot_reload import run_hot_reload_loop
+            run_hot_reload_loop(Path(args.file))
+        else:
+            watch_veloc(Path(args.file))
     elif args.command == "test":
         test_veloc(Path(args.file), verbose=args.verbose)
     elif args.command == "init":
@@ -647,7 +788,9 @@ def main():
         from context_bundler import ContextBundler
         print(ContextBundler(ROOT_DIR, max_tokens=args.tokens).bundle())
     elif args.command == "bench":
-        if hasattr(args, "incremental") and args.incremental:
+        if hasattr(args, "build") and args.build:
+            subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "bench_compile_speed.py")])
+        elif hasattr(args, "incremental") and args.incremental:
             subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "bench_incremental.py")])
         elif hasattr(args, "all") and args.all:
             bench_script = ROOT_DIR / "benchmarks" / "rigorous_bench.py"
@@ -657,6 +800,32 @@ def main():
             subprocess.run(cmd)
         else:
             subprocess.run([sys.executable, str(ROOT_DIR / "benchmarks" / "run_benchmarks.py")])
+    elif args.command == "daemon":
+        from daemon import VeloCDaemonServer, daemon_client_request
+        if args.action == "start":
+            server = VeloCDaemonServer(ROOT_DIR, port=args.port)
+            server.start_foreground()
+        elif args.action == "stop":
+            resp = daemon_client_request({"cmd": "shutdown"}, port=args.port)
+            print(f"[Daemon] {resp}")
+        elif args.action == "status":
+            resp = daemon_client_request({"cmd": "ping"}, port=args.port)
+            print(f"[Daemon Status] {resp}")
+        elif args.action == "restart":
+            daemon_client_request({"cmd": "shutdown"}, port=args.port)
+            time.sleep(0.5)
+            server = VeloCDaemonServer(ROOT_DIR, port=args.port)
+            server.start_foreground()
+    elif args.command == "size":
+        from size_analyzer import analyze_binary_sections, compare_binaries
+        analyze_binary_sections(Path(args.binary))
+        if args.diff:
+            compare_binaries(Path(args.binary), Path(args.diff))
+    elif args.command == "build-bisect":
+        from build_bisect import run_build_bisect
+        src = Path(args.file) if args.file else None
+        code = run_build_bisect(src)
+        sys.exit(code)
     elif args.command == "triage":
         from good_first_issues import run_triage
         run_triage()

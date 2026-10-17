@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-10-17 14:14:55",
+  "compiler": "Clang 20 (Windhawk / MinGW)",
+  "hardware": "Intel Core i5-10400F @ 2.90 GHz (6C / 12T)",
+  "phases_breakdown": {},
+  "c_cpp_baselines": {
+    "empty": {
+      "cold_ms": 440.42,
+      "hot_ms": 433.67
+    },
+    "hello_world": {
+      "cold_ms": 470.4,
+      "hot_ms": 385.69
+    },
+    "hello_iostream": {
+      "cold_ms": 1894.45,
+      "hot_ms": 1953.16
+    },
+    "full_veloc_header": {
+      "cold_ms": 3518.92,
+      "hot_ms": 3518.19
+    }
+  },
+  "apps_build_times": {
+    "veloc-compiler": {
+      "cold_ms": 3814.15,
+      "hot_ms": 309.29,
+      "status": "PASS"
+    },
+    "veloc-db": {
+      "cold_ms": 3428.39,
+      "hot_ms": 245.39,
+      "status": "PASS"
+    },
+    "veloc-edit": {
+      "cold_ms": 3481.28,
+      "hot_ms": 246.25,
+      "status": "PASS"
+    },
+    "veloc-llm": {
+      "cold_ms": 3571.08,
+      "hot_ms": 270.62,
+      "status": "PASS"
+    },
+    "veloc-pathtracer": {
+      "cold_ms": 3647.9,
+      "hot_ms": 295.77,
+      "status": "PASS"
+    },
+    "veloc-render": {
+      "cold_ms": 3249.66,
+      "hot_ms": 312.8,
+      "status": "PASS"
+    },
+    "veloc-sync": {
+      "cold_ms": 3583.42,
+      "hot_ms": 248.9,
+      "status": "PASS"
+    }
+  },
+  "synthetic_scaling": {
+    "1000_loc": {
+      "clang_cold_ms": 512.33,
+      "clang_hot_ms": 525.41
+    },
+    "10000_loc": {
+      "clang_cold_ms": 994.29,
+      "clang_hot_ms": 934.52
+    },
+    "100000_loc": {
+      "clang_cold_ms": 5391.9,
+      "clang_hot_ms": 5321.9
+    }
+  }
+}

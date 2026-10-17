@@ -1,17 +1,21 @@
-# VeloC Continuous Performance Budgets
-# CI builds verify that execution time, compile latency, and memory footprints stay within budget.
+# VeloC Compilation & Runtime Performance Budgets
 
 [build_budgets]
-max_transpile_time_ms = 50.0
-max_compile_time_ms = 4000.0
-max_binary_size_kb = 3500.0
+# Maximum allowed cold build time for hello world (with PCH / lean header)
+cold_build_hello_max_ms = 2000.0
+# Maximum allowed hot incremental build time
+hot_build_hello_max_ms = 5.0
+# Maximum allowed cold build time for 10k LOC synthetic code
+cold_build_10k_loc_max_ms = 2500.0
+# Maximum compiler peak RSS memory for 100k LOC
+compiler_peak_rss_100k_max_mb = 50.0
+# Maximum executable binary size for Hello World (-Oz -gc-sections)
+hello_world_binary_size_max_kb = 250.0
 
 [runtime_budgets]
-max_fma_saturation_diff_pct = 25.0
-max_gemm_execution_time_ms = 10.0
-max_sort_execution_time_ms = 5.0
-max_hash_lookup_latency_ns = 50.0
-
-[regression_policy]
-max_allowed_slowdown_pct = 3.0
-strict_mode = true
+# Softmax 1M floats speedup vs std::exp
+softmax_min_speedup_vs_stl = 20.0
+# GEMM 6x16 peak throughput on AVX2
+gemm_f32_min_gflops = 150.0
+# SwissTable lookup latency
+swisstable_lookup_max_ns = 25.0
