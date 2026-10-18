@@ -10,8 +10,7 @@ import re
 import subprocess
 import time
 
-CLANG_PATH = Path("C:/Program Files/Windhawk/Compiler/bin/clang++.exe")
-LLD_PATH = Path("C:/Program Files/Windhawk/Compiler/bin/ld.lld.exe")
+from toolchain import CLANG_PATH, LLD_PATH
 
 class LlvmBackend:
     def __init__(self, target_triple: str = "x86_64-w64-windows-gnu"):
@@ -138,16 +137,17 @@ class LlvmBackend:
 
     def compile_ll(self, ll_path: Path, output_exe: Path, opt_level: str = "-O3") -> Tuple[float, int, str]:
         t0 = time.perf_counter()
+        if CLANG_PATH is None or not CLANG_PATH.exists():
+            return 0.0, 1, "clang++ not found (set VELOC_CLANG or install LLVM)"
         cmd = [
             str(CLANG_PATH),
             "-m64",
-            "-mconsole",
             "-x", "ir",
             opt_level,
             str(ll_path),
             "-o", str(output_exe)
         ]
-        if LLD_PATH.exists():
+        if LLD_PATH is not None and LLD_PATH.exists():
             cmd.extend(["-fuse-ld=lld", "-Wl,--gc-sections"])
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         dur = (time.perf_counter() - t0) * 1000.0

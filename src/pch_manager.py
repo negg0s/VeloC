@@ -10,11 +10,11 @@ import subprocess
 import time
 from pathlib import Path
 
-ROOT_DIR = Path("D:/VeloC")
+ROOT_DIR = Path(__file__).resolve().parent.parent
 INCLUDE_DIR = ROOT_DIR / "include"
 CACHE_DIR = ROOT_DIR / ".cache"
-CLANG_PATH = Path("C:/Program Files/Windhawk/Compiler/bin/clang++.exe")
-LLD_PATH = Path("C:/Program Files/Windhawk/Compiler/bin/ld.lld.exe")
+
+from toolchain import CLANG_PATH, LLD_PATH, find_clang, find_lld
 
 class PchManager:
     def __init__(self, root: Path = ROOT_DIR):
@@ -23,15 +23,13 @@ class PchManager:
         self.include_dir = root / "include"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def get_pch_flags(self, opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False) -> list:
+    def get_pch_flags(self, opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False, portable: bool = False) -> list:
         from fp_policy import FloatingPointPolicy
         fp_policy = FloatingPointPolicy(fp_mode, enable_ftz=enable_ftz)
         math_flags = fp_policy.get_compiler_flags()
         flags = [
             "-std=c++20",
             opt_level,
-            "-march=native",
-            "-static",
             "-fwrapv",
             "-fstack-protector-strong",
             "-ftrivial-auto-var-init=zero",
@@ -42,22 +40,30 @@ class PchManager:
             "-I.",
             f"-I{self.include_dir}"
         ]
+        if not portable:
+            flags.insert(2, "-march=native")
+        if os.name == "nt":
+            flags.append("-static")
         return flags
 
-    def get_compiler_fingerprint(self, opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False) -> str:
+    def get_compiler_fingerprint(self, opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False, portable: bool = False) -> str:
         flags_str = " ".join(self.get_pch_flags(opt_level, profile, fp_mode, enable_ftz))
-        clang_mtime = str(CLANG_PATH.stat().st_mtime) if CLANG_PATH.exists() else "0"
+        clang_mtime = str(CLANG_PATH.stat().st_mtime) if (CLANG_PATH is not None and CLANG_PATH.exists()) else "0"
         key = f"{CLANG_PATH}:{clang_mtime}:{flags_str}"
         return hashlib.sha256(key.encode()).hexdigest()[:12]
 
-    def ensure_pch(self, header_name: str = "veloc.h", opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False, verbose: bool = False) -> Path:
+    def ensure_pch(self, header_name: str = "veloc.h", opt_level: str = "-O3", profile: str = "max-perf", fp_mode: str = "strict", enable_ftz: bool = False, verbose: bool = False, portable: bool = False) -> Path:
         header_path = self.include_dir / header_name
         if not header_path.exists():
+            return None
+        if CLANG_PATH is None or not CLANG_PATH.exists():
+            if verbose:
+                print("[VeloC PCH Warning] clang++ not found; PCH generation skipped")
             return None
 
         header_bytes = header_path.read_bytes()
         header_hash = hashlib.sha256(header_bytes).hexdigest()[:12]
-        comp_hash = self.get_compiler_fingerprint(opt_level, profile, fp_mode, enable_ftz)
+        comp_hash = self.get_compiler_fingerprint(opt_level, profile, fp_mode, enable_ftz, portable)
         pch_stem = f"{header_path.stem}_{comp_hash}_{header_hash}"
         pch_path = self.cache_dir / f"{pch_stem}.pch"
 
@@ -68,7 +74,7 @@ class PchManager:
             print(f"[VeloC PCH] Precompiling {header_name} ({opt_level}, profile={profile})...")
 
         t0 = time.perf_counter()
-        flags = self.get_pch_flags(opt_level, profile)
+        flags = self.get_pch_flags(opt_level, profile, portable=portable)
         cmd = [
             str(CLANG_PATH),
             "-x", "c++-header",

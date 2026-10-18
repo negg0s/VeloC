@@ -9,8 +9,8 @@ import json
 from pathlib import Path
 
 
-# Paths strictly on D:\
-ROOT_DIR = Path("D:/VeloC")
+# Paths relative to the repository containing veloc.py (portable install)
+ROOT_DIR = Path(__file__).resolve().parent
 SRC_DIR = ROOT_DIR / "src"
 INCLUDE_DIR = ROOT_DIR / "include"
 BUILD_DIR = ROOT_DIR / "build"
@@ -20,12 +20,76 @@ BENCH_DIR = ROOT_DIR / "benchmarks"
 # VeloC compiler subsystems added to sys.path
 sys.path.insert(0, str(SRC_DIR))
 
-# Clang compiler path discovered on system
-CLANG_PATH = Path("C:/Program Files/Windhawk/Compiler/bin/clang++.exe")
+from toolchain import CLANG_PATH  # noqa: E402
+
+VERSION = "1.0.0"
+_version_file = ROOT_DIR / "VERSION"
+if _version_file.exists():
+    VERSION = _version_file.read_text(encoding="utf-8").strip() or VERSION
+
+
+class BuildError(RuntimeError):
+    """Build pipeline failure; main()/the CLI guard prints it and exits."""
+
+    def __init__(self, message: str, code: int = 1):
+        super().__init__(message)
+        self.code = code
+
 
 def ensure_dirs():
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+_HEADERS_FINGERPRINT_CACHE = {"key": None, "value": ""}
+
+
+def _headers_fingerprint() -> str:
+    """Cheap fingerprint of every include/*.h the compile might pick up.
+
+    Cached after the first computation; includes only change rarely per build
+    session, and clang itself recompiles when mtimes change.
+    """
+    mtime_key = f"{INCLUDE_DIR} mt={INCLUDE_DIR.stat().st_mtime if INCLUDE_DIR.exists() else 0}"
+    if _HEADERS_FINGERPRINT_CACHE["key"] != mtime_key:
+        digest = hashlib.sha256()
+        if INCLUDE_DIR.exists():
+            for p in sorted(INCLUDE_DIR.rglob("*.h")):
+                digest.update(p.relative_to(INCLUDE_DIR).as_posix().encode())
+                digest.update(p.read_bytes())
+        else:
+            digest.update(b"<no-include-dir>")
+        _HEADERS_FINGERPRINT_CACHE["key"] = mtime_key
+        _HEADERS_FINGERPRINT_CACHE["value"] = digest.hexdigest()[:16]
+    return _HEADERS_FINGERPRINT_CACHE["value"]
+
+
+def _run_safety_gate(source_str, source_path: Path, profile: str | None, fp_mode: str) -> None:
+    """Safety/security/FP lints. Runs on every build, including cache hits."""
+    if profile == "safety":
+        from safety_profile import SafetyCriticalChecker
+        violations = SafetyCriticalChecker(source_str, str(source_path)).check()
+        if violations:
+            print(f"\n[VeloC Safety Profile Violation] {len(violations)} safety rule breaches detected:")
+            for v in violations:
+                print(f"  - [{v['rule']}] Line {v['line']}: {v['message']} ({v['snippet']})")
+            raise BuildError(f"safety profile violation ({len(violations)} findings)", code=1)
+
+    from security import CapabilitySecurity, SecretBranchLinter
+    cap_sec = CapabilitySecurity(ROOT_DIR / "veloc.toml")
+    cap_violations = cap_sec.verify_source(source_str, str(source_path))
+    if cap_violations:
+        for cv in cap_violations:
+            print(f"[VeloC Security Error] {cv['code']}: {cv['message']}")
+        raise BuildError("capability security violation", code=1)
+
+    for sw in SecretBranchLinter(source_str, str(source_path)).lint():
+        print(f"[VeloC Security Warning] {sw['rule']}: Line {sw['line']}: {sw['message']}")
+
+    from fp_policy import FloatingPointPolicy, FloatingPointLinter, AttributeTransformer  # noqa: F401
+    for fpl in FloatingPointLinter(source_str, str(source_path), global_mode=fp_mode).lint():
+        print(f"[VeloC FP {fpl['severity'].capitalize()}] {fpl['rule']}: Line {fpl['line']}: {fpl['message']}")
+
 
 def clean_cache(all_artifacts: bool = False):
     cleaned = 0
@@ -49,14 +113,15 @@ def clean_cache(all_artifacts: bool = False):
         if pycache.exists():
             shutil.rmtree(pycache)
             cleaned += 1
-    print(f"[VeloC Clean] Cleaned {cleaned} temporary files/directories from D:\\VeloC\\.cache")
+    print(f"[VeloC Clean] Cleaned {cleaned} temporary files/directories under {CACHE_DIR}")
 
-def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O3", 
+def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O3",
                 test_mode: bool = False, verbose: bool = False, quiet: bool = False,
                 opt_report: bool = False, profile: str = None,
                 timings: bool = False, json_output: bool = False,
                 backend: str = "cpp", lean: bool = False, no_pch: bool = False,
-                fp_mode: str = "strict", enable_ftz: bool = False) -> Path:
+                fp_mode: str = "strict", enable_ftz: bool = False,
+                portable: bool = False) -> Path:
     t_start = time.perf_counter()
     if profile:
         profile_map = {
@@ -69,7 +134,10 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     ensure_dirs()
     if not source_path.exists():
         print(f"[Error] Source file not found: {source_path}")
-        sys.exit(1)
+        raise BuildError(f"source file not found: {source_path}")
+
+    if CLANG_PATH is None:
+        raise BuildError("clang++ not found. Set VELOC_CLANG or install LLVM and put it on PATH.")
 
     stem = source_path.stem
     if test_mode:
@@ -82,13 +150,18 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         output_exe = BUILD_DIR / f"{stem}.exe"
 
     content_bytes = source_path.read_bytes()
-    current_hash = hashlib.sha256(content_bytes + str(test_mode).encode() + backend.encode() + opt_level.encode()).hexdigest()
+    headers_fp = _headers_fingerprint()
+    current_hash = hashlib.sha256(
+        content_bytes + str(test_mode).encode() + backend.encode() + opt_level.encode()
+        + fp_mode.encode() + str(enable_ftz).encode() + str(lean).encode()
+        + str(portable).encode() + (profile or "").encode() + headers_fp.encode()
+    ).hexdigest()
 
     # Instant Incremental Build: if source unchanged and exe exists, skip compilation!
     if output_exe.exists() and hash_target.exists():
         if hash_target.read_text().strip() == current_hash and not timings and not json_output:
             if verbose:
-                print(f"[VeloC Instant Cache Hit] {source_path.name} -> {output_exe.name} (0.3ms - Up to date)")
+                print(f"[VeloC Cache Hit] {source_path.name} -> {output_exe.name} (up to date)")
             if opt_report:
                 from ir import IRGenerator, VeloCOptimizer
                 src_txt = source_path.read_text(encoding="utf-8")
@@ -97,11 +170,20 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
                 opt = VeloCOptimizer(profile or "max-perf")
                 _, rep = opt.optimize(mid)
                 print(rep.summary())
+            # Safety checks stay enabled on cache hits (a cached fast build
+            # must never silently bypass them).
+            if profile == "safety":
+                _run_safety_gate(source_str_cache=source_path.read_text(encoding="utf-8"),
+                                 source_path=source_path, profile=profile, fp_mode=fp_mode)
             return output_exe
 
     # Read source
     t_read_start = time.perf_counter()
     source_str = source_path.read_text(encoding="utf-8")
+    # VeloC scripts may carry a shebang (veloc script support); it is not C++
+    # and would fail with "invalid preprocessing directive" if forwarded.
+    if source_str.startswith("#!"):
+        source_str = "\n" + source_str.split("\n", 1)[1]
     t_read = (time.perf_counter() - t_read_start) * 1000.0
 
     t_macro_start = time.perf_counter()
@@ -136,7 +218,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         t_ll_compile, rc, err = llvm_gen.compile_ll(ll_target, output_exe, opt_level=opt_level)
         if rc != 0:
             print(f"[LLVM Backend Build Failed]:\n{err}")
-            sys.exit(rc)
+            raise BuildError("LLVM backend compile failed", code=rc or 1)
         t_total = (time.perf_counter() - t_start) * 1000.0
 
         if json_output:
@@ -187,34 +269,8 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     t_transpile = (time.perf_counter() - t_start) * 1000.0
 
-    # Security & Safety Checks
     t_sema_start = time.perf_counter()
-    if profile == "safety":
-        from safety_profile import SafetyCriticalChecker
-        safety_checker = SafetyCriticalChecker(source_str, str(source_path))
-        violations = safety_checker.check()
-        if violations:
-            print(f"\n[VeloC Safety Profile Violation] {len(violations)} safety rule breaches detected:")
-            for v in violations:
-                print(f"  - [{v['rule']}] Line {v['line']}: {v['message']} ({v['snippet']})")
-            sys.exit(1)
-
-    from security import CapabilitySecurity, SecretBranchLinter
-    cap_sec = CapabilitySecurity(ROOT_DIR / "veloc.toml")
-    cap_violations = cap_sec.verify_source(source_str, str(source_path))
-    if cap_violations:
-        for cv in cap_violations:
-            print(f"[VeloC Security Error] {cv['code']}: {cv['message']}")
-        sys.exit(1)
-
-    for sw in SecretBranchLinter(source_str, str(source_path)).lint():
-        print(f"[VeloC Security Warning] {sw['rule']}: Line {sw['line']}: {sw['message']}")
-
-    # Floating-Point Precision & Diagnostics Check
-    from fp_policy import FloatingPointPolicy, FloatingPointLinter, AttributeTransformer
-    for fpl in FloatingPointLinter(source_str, str(source_path), global_mode=fp_mode).lint():
-        print(f"[VeloC FP {fpl['severity'].capitalize()}] {fpl['rule']}: Line {fpl['line']}: {fpl['message']}")
-
+    _run_safety_gate(source_str, source_path, profile, fp_mode)
     t_sema = (time.perf_counter() - t_sema_start) * 1000.0
 
     # Header and PCH Selection
@@ -222,6 +278,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     header_name = "veloc_core.h" if is_lean_candidate else "veloc.h"
 
     if cpp_target.exists():
+        from fp_policy import AttributeTransformer
         gen_cpp = cpp_target.read_text(encoding="utf-8")
         if is_lean_candidate:
             gen_cpp = gen_cpp.replace("include/veloc.h", "include/veloc_core.h")
@@ -233,6 +290,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
     pm = PchManager(ROOT_DIR)
 
     # Clang Flags: Strict IEEE-754 by default!
+    from fp_policy import FloatingPointPolicy, AttributeTransformer
     effective_fp = "strict" if profile == "safety" else fp_mode
     fp_policy = FloatingPointPolicy(effective_fp, enable_ftz=enable_ftz)
     math_flags = fp_policy.get_compiler_flags()
@@ -242,14 +300,9 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         "-o", str(output_exe),
         opt_level,
         "-std=c++20",
-        "-march=native",
-        "-static",
         "-fwrapv",
         "-fstack-protector-strong",
         "-ftrivial-auto-var-init=zero",
-        "-Wl,--dynamicbase",
-        "-Wl,--nxcompat",
-        "-Wl,--no-insert-timestamp",
         *math_flags,
         "-fno-exceptions",
         "-fno-rtti",
@@ -263,17 +316,29 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         f"-I{ROOT_DIR / 'packages' / 'veloc-net' / 'include'}",
         f"-I{ROOT_DIR / 'packages' / 'veloc-embedded' / 'include'}",
         f"-I{ROOT_DIR / 'packages' / 'veloc-cli' / 'include'}",
-        "-lws2_32"
     ]
+    if not portable:
+        # host-tuned codegen (VC-05): opt-in via --portable to drop
+        cmd.append("-march=native")
+
+    # Windows-only static linking and PE mitigations (VC-04)
+    if sys.platform == "win32":
+        cmd.extend([
+            "-static",
+            "-Wl,--dynamicbase",
+            "-Wl,--nxcompat",
+            "-Wl,--no-insert-timestamp",
+            "-lws2_32",
+        ])
 
     # Precompiled Header integration
     if not no_pch:
-        pch = pm.ensure_pch(header_name, opt_level, profile or "max-perf", fp_mode=effective_fp, enable_ftz=enable_ftz)
+        pch = pm.ensure_pch(header_name, opt_level, profile or "max-perf", fp_mode=effective_fp, enable_ftz=enable_ftz, portable=portable)
         if pch and pch.exists():
             cmd.extend(["-include-pch", str(pch)])
 
     # Fast Linker integration
-    if LLD_PATH.exists():
+    if LLD_PATH is not None and LLD_PATH.exists():
         cmd.extend(["-fuse-ld=lld", "-Wl,--gc-sections"])
 
     if verbose:
@@ -286,7 +351,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
 
     if res.returncode != 0:
         print(f"[Build Failed]:\n{res.stderr}")
-        sys.exit(res.returncode)
+        raise BuildError(f"clang exited with code {res.returncode}", code=res.returncode)
 
     hash_target.write_text(current_hash)
 
@@ -312,7 +377,7 @@ def build_veloc(source_path: Path, output_exe: Path = None, opt_level: str = "-O
         print("=" * 70)
         print(f"  * Runtime Header Mode      : {header_name}")
         print(f"  * Precompiled Header (PCH) : {'ACTIVE' if not no_pch else 'DISABLED'}")
-        print(f"  * Linker                   : {'LLD (ld.lld.exe)' if LLD_PATH.exists() else 'Default'}")
+        print(f"  * Linker                   : {'LLD (ld.lld.exe)' if (LLD_PATH is not None and LLD_PATH.exists()) else 'Default'}")
         print("-" * 70)
         print(f"  1. File Read & Macro Expand: {t_read + t_macro:7.1f} ms")
         print(f"  2. Lexer Tokenization      : {t_lex:7.1f} ms")
@@ -410,21 +475,37 @@ test "result type test" {
 """
     (target / "src" / "main.vc").write_text(main_vc, encoding="utf-8")
     (target / "tests" / "test_main.vc").write_text(test_vc, encoding="utf-8")
+    rel_target = target.relative_to(ROOT_DIR)
     print(f"[VeloC Init Success] New project initialized at: {target}")
-    print(f"  To run:  python D:\\VeloC\\veloc.py run {target}\\src\\main.vc")
-    print(f"  To test: python D:\\VeloC\\veloc.py test {target}\\tests\\test_main.vc")
+    print(f"  To run:  python veloc.py run {rel_target / 'src' / 'main.vc'}")
+    print(f"  To test: python veloc.py test {rel_target / 'tests' / 'test_main.vc'}")
 
 def show_info():
+    from toolchain import clang_status_line
+    sys.path.insert(0, str(SRC_DIR))
+    try:
+        from hwinfo import HardwareInspector
+        profile = HardwareInspector.inspect()
+    except Exception as exc:  # hardware inspection is best-effort
+        profile = None
+        print(f"[VeloC Info] Hardware inspection failed: {exc}")
+
     print("==================================================")
     print("           VeloC System & Hardware Info           ")
     print("==================================================")
-    print(f"VeloC Version:   2.0 (Massive Community Update)")
+    print(f"VeloC Version:   {VERSION}")
     print(f"Installation:    {ROOT_DIR}")
-    print(f"Clang Compiler:  {CLANG_PATH}")
-    print(f"Target CPU:      Intel(R) Core(TM) i5-10400F (6 Cores, 12 Threads)")
-    print(f"Vector Support:  AVX2, FMA3, BMI2, SSE4.2 (256-bit Vector Width)")
-    print(f"Core Pinning:    Active (6 Dedicated Physical Core Workers)")
-    print(f"Cache Hierarchy: 32 KB L1 Data, 256 KB L2, 12 MB L3")
+    print(f"Clang Compiler:  {clang_status_line()}")
+    if profile is not None:
+        cpu = profile.cpu_model or "Unknown CPU"
+        cores = f"{profile.physical_cores}C/{profile.logical_cores}T" if profile.logical_cores > 0 else "unknown"
+        clocks = (f"base {profile.base_mhz} MHz / max {profile.max_mhz} MHz"
+                  if profile.base_mhz or profile.max_mhz else "unknown")
+        supported = [k for k, v in profile.simd_extensions.items() if v] or ["(undetected)"]
+        print(f"CPU:             {cpu} ({cores})")
+        print(f"Clocks:          {clocks}")
+        print(f"RAM:             {profile.ram_total_gb if profile.ram_total_gb else 'unknown'} GB")
+        print(f"Vector/SIMD:     {', '.join(supported)}")
     print("==================================================")
 
 def run_static_check(source_path: Path, bounds_report: bool = False):
@@ -493,7 +574,7 @@ def run_query_trace(source_path: Path):
 
 def main():
     parser = argparse.ArgumentParser(description="VeloC: The High-Performance Faster C++ Dialect & Toolchain")
-    parser.add_argument("-V", "--version", action="version", version="VeloC 1.0.0 (x86_64-pc-windows-msvc/clang)")
+    parser.add_argument("-V", "--version", action="version", version=f"VeloC {VERSION} (x86_64, clang toolchain)")
     subparsers = parser.add_subparsers(dest="command")
 
     build_p = subparsers.add_parser("build", help="Compile a .vc source file")
@@ -509,6 +590,7 @@ def main():
     build_p.add_argument("--no-pch", action="store_true", help="Disable precompiled header (PCH) usage")
     build_p.add_argument("--fp", default="strict", choices=["strict", "relaxed", "fast", "reproducible"], help="Floating-point precision semantics (default: strict IEEE-754)")
     build_p.add_argument("--enable-ftz", action="store_true", help="Enable hardware Flush-to-Zero and Denormals-are-Zero (FTZ/DAZ)")
+    build_p.add_argument("--portable", action="store_true", help="Do NOT use -march=native (portable binaries, lower peak performance)")
     build_p.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     run_p = subparsers.add_parser("run", help="Compile and run a .vc source file")
@@ -538,6 +620,8 @@ def main():
 
     clean_p = subparsers.add_parser("clean", help="Clean cache and build artifacts")
     clean_p.add_argument("--all", action="store_true", help="Clean executables in build/ as well")
+
+    subparsers.add_parser("health", help="Generate the repository health report")
 
     watch_p = subparsers.add_parser("watch", help="Watch a .vc file and auto-reload on save")
     watch_p.add_argument("file", help="Path to .vc file to watch")
@@ -668,7 +752,7 @@ def main():
 
     cache_srv_p = subparsers.add_parser("cache-server", help="Launch local/LAN HTTP CAS build cache daemon")
     cache_srv_p.add_argument("--port", type=int, default=8080, help="HTTP port (default 8080)")
-    cache_srv_p.add_argument("--dir", default="D:/VeloC/.cache/remote", help="Storage directory")
+    cache_srv_p.add_argument("--dir", default=str(CACHE_DIR / "remote"), help="Storage directory")
 
     lsp_p = subparsers.add_parser("lsp", help="Run Language Server Protocol (LSP) server")
 
@@ -695,8 +779,8 @@ def main():
 
 
     if args.command == "build":
-        build_veloc(Path(args.file), Path(args.output) if args.output else None, 
-                    opt_level=args.opt, verbose=args.verbose, 
+        build_veloc(Path(args.file), Path(args.output) if args.output else None,
+                    opt_level=args.opt, verbose=args.verbose,
                     opt_report=args.opt_report, profile=args.profile,
                     timings=getattr(args, "timings", False),
                     json_output=getattr(args, "json", False),
@@ -704,7 +788,8 @@ def main():
                     lean=getattr(args, "lean", False),
                     no_pch=getattr(args, "no_pch", False),
                     fp_mode=getattr(args, "fp", "strict"),
-                    enable_ftz=getattr(args, "enable_ftz", False))
+                    enable_ftz=getattr(args, "enable_ftz", False),
+                    portable=getattr(args, "portable", False))
     elif args.command == "ir":
         from ir import IRGenerator, VeloCOptimizer
         src_path = Path(args.file)
@@ -785,7 +870,12 @@ def main():
     elif args.command == "clean":
         clean_cache(all_artifacts=args.all)
     elif args.command == "explain":
-        print(explain_error_code(args.code))
+        try:
+            from diagnostics import explain_error_code
+            print(explain_error_code(args.code))
+        except ImportError:
+            print(f"[VeloC] Error-code lookup unavailable: src/diagnostics.py is missing (code {args.code})")
+            sys.exit(1)
     elif args.command == "ci":
         subprocess.run([sys.executable, str(ROOT_DIR / "tests" / "run_tests.py")])
     elif args.command == "spec-coverage":
@@ -906,16 +996,19 @@ def main():
         run_triage()
     elif args.command == "dev-setup":
         ensure_dirs()
+        from toolchain import clang_status_line
+        clang_found = CLANG_PATH is not None
         print("=" * 80)
         print("                   VeloC Toolchain & Developer Setup                            ")
         print("=" * 80)
         print(f"  * Root Directory: {ROOT_DIR}")
-        print(f"  * Clang Compiler: {CLANG_PATH} ({'FOUND' if CLANG_PATH.exists() else 'MISSING'})")
+        print(f"  * Clang Compiler: {clang_status_line()}")
         print(f"  * Python Executable: {sys.executable} ({sys.version.split()[0]})")
         print(f"  * Include Directory: {INCLUDE_DIR} ({'FOUND' if (INCLUDE_DIR / 'veloc.h').exists() else 'MISSING'})")
         print(f"  * Cache Directory: {CACHE_DIR}")
         print(f"  * Build Directory: {BUILD_DIR}")
-        print("  [STATUS] Toolchain verified and operational for VeloC 1.0-RC development!")
+        status = "operational (clang found)" if clang_found else "INCOMPLETE (clang++ not found; set VELOC_CLANG or install LLVM)"
+        print(f"  [STATUS] VeloC {VERSION} — {status}")
         print("=" * 80)
     elif args.command == "crater":
         from crater import run_crater
@@ -1039,4 +1132,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BuildError as exc:
+        print(f"[VeloC Build Error] {exc}")
+        sys.exit(exc.code)
