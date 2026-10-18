@@ -1,39 +1,42 @@
 # VeloC
 
-VeloC (Velocity + C) - диалект системного программирования со строгой статической типизацией, компилируемый в нативный машинный код через бэкенд C++20 / Clang. Проект спроектирован для задач с высокими требованиями к задержке и пропускной способности (HFT, игровые движки, сетевые серверы, высокопроизводительные вычисления).
+VeloC (Velocity + C) — экспериментальный компилятор и диалект C++, написанный
+на Python: исходник `.vc` транслируется в C++ и собирается локальным Clang
+(Windows-first). **Статус проекта: исследовательский прототип, не production** —
+см. [docs/known-limitations.md](docs/known-limitations.md) и
+[docs/audit/claims-audit.md](docs/audit/claims-audit.md).
 
-## Ключевые возможности
+Открыто и честно:
 
-- **Детерминированная память**: арены памяти (Arena), линейные аллокаторы, перемотка маркеров (Rewind Markers) и zero-allocation контейнеры (SmallVec, StackString).
-- **Векторизация AVX2/FMA3**: встроенные примитивы параллельной обработки данных (GEMM, ArgMax, Softmax, SiLU, RMSNorm, кумулятивные суммы, косинусная схожесть).
-- **Предсказуемый рантайм**: отсутствие сборщика мусора (GC), отсутствие скрытых аллокаций, строгий контроль времени жизни объектов.
-- **Кэш-эффективные структуры данных**: поиск Eytzinger с упреждающей выборкой строк кэша, хэш-таблицы SwissTable / FlatMap, lock-free MPSC очереди.
-- **Стандарты вычислений**: строгий режим IEEE-754 по умолчанию, воспроизводимое параллельное сложение Kahan/Pairwise с контролем ULP-ошибок.
+- работает только на **Windows** (сборка использует `-static`, `-lws2_32`,
+  PE-флаги линкера; Linux/macOS не проверялись);
+- тулчейн ищется в порядке `VELOC_CLANG` → `clang++` на PATH → типовые пути
+  Windows (`C:\Program Files\LLVM\...`, Windhawk-путь); без Clang вы получите
+  понятную ошибку, а не сборку «из воздуха»;
+- проверенная на этой машине конфигурация: Windows 11, Python 3.12,
+  Clang 20.1.x (`--version` показывает найденный компилятор); Clang 18+ —
+  минимальная заявка по синтаксису C++20, но она **не проверялась** на всех
+  версиях;
+- `-march=native` включён по умолчанию для скорости; для переносимых
+  бинарников добавлен `build --portable`.
+
+## Требования
+
+- Windows 10/11 x86_64 (Linux/macOS — не проверялись, см. known-limitations)
+- Python 3.10+
+- Clang 18+ (проверено только на Clang 20.1.3)
 
 ## Быстрый старт
-
-### Требования к системе
-- Python 3.10+
-- Clang 18+ (с поддержкой C++20)
-- Процессор x86_64 с инструкциями AVX2
-
-### Клонирование
 
 ```bash
 git clone https://github.com/NEGG0/VeloC.git
 cd VeloC
+python veloc.py --version       # версия и найденный Clang
+python veloc.py info            # CPU/тулчейн (если Clang не найден — подскажет)
+python veloc.py run examples/hello.vc
 ```
 
-### Проверка окружения
-
-```bash
-python veloc.py --version
-python veloc.py hwinfo
-```
-
-## Примеры кода
-
-### Hello World (`examples/hello.vc`)
+## Пример (`examples/hello.vc`)
 
 ```c
 fn main() -> i32 {
@@ -42,64 +45,53 @@ fn main() -> i32 {
 }
 ```
 
-Запуск:
 ```bash
-python veloc.py run examples/hello.vc
-```
-
-### Арены памяти и Zero-Allocation
-
-```c
-fn process_frame() {
-    let mut arena = Arena::new(1024 * 1024);
-    let marker = arena.mark();
-
-    // Быстрые временные аллокации кадра в непрерывном буфере
-    let buffer = arena.alloc_array<f32>(10000);
-
-    // Мгновенный сброс указателя без вызовов free()
-    arena.rewind(marker);
-}
-```
-
-### Векторные операции AVX2
-
-```c
-// Скалярное произведение 10 миллионов float на AVX2
-let dot = simd_dot_product(vec_a, vec_b, 10000000);
-
-// Быстрый поиск в кэше CPU L1/L2
-let index = branchless_lower_bound(sorted_data, count, target);
+python veloc.py run examples/hello.vc      # compile + run
+python veloc.py build examples/hello.vc -o app.exe
+python veloc.py build examples/hello.vc --profile=safety   # safety-gate
+python veloc.py build examples/hello.vc --portable         # без -march=native
 ```
 
 ## Основные команды CLI
 
-| Команда | Описание |
-|---|---|
-| `python veloc.py run <file.vc>` | Сборка и запуск файла |
-| `python veloc.py build <file.vc> -o app.exe` | Компиляция исполняемого файла |
-| `python veloc.py build <file.vc> --profile=max-perf` | Сборка с оптимизациями (-O3, native tune) |
-| `python veloc.py test` | Запуск полного набора регрессионных тестов |
-| `python veloc.py check <file.vc>` | Статический анализ типов и времени жизни |
-| `python veloc.py fmt <file.vc>` | Форматирование исходного кода |
-| `python veloc.py repl` | Интерактивная консоль VeloC |
-| `python veloc.py clean --all` | Очистка временных файлов и кэша сборки |
+Полная таблица 50+ команд со статусом проверки — в
+[docs/commands-status.md](docs/commands-status.md). Основные:
 
-## Архитектура репозитория
+| Команда | Описание | Статус на этой машине |
+|---|---|---|
+| `veloc.py build <file.vc>` | Компиляция .vc → exe | работает |
+| `veloc.py run <file.vc>` | Compile + запуск | работает |
+| `veloc.py test` | Golden регресс-тесты | 3/3 PASS |
+| `veloc.py ci` | Полный набор проверок компилятора | 26/26 PASS (26.0) |
+| `veloc.py info` / `hwinfo` | Сведения о тулчейне и железе | работает |
+| `veloc.py explain E0001` | Расшифровка кода ошибки | работает |
+| `veloc.py health` | Отчёт о здоровье репозитория | работает |
+| `veloc.py clean [--all]` | Очистка .cache/build | работает |
+| `veloc.py repl`,`playground`,`daemon`,`lsp`,`mcp` … | Сервисы и утилиты | не проверены на этой машине |
+
+## Документы, которые надо читать под фильтром
+
+Историческая документация (CHANGELOG, DECISIONS, PROGRESS, QUEUE,
+AUDIT, GOVERNANCE) написана по ходу разработки и содержала утверждения,
+которые не подтверждаются проверками ("GA", "100% GREEN", SLSA, крипто).
+Незакреплённые утверждения разобраны в `docs/audit/claims-audit.md`;
+оригиналы перенесены в `docs/history/` и `docs/dev/` с сохранением текста.
+
+## Структура репозитория
 
 ```text
 VeloC/
-├── src/          # Транслятор, лексер, парсер, PCH менеджер, кодогенерация
-├── include/      # Заголовочный рантайм (C++20 ядра, SIMD, аллокаторы)
-├── examples/     # Практические примеры и витрины возможностей
-├── tests/        # Юнит-тесты, golden тесты, проверки компилятора
-├── benchmarks/   # Эталонные замеры производительности
-├── apps/         # Реальные приложения на VeloC (БД, трассировщик лучей, LLM)
-├── docs/         # Спецификация языка, архитектурные решения и руководства
-├── veloc.py      # Основной интерфейс командной строки (CLI)
-└── veloc.bat     # Windows batch-обёртка для запуска veloc
+├── src/          # лексер, парсер, кодоген, слои OC/бэкендов (66 модулей)
+├── include/      # заголовки времени выполнения (veloc.h, veloc_core.h)
+├── examples/     # примеры возможностей языка (используются CI)
+├── tests/        # golden тесты, conformance, fuzzing
+├── benchmarks/   # скрипты измерений (числа — самозамеры, см. claims-audit)
+├── apps/         # приложения (veloc-db, veloc-render, veloc-llm …)
+├── docs/         # документация, отчёты аудита, история
+├── veloc.py      # CLI-драйвер (единая точка входа)
+└── VERSION       # единственный источник версии
 ```
 
 ## Лицензия
 
-Проект распространяется под лицензией MIT. Подробности в файле [LICENSE](LICENSE).
+Проект распространяется по лицензии MIT. Подробности в файле [LICENSE](LICENSE).
