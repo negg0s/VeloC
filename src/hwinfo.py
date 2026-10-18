@@ -45,105 +45,116 @@ class HardwareProfile:
 
 class HardwareInspector:
     @staticmethod
-    def inspect() -> HardwareProfile:
-        cpu_model = platform.processor() or "Unknown CPU"
-        phys_cores = 6
-        log_cores = 12
-        base_mhz = 2900
-        max_mhz = 4300
-        ram_gb = 16.0
-
-        # Query Windows Management Information
+    def _powershell_json(cmd: str):
+        import subprocess
         try:
-            cmd = "Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed | ConvertTo-Json"
-            res = subprocess.run(["powershell", "-NoProfile", "-Command", cmd], capture_output=True, text=True)
+            res = subprocess.run(["powershell", "-NoProfile", "-Command", cmd], capture_output=True, text=True, timeout=30)
             if res.returncode == 0 and res.stdout.strip():
-                data = json.loads(res.stdout)
-                cpu_model = data.get("Name", cpu_model).strip()
-                phys_cores = int(data.get("NumberOfCores", phys_cores))
-                log_cores = int(data.get("NumberOfLogicalProcessors", log_cores))
-                max_mhz = int(data.get("MaxClockSpeed", max_mhz))
+                return json.loads(res.stdout)
         except Exception:
             pass
+        return None
 
+    @staticmethod
+    def _proc_cpuinfo() -> dict:
         try:
-            cmd_ram = "Get-CimInstance Win32_ComputerSystem | Select-Object TotalPhysicalMemory | ConvertTo-Json"
-            res_ram = subprocess.run(["powershell", "-NoProfile", "-Command", cmd_ram], capture_output=True, text=True)
-            if res_ram.returncode == 0 and res_ram.stdout.strip():
-                data_ram = json.loads(res_ram.stdout)
-                total_bytes = int(data_ram.get("TotalPhysicalMemory", 16 * 1024**3))
+            info = Path("/proc/cpuinfo")
+            if info.exists():
+                text = info.read_text(encoding="utf-8", errors="replace")
+                blocks = [b for b in text.split("\n\n") if b]
+                first = dict(line.split(":", 1) for line in blocks[0].splitlines() if ":" in line)
+                return {k.strip(): v.strip() for k, v in first.items()}
+        except Exception:
+            pass
+        return {}
+
+    @staticmethod
+    def inspect() -> HardwareProfile:
+        flags_map = {
+            "sse": "SSE", "sse2": "SSE2", "sse3": "SSE3", "ssse3": "SSSE3",
+            "sse4_1": "SSE4_1", "sse4_2": "SSE4_2", "avx": "AVX", "avx2": "AVX2",
+            "fma": "FMA3", "f16c": "F16C", "bmi1": "BMI1", "bmi2": "BMI2",
+            "aes": "AES_NI", "pclmulqdq": "PCLMULQDQ",
+            "avx512f": "AVX512F", "neon": "ARM_NEON", "sve": "ARM_SVE",
+        }
+        cpu_model = "Unknown CPU"
+        phys_cores = 0
+        log_cores = os.cpu_count() or 0
+        base_mhz = 0
+        max_mhz = 0
+        ram_gb = 0.0
+
+        proc = HardwareInspector._proc_cpuinfo()
+        if proc.get("model name"):
+            cpu_model = proc["model name"]
+            mhz = proc.get("cpu MHz", "").strip()
+            if mhz:
+                base_mhz = int(float(mhz))
+
+        if sys.platform == "win32":
+            data = HardwareInspector._powershell_json(
+                "Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, "
+                "NumberOfLogicalProcessors, MaxClockSpeed | ConvertTo-Json")
+            if data:
+                if data.get("Name"):
+                    cpu_model = str(data["Name"]).strip()
+                phys_cores = int(data.get("NumberOfCores", 0) or 0)
+                log_cores = int(data.get("NumberOfLogicalProcessors", 0) or log_cores)
+                max_mhz = int(data.get("MaxClockSpeed", 0) or 0)
+
+        if sys.platform == "win32":
+            data_ram = HardwareInspector._powershell_json(
+                "Get-CimInstance Win32_ComputerSystem | Select-Object TotalPhysicalMemory | ConvertTo-Json")
+            if data_ram:
+                total_bytes = int(data_ram.get("TotalPhysicalMemory", 0) or 0)
                 ram_gb = round(total_bytes / (1024**3), 2)
-        except Exception:
-            pass
-
-        # Comet Lake / Skylake-derived cache topology
-        caches = {
-            "L1D": CacheInfo(level="L1D", size_kb=32, line_size=64, associativity=8, shared_threads=2),
-            "L1I": CacheInfo(level="L1I", size_kb=32, line_size=64, associativity=8, shared_threads=2),
-            "L2": CacheInfo(level="L2", size_kb=256, line_size=64, associativity=4, shared_threads=2),
-            "L3": CacheInfo(level="L3", size_kb=12288, line_size=64, associativity=16, shared_threads=12)
-        }
-
-        # Detection of ISA features
-        # i5-10400F has AVX2, FMA3, BMI1, BMI2, F16C, AES, SSE4.2, PCLMUL; NO AVX-512, NO AMX
-        simd_features = {
-            "SSE": True,
-            "SSE2": True,
-            "SSE3": True,
-            "SSSE3": True,
-            "SSE4_1": True,
-            "SSE4_2": True,
-            "AVX": True,
-            "AVX2": True,
-            "FMA3": True,
-            "F16C": True,
-            "BMI1": True,
-            "BMI2": True,
-            "AES_NI": True,
-            "PCLMULQDQ": True,
-            "AVX512F": False,
-            "AVX512BW": False,
-            "AVX512CD": False,
-            "AVX512DQ": False,
-            "AVX512VL": False,
-            "AMX": False,
-            "ARM_NEON": False,
-            "ARM_SVE": False
-        }
-
-        vector_width = 256 if simd_features["AVX2"] else 128
-
-        # GPU Detection
-        gpu_info = None
-        try:
-            cmd_gpu = "Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, AdapterRAM | ConvertTo-Json"
-            res_gpu = subprocess.run(["powershell", "-NoProfile", "-Command", cmd_gpu], capture_output=True, text=True)
-            if res_gpu.returncode == 0 and res_gpu.stdout.strip():
-                gdata = json.loads(res_gpu.stdout)
-                if isinstance(gdata, list):
-                    # Filter for discrete GPU (NVIDIA)
-                    for g in gdata:
-                        if "NVIDIA" in g.get("Name", ""):
-                            gpu_info = {
-                                "name": g.get("Name"),
-                                "driver": g.get("DriverVersion"),
-                                "vram_mb": 8192,
-                                "vulkan_support": True,
-                                "cuda_driver_support": True
-                            }
+        else:
+            try:
+                meminfo = Path("/proc/meminfo")
+                if meminfo.exists():
+                    for line in meminfo.read_text(encoding="utf-8").splitlines():
+                        if line.startswith("MemTotal:"):
+                            ram_gb = round(int(line.split()[1]) / (1024**2), 2)
                             break
-                    if not gpu_info and len(gdata) > 0:
-                        gpu_info = {"name": gdata[0].get("Name"), "driver": gdata[0].get("DriverVersion"), "vram_mb": 4096}
-                elif isinstance(gdata, dict):
+            except Exception:
+                pass
+
+        # SIMD feature detection: trustworthy only via /proc/cpuinfo flags.
+        # On Windows without a CPUID probe we report nothing as True rather
+        # than guessing a marketing table.
+        cpu_flags: list[str] = []
+        if "flags" in proc:
+            cpu_flags = proc["flags"].split()
+        simd_features = {nice: (flag in cpu_flags) for flag, nice in flags_map.items()}
+
+        vector_width = 256 if simd_features.get("AVX2") else (128 if any(simd_features.values()) else 0)
+
+        # Cache hierarchy: reported only when actually detected (/proc/cpuinfo
+        # or platform APIs); the previous hardcoded table was removed.
+        caches: Dict[str, CacheInfo] = {}
+        if "cache size" in proc:
+            try:
+                caches["L3"] = CacheInfo(level="L3", size_kb=int(proc["cache size"]), line_size=64,
+                                         associativity=0, shared_threads=log_cores or 0)
+            except (ValueError, TypeError):
+                pass
+
+        gpu_info = None
+        if sys.platform == "win32":
+            gdata = HardwareInspector._powershell_json(
+                "Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, AdapterRAM | ConvertTo-Json")
+            if gdata:
+                candidates = gdata if isinstance(gdata, list) else [gdata]
+                gpu = candidates[0] if candidates else None
+                if gpu and gpu.get("Name"):
+                    ram_bytes = int(gpu.get("AdapterRAM") or 0)
                     gpu_info = {
-                        "name": gdata.get("Name"),
-                        "driver": gdata.get("DriverVersion"),
-                        "vram_mb": 8192,
-                        "vulkan_support": True,
-                        "cuda_driver_support": True
+                        "name": gpu.get("Name"),
+                        "driver": gpu.get("DriverVersion"),
+                        "vram_mb": round(ram_bytes / (1024**2)) if ram_bytes else None,
                     }
-        except Exception:
-            pass
+
+        arch = platform.machine() or "unknown"
 
         profile = HardwareProfile(
             cpu_model=cpu_model,
@@ -151,7 +162,7 @@ class HardwareInspector:
             logical_cores=log_cores,
             base_mhz=base_mhz,
             max_mhz=max_mhz,
-            arch="x86_64",
+            arch=arch,
             simd_extensions=simd_features,
             vector_width_bits=vector_width,
             caches=caches,
@@ -167,40 +178,65 @@ class HardwareInspector:
             d = asdict(profile)
             return json.dumps(d, indent=2)
 
+        def val(x, unit="", unknown="unknown"):
+            return unknown if not x else f"{x}{unit}"
+
+        def fmt_cores(phys, logical):
+            if logical > 0 and phys > 0:
+                return f"{phys} Physical Cores / {logical} Hardware Threads (SMT/HT)"
+            if logical > 0:
+                return f"{logical} Logical Cores (physical count not detected)"
+            return "unknown"
+
+        def fmt_clocks(base, mx):
+            if base or mx:
+                base_str = f"{base} MHz" if base else "unknown"
+                mx_str = f"{mx} MHz" if mx else "unknown"
+                return f"Base {base_str} / Max {mx_str}"
+            return "unknown"
+
         lines = [
             "================================================================================",
             "                   VeloC Hardware Inspector & Topology Report                   ",
             "================================================================================",
             f"  CPU Model:             {profile.cpu_model}",
-            f"  Architecture:          {profile.arch} (Vector register width: {profile.vector_width_bits}-bit)",
-            f"  Topology:              {profile.physical_cores} Physical Cores / {profile.logical_cores} Hardware Threads (SMT/HT)",
-            f"  Clocks:                Base {profile.base_mhz} MHz / Max Turbo {profile.max_mhz} MHz",
-            f"  Total RAM:             {profile.ram_total_gb} GB DDR4",
+            f"  Architecture:          {profile.arch} (Vector register width: {profile.vector_width_bits or 'unknown'}-bit)",
+            f"  Topology:              {fmt_cores(profile.physical_cores, profile.logical_cores)}",
+            f"  Clocks:                {fmt_clocks(profile.base_mhz, profile.max_mhz)}",
+            f"  Total RAM:             {val(profile.ram_total_gb, ' GB')}",
             f"  Hardware Hash:         {profile.hw_hash}",
             "--------------------------------------------------------------------------------",
             "  Memory Cache Hierarchy:",
-            f"    - L1 Data:           {profile.caches['L1D'].size_kb} KB / core, 8-way, 64B line",
-            f"    - L1 Instruction:    {profile.caches['L1I'].size_kb} KB / core, 8-way, 64B line",
-            f"    - L2 Cache:          {profile.caches['L2'].size_kb} KB / core, 4-way, non-inclusive",
-            f"    - L3 Shared Cache:   {profile.caches['L3'].size_kb / 1024:.1f} MB shared across all {profile.physical_cores} cores, 16-way",
-            "--------------------------------------------------------------------------------",
-            "  SIMD & Instruction Set Architecture Extensions:",
         ]
-        
+
+        cache_names = {"L1D": "L1 Data", "L1I": "L1 Instruction", "L2": "L2 Cache", "L3": "L3 Shared Cache"}
+        if profile.caches:
+            for key, info in profile.caches.items():
+                lines.append(f"    - {cache_names.get(key, key)}: {info.size_kb} KB")
+        else:
+            lines.append("    - not detected on this platform (use `veloc hwinfo` after adding a CPUID probe)")
+
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("  SIMD & Instruction Set Architecture Extensions:")
         supported = [k for k, v in profile.simd_extensions.items() if v]
-        unsupported = [k for k, v in profile.simd_extensions.items() if not v]
-        lines.append(f"    [SUPPORTED]   {', '.join(supported)}")
-        lines.append(f"    [UNSUPPORTED] {', '.join(unsupported)}")
+        if supported:
+            lines.append(f"    [SUPPORTED]   {', '.join(supported)}")
+            unsupported = [k for k, v in profile.simd_extensions.items() if not v]
+            lines.append(f"    [UNSUPPORTED] {', '.join(unsupported)}")
+        else:
+            lines.append("    [UNKNOWN] no reliable detection on this platform yet (no /proc/cpuinfo)")
 
         lines.append("--------------------------------------------------------------------------------")
         if profile.gpu_info:
             lines.append("  Detected Hardware Accelerators (GPU):")
             lines.append(f"    - Device:            {profile.gpu_info.get('name')}")
             lines.append(f"    - Driver Version:    {profile.gpu_info.get('driver')}")
-            lines.append(f"    - Dedicated VRAM:    {profile.gpu_info.get('vram_mb')} MB")
-            lines.append(f"    - APIs:              Vulkan 1.3 (Active) | CUDA Driver API (Supported)")
+            lines.append(f"    - Dedicated VRAM:    {profile.gpu_info.get('vram_mb') or 'unknown'} MB")
+            v = profile.gpu_info.get("vulkan_support")
+            if v is not None:
+                lines.append(f"    - Vulkan support:    {'yes' if v else 'no (detected, unverified)'}")
         else:
-            lines.append("  Detected Accelerators: None (Using multithreaded CPU kernel emulator)")
+            lines.append("  Detected Accelerators: none detected")
         lines.append("================================================================================")
         return "\n".join(lines)
 
