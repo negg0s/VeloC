@@ -1,3 +1,7 @@
+# VeloC CHANGELOG
+
+The history of versions 9.x - 1.0.0 took place during the active development stage without external verification, so statuses like 'General Availability'/'100% GREEN' in this file are internal designations of the author, not statements of fact for external use (see docs/audit/claims-audit.md). The numbering was adopted along the way: the project jumped through insufficient versions of 9.10/11/12 and now lives in SemVer 1.0.0 (see VERSION).
+
 # ЖУРНАЛ ИЗМЕНЕНИЙ (CHANGELOG.md)
 
 Все изменения, улучшения и исправления языка VeloC документируются здесь.

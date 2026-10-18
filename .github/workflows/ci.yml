@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  veloc:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install LLVM/Clang
+        run: choco install llvm -y --no-progress
+      - name: Show toolchain
+        run: python veloc.py dev-setup
+      - name: Golden tests
+        run: python veloc.py test
+      - name: Compiler checks (veloc ci)
+        run: python veloc.py ci

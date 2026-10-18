@@ -1,2 +1,2 @@
 @echo off
-python D:\VeloC\veloc.py clean --all
+python "%~dp0veloc.py" clean --all

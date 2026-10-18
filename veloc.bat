@@ -1,2 +1,2 @@
 @echo off
-python D:\VeloC\veloc.py %*
+python "%~dp0veloc.py" %*
