@@ -29,7 +29,7 @@ VeloC (Velocity + C) — экспериментальный компилятор
 ## Быстрый старт
 
 ```bash
-git clone https://github.com/NEGG0/VeloC.git
+git clone https://github.com/negg0s/VeloC.git
 cd VeloC
 python veloc.py --version       # версия и найденный Clang
 python veloc.py info            # CPU/тулчейн (если Clang не найден — подскажет)
