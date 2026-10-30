@@ -3,6 +3,8 @@
 [![CI](https://github.com/negg0s/VeloC/actions/workflows/ci.yml/badge.svg)](https://github.com/negg0s/VeloC/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+[English overview](README.en.md)
+
 VeloC (Velocity + C) — экспериментальный компилятор и диалект C++, написанный
 на Python: исходник `.vc` транслируется в C++ и собирается локальным Clang
 (Windows-first). **Статус проекта: исследовательский прототип, не production** —
