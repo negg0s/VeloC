@@ -1,6 +1,6 @@
 # Rust Interop (C-ABI) Guide for VeloC
 
-VeloC is designed from first principles with zero-overhead C-ABI compatibility (`extern "C"`). This allows seamless, bidirectional interoperation between Rust and VeloC without wrapper overhead or runtime garbage collection friction.
+VeloC is designed from first principles with zero-overhead C-ABI compatibility (`extern "C"`). This allows direct, bidirectional interoperation between Rust and VeloC without wrapper overhead or runtime garbage collection friction.
 
 ---
 

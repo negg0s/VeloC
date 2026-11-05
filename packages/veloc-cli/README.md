@@ -1,6 +1,6 @@
 # veloc-cli: Command-Line Framework & SIMD Search Tools for VeloC
 
-`veloc-cli` provides robust argument parsing, formatted ANSI terminal tables, and high-throughput AVX2 SIMD substring search for building command-line developer tools.
+`veloc-cli` provides typed argument parsing, formatted ANSI terminal tables, and high-throughput AVX2 SIMD substring search for building command-line developer tools.
 
 ## Architecture & Features
 
