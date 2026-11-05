@@ -2,7 +2,7 @@
 
 Историческая сводка по этапам разработки перенесена в
 [docs/history/PROGRESS-2026-10.md](docs/history/PROGRESS-2026-10.md);
-утверждения из неё не все проверены — см.
+утверждения из неё не все проверены - см.
 [docs/audit/claims-audit.md](docs/audit/claims-audit.md).
 
 Текущее состояние (2026-10-18, ветка `cleanup/veloc`):

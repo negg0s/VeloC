@@ -1008,7 +1008,7 @@ def main():
         print(f"  * Cache Directory: {CACHE_DIR}")
         print(f"  * Build Directory: {BUILD_DIR}")
         status = "operational (clang found)" if clang_found else "INCOMPLETE (clang++ not found; set VELOC_CLANG or install LLVM)"
-        print(f"  [STATUS] VeloC {VERSION} — {status}")
+        print(f"  [STATUS] VeloC {VERSION} - {status}")
         print("=" * 80)
     elif args.command == "crater":
         from crater import run_crater

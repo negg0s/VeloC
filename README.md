@@ -5,9 +5,9 @@
 
 [English overview](README.en.md)
 
-VeloC (Velocity + C) — экспериментальный компилятор и диалект C++, написанный
+VeloC (Velocity + C) - экспериментальный компилятор и диалект C++, написанный
 на Python: исходник `.vc` транслируется в C++ и собирается локальным Clang
-(Windows-first). **Статус проекта: исследовательский прототип, не production** —
+(Windows-first). **Статус проекта: исследовательский прототип, не production** -
 см. [docs/known-limitations.md](docs/known-limitations.md) и
 [docs/audit/claims-audit.md](docs/audit/claims-audit.md).
 
@@ -19,7 +19,7 @@ VeloC (Velocity + C) — экспериментальный компилятор
   Windows (`C:\Program Files\LLVM\...`, Windhawk-путь); без Clang вы получите
   понятную ошибку, а не сборку «из воздуха»;
 - проверенная на этой машине конфигурация: Windows 11, Python 3.12,
-  Clang 20.1.x (`--version` показывает найденный компилятор); Clang 18+ —
+  Clang 20.1.x (`--version` показывает найденный компилятор); Clang 18+ -
   минимальная заявка по синтаксису C++20, но она **не проверялась** на всех
   версиях;
 - `-march=native` включён по умолчанию для скорости; для переносимых
@@ -27,7 +27,7 @@ VeloC (Velocity + C) — экспериментальный компилятор
 
 ## Требования
 
-- Windows 10/11 x86_64 (Linux/macOS — не проверялись, см. known-limitations)
+- Windows 10/11 x86_64 (Linux/macOS - не проверялись, см. known-limitations)
 - Python 3.10+
 - Clang 18+ (проверено только на Clang 20.1.3)
 
@@ -37,7 +37,7 @@ VeloC (Velocity + C) — экспериментальный компилятор
 git clone https://github.com/negg0s/VeloC.git
 cd VeloC
 python veloc.py --version       # версия и найденный Clang
-python veloc.py info            # CPU/тулчейн (если Clang не найден — подскажет)
+python veloc.py info            # CPU/тулчейн (если Clang не найден - подскажет)
 python veloc.py run examples/hello.vc
 ```
 
@@ -59,7 +59,7 @@ python veloc.py build examples/hello.vc --portable         # без -march=nativ
 
 ## Основные команды CLI
 
-Полная таблица 50+ команд со статусом проверки — в
+Полная таблица 50+ команд со статусом проверки - в
 [docs/commands-status.md](docs/commands-status.md). Основные:
 
 | Команда | Описание | Статус на этой машине |
@@ -90,7 +90,7 @@ VeloC/
 ├── include/      # заголовки времени выполнения (veloc.h, veloc_core.h)
 ├── examples/     # примеры возможностей языка (используются CI)
 ├── tests/        # golden тесты, conformance, fuzzing
-├── benchmarks/   # скрипты измерений (числа — самозамеры, см. claims-audit)
+├── benchmarks/   # скрипты измерений (числа - самозамеры, см. claims-audit)
 ├── apps/         # приложения (veloc-db, veloc-render, veloc-llm …)
 ├── docs/         # документация, отчёты аудита, история
 ├── veloc.py      # CLI-драйвер (единая точка входа)
