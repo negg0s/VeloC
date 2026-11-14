@@ -48,3 +48,7 @@ wal.log
 game_frame_trace.json
 projects/bench_incremental/
 .veloc/learn/workspace/autograding/
+# Python cache
+*.pyc
+*.pyo
+*.pyd
