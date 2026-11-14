@@ -1,5 +1,5 @@
 """
-Comprehensive Compilation Speed & Phase Diagnostics Benchmark
+Compilation Speed & Phase Diagnostics Benchmark
 Measures cold and hot build times across:
 1. Empty program
 2. Hello World

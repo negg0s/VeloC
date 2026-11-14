@@ -1,4 +1,4 @@
-# The VeloC Book: Comprehensive Language & Systems Guide
+# The VeloC Book: Language & Systems Guide
 
 Welcome to **The VeloC Book**, the definitive guide to systems programming with VeloC - the zero-cost high-performance language designed for game engines, machine learning, numerical science, and real-time systems.
 

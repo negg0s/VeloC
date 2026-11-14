@@ -2,7 +2,7 @@ import unittest
 import time
 from src.macro_expander import MacroExpander
 
-class TestCompilerDoSRobustness(unittest.TestCase):
+class TestCompilerDoSDefense(unittest.TestCase):
     def test_recursive_macro_bomb_defense(self):
         bomb = '''
         macro_rules! bomb {

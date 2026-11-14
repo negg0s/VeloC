@@ -18,7 +18,7 @@ def run_benchmark():
     vc_exe = BUILD_DIR / "veloc_benchmark.exe"
 
     print("================================================================")
-    print("      VeloC vs Standard C++ Comprehensive Benchmark Suite       ")
+    print("      VeloC vs Standard C++ Benchmark Suite       ")
     print("================================================================")
 
     # 1. Compile Standard C++

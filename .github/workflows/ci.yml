@@ -12,6 +12,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Verify repository constraints
+        run: python tools/check_constraints.py
       - name: Install LLVM/Clang
         run: choco install llvm -y --no-progress
       - name: Show toolchain

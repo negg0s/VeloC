@@ -1,5 +1,5 @@
 """
-VeloC Comprehensive Numerics & Mathematical Accuracy Harness
+VeloC Numerics & Mathematical Accuracy Harness
 Evaluates precision contracts (Max ULP, Mean ULP, Error Distribution, Latency ns/elem)
 across standard functions against high-precision (double/quad) references.
 Outputs results to benchmarks/results/numerics_accuracy.json and docs/perf/accuracy_contracts.md.

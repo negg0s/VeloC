@@ -66,7 +66,7 @@ class MutationFuzzer:
 
 def run_fuzzer(iterations: int = 500):
     print("==================================================")
-    print("           VeloC Compiler Robustness Fuzzer       ")
+    print("           VeloC Compiler Stress Fuzzer       ")
     print("==================================================")
     print(f"Target: Running {iterations} mutation fuzzing iterations...")
     print("Invariant: Lexer and Parser must NEVER panic or raise unhandled crashes.\n")

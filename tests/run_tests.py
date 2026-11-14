@@ -1,4 +1,4 @@
-# Comprehensive Test Runner and CI Suite for VeloC
+# Automated Test Runner and CI Suite for VeloC
 # Supports positive tests, negative (should fail to compile) tests, and diagnostic snapshot testing.
 
 import sys

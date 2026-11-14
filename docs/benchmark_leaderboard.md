@@ -1,4 +1,4 @@
-# VeloC Comprehensive Benchmark Leaderboard
+# VeloC Benchmark Leaderboard
 
 Hardware Environment:
 - **Processor:** Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz (6 Physical Cores, 12 Threads)
