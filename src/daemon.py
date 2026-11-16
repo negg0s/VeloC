@@ -142,6 +142,10 @@ def daemon_client_request(req_dict: dict, host: str = HOST, port: int = PORT) ->
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+
+def stop_daemon(host: str = HOST, port: int = PORT) -> dict:
+    return daemon_client_request({"command": "stop"}, host=host, port=port)
+
 VeloCDaemonServer = CompilerDaemon
 
 if __name__ == "__main__":

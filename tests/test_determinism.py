@@ -65,8 +65,8 @@ def test_deterministic_builds():
     print("==================================================")
     print(f"Determinism Results: {passed} passed, {failed} failed")
     print("==================================================")
-    return failed == 0
+    assert failed == 0, f"Determinism failure: {failed} builds failed"
 
 if __name__ == "__main__":
-    success = test_deterministic_builds()
-    sys.exit(0 if success else 1)
+    test_deterministic_builds()
+    sys.exit(0)

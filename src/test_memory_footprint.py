@@ -9,7 +9,7 @@ import time
 import tracemalloc
 from pathlib import Path
 
-ROOT_DIR = Path("D:/VeloC")
+ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT_DIR / "src"))
 from lexer import Lexer
 from parser import Parser

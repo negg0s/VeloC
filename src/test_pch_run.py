@@ -2,9 +2,17 @@ import subprocess
 import time
 from pathlib import Path
 from pch_manager import PchManager, LLD_PATH
+from toolchain import CLANG_PATH
+
+if CLANG_PATH is None:
+    print("[VeloC PCH] Clang not found; skipping benchmark.")
+    raise SystemExit(0)
 
 pm = PchManager()
 pch = pm.ensure_pch('veloc.h', '-O3', profile="max-perf", verbose=True)
+if pch is None:
+    print("[VeloC PCH] PCH generation skipped.")
+    raise SystemExit(0)
 
 src = Path('.cache/test_pch_include.cpp')
 src.write_text("""#include <veloc.h>
@@ -16,7 +24,7 @@ int main() {
 
 flags = pm.get_pch_flags("-O3", "max-perf")
 cmd = [
-    'C:/Program Files/Windhawk/Compiler/bin/clang++.exe',
+    str(CLANG_PATH),
     *flags,
     '-include-pch', str(pch),
     '-fuse-ld=lld',

@@ -1,8 +1,13 @@
 import time
 import subprocess
 from pathlib import Path
+from toolchain import CLANG_PATH
 
-CLANG = "C:/Program Files/Windhawk/Compiler/bin/clang++.exe"
+if CLANG_PATH is None:
+    print("[VeloC Lean] Clang not found; skipping benchmark.")
+    raise SystemExit(0)
+
+CLANG = str(CLANG_PATH)
 src = Path(".cache/test_lean.cpp")
 
 t0 = time.perf_counter()

@@ -37,7 +37,6 @@ class PchManager:
             "-fno-exceptions",
             "-fno-rtti",
             "-fomit-frame-pointer",
-            "-I.",
             f"-I{self.include_dir}"
         ]
         if not portable:

@@ -11,18 +11,26 @@ import sys
 import subprocess
 import time
 from pathlib import Path
+import pytest
 
-ROOT_DIR = Path("D:/VeloC")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR / "src"))
+from toolchain import find_clang
+
 CACHE_DIR = ROOT_DIR / ".cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 def test_nan_propagation():
+    clang_bin = find_clang()
+    if clang_bin is None:
+        pytest.skip("clang++ compiler not found in environment")
+
     test_src = CACHE_DIR / "test_nan_prop.cpp"
     test_src.write_text('''
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
-#include "D:/VeloC/include/veloc_numerics.h"
+#include <veloc_numerics.h>
 
 int main() {
     float nan_val = NAN;
@@ -77,27 +85,22 @@ int main() {
 
     test_exe = CACHE_DIR / "test_nan_prop.exe"
     clang_cmd = [
-        "C:/Program Files/Windhawk/Compiler/bin/clang++.exe",
+        str(clang_bin),
         "-std=c++20",
         "-O3",
         "-fno-fast-math",
         "-frounding-math",
+        f"-I{ROOT_DIR / 'include'}",
         str(test_src),
         "-o", str(test_exe)
     ]
     res_compile = subprocess.run(clang_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if res_compile.returncode != 0:
-        print(f"[FAIL] Compilation failed:\n{res_compile.stderr}")
-        return False
+    assert res_compile.returncode == 0, f"Compilation failed:\n{res_compile.stderr}"
 
     res_run = subprocess.run([str(test_exe)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if res_run.returncode == 0 and "ALL_NAN_TESTS_PASSED" in res_run.stdout:
-        print("[PASS] IEEE-754 NaN and Infinity propagation verified successfully.")
-        return True
-    else:
-        print(f"[FAIL] Execution failed:\n{res_run.stderr}\n{res_run.stdout}")
-        return False
+    assert res_run.returncode == 0 and "ALL_NAN_TESTS_PASSED" in res_run.stdout, f"Execution failed:\n{res_run.stderr}\n{res_run.stdout}"
+    print("[PASS] IEEE-754 NaN and Infinity propagation verified successfully.")
 
 if __name__ == "__main__":
-    success = test_nan_propagation()
-    sys.exit(0 if success else 1)
+    test_nan_propagation()
+    sys.exit(0)

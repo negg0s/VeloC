@@ -9,12 +9,20 @@ Verifies that:
 import sys
 import subprocess
 from pathlib import Path
+import pytest
 
-ROOT_DIR = Path("D:/VeloC")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR / "src"))
+from toolchain import find_clang
+
 CACHE_DIR = ROOT_DIR / ".cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 def test_fp_reproducible():
+    clang_bin = find_clang()
+    if clang_bin is None:
+        pytest.skip("clang++ compiler not found in environment")
+
     test_src = CACHE_DIR / "test_repro.cpp"
     test_src.write_text('''
 #include <stdio.h>
@@ -24,7 +32,7 @@ def test_fp_reproducible():
 #include <assert.h>
 #include <thread>
 #include <vector>
-#include "D:/VeloC/include/veloc_numerics.h"
+#include <veloc_numerics.h>
 
 int main() {
     const size_t N = 100000;
@@ -91,29 +99,24 @@ int main() {
 
     test_exe = CACHE_DIR / "test_repro.exe"
     clang_cmd = [
-        "C:/Program Files/Windhawk/Compiler/bin/clang++.exe",
+        str(clang_bin),
         "-std=c++20",
         "-O3",
         "-static",
         "-fno-fast-math",
         "-frounding-math",
+        f"-I{ROOT_DIR / 'include'}",
         str(test_src),
         "-o", str(test_exe)
     ]
     res_compile = subprocess.run(clang_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if res_compile.returncode != 0:
-        print(f"[FAIL] Compilation failed:\n{res_compile.stderr}")
-        return False
+    assert res_compile.returncode == 0, f"Compilation failed:\n{res_compile.stderr}"
 
     res_run = subprocess.run([str(test_exe)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     print(res_run.stdout)
-    if res_run.returncode == 0 and "ALL_REPRODUCIBILITY_TESTS_PASSED" in res_run.stdout:
-        print("[PASS] Bit-for-bit reproducibility and Kahan error compensation verified.")
-        return True
-    else:
-        print(f"[FAIL] Execution failed:\n{res_run.stderr}")
-        return False
+    assert res_run.returncode == 0 and "ALL_REPRODUCIBILITY_TESTS_PASSED" in res_run.stdout, f"Execution failed:\n{res_run.stderr}"
+    print("[PASS] Bit-for-bit reproducibility and Kahan error compensation verified.")
 
 if __name__ == "__main__":
-    success = test_fp_reproducible()
-    sys.exit(0 if success else 1)
+    test_fp_reproducible()
+    sys.exit(0)

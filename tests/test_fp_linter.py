@@ -43,8 +43,7 @@ fn bad_fast_code(x: f32) -> bool {
     assert "FP-003" in rules_found, "FP-003 (unchecked division) must be detected"
 
     print("[PASS] All floating-point linter rules triggered as expected.")
-    return True
 
 if __name__ == "__main__":
-    success = test_linter()
-    sys.exit(0 if success else 1)
+    test_linter()
+    sys.exit(0)
