@@ -424,12 +424,14 @@ public:
         Sha256 ctx;
         ctx.update(data, len);
         auto d = ctx.finalize();
+        static constexpr char hex_digits[] = "0123456789abcdef";
         char buf[65];
         for (int i = 0; i < 32; ++i) {
-            std::sprintf(buf + i * 2, "%02x", d[i]);
+            buf[i * 2] = hex_digits[(d[i] >> 4) & 0x0f];
+            buf[i * 2 + 1] = hex_digits[d[i] & 0x0f];
         }
         buf[64] = '\0';
-        return std::string(buf);
+        return std::string(buf, 64);
     }
 };
 
